@@ -1,0 +1,408 @@
+.layer {
+  position: absolute;
+  z-index: 20;
+  inset: 0;
+  pointer-events: none;
+}
+
+.scrim {
+  position: absolute;
+  inset: 0;
+  background: rgb(5 12 28 / 66%);
+  pointer-events: auto;
+}
+
+.modal {
+  position: absolute;
+  z-index: 1;
+  top: 108px;
+  left: max(16px, calc(50% - 179px));
+  display: flex;
+  width: calc(100% - 32px);
+  max-width: 358px;
+  max-height: calc(100% - 124px);
+  flex-direction: column;
+  border-radius: 28px;
+  padding: 20px;
+  background: #ffffff;
+  color: #18243c;
+  pointer-events: auto;
+}
+
+.offerModal {
+  min-height: 500px;
+}
+
+.modalHeader {
+  display: grid;
+  min-height: 48px;
+  grid-template-columns: 48px 1fr 48px;
+  align-items: center;
+}
+
+.modalHeader h2 {
+  overflow: hidden;
+  margin: 0;
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font: 700 24px/30px Fregat, sans-serif;
+}
+
+.modalHeader button {
+  color: #18243c;
+}
+
+.modalBody {
+  display: flex;
+  min-height: 238px;
+  flex: 1;
+  flex-direction: column;
+  justify-content: center;
+  border-radius: 18px;
+  padding: 20px 16px;
+  background: #f1f5f9;
+  text-align: center;
+}
+
+.definition {
+  margin: 0;
+  color: #64748b;
+  font: 400 18px/24px Fregat, sans-serif;
+}
+
+.offerBody {
+  min-height: 256px;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.badge {
+  display: inline-flex;
+  min-height: 28px;
+  align-items: center;
+  align-self: center;
+  gap: 6px;
+  border-radius: 999px;
+  padding: 4px 10px;
+  background: #2563eb;
+  color: #ffffff;
+  font: 700 14px/20px Fregat, sans-serif;
+}
+
+.badge.product {
+  background: #f6c945;
+  color: #3a2d00;
+}
+
+.badge svg {
+  width: 16px;
+  height: 16px;
+}
+
+.offerDescription {
+  margin: 0;
+  color: #64748b;
+  font: 400 18px/22px Fregat, sans-serif;
+}
+
+.actions {
+  display: grid;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.sheet {
+  position: absolute;
+  z-index: 1;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  border-radius: 28px 28px 0 0;
+  padding: 0 16px 16px;
+  background: #ffffff;
+  color: #18243c;
+  pointer-events: auto;
+}
+
+.sheetHandle {
+  width: 36px;
+  height: 4px;
+  margin: 8px auto 0;
+  border-radius: 999px;
+  background: #cbd5e1;
+}
+
+.sheetHeader {
+  display: grid;
+  height: 56px;
+  grid-template-columns: 48px 1fr 48px;
+  align-items: center;
+}
+
+.sheetHeader h2 {
+  margin: 0;
+  text-align: center;
+  font: 700 24px/30px Fregat, sans-serif;
+}
+
+.sheetCopy {
+  margin: 0 16px 16px;
+  color: #64748b;
+  text-align: center;
+  font: 400 16px/24px Fregat, sans-serif;
+}
+
+.sheetActions {
+  display: grid;
+  gap: 12px;
+}
+
+.toggleList {
+  display: grid;
+  gap: 10px;
+  margin: 0 0 16px;
+}
+
+.toggleRow {
+  display: flex;
+  min-height: 56px;
+  align-items: center;
+  justify-content: space-between;
+  border-radius: 14px;
+  padding: 8px 12px;
+  background: #f1f5f9;
+  font: 700 18px/22px Fregat, sans-serif;
+}
+
+.switch {
+  position: relative;
+  width: 52px;
+  height: 30px;
+  border: 0;
+  border-radius: 999px;
+  padding: 0;
+  background: #cbd5e1;
+  cursor: pointer;
+}
+
+.switch::after {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #ffffff;
+  box-shadow: 0 1px 3px rgb(24 36 60 / 25%);
+  content: '';
+  transition: transform 160ms ease;
+}
+
+.switch.on {
+  background: #3b5bdb;
+}
+
+.switch.on::after {
+  transform: translateX(22px);
+}
+
+.rating {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin: 4px 0 16px;
+}
+
+.star {
+  width: 48px;
+  height: 48px;
+  border: 0;
+  padding: 8px;
+  background: transparent;
+  color: #cbd5e1;
+  cursor: pointer;
+}
+
+.star.active {
+  color: #f6c945;
+}
+
+.star svg {
+  width: 100%;
+  height: 100%;
+  fill: currentColor;
+}
+
+.feedbackLabel {
+  display: block;
+  margin: 0 0 6px;
+  font: 700 16px/22px Fregat, sans-serif;
+}
+
+.textarea {
+  width: 100%;
+  height: 128px;
+  resize: none;
+  border: 1px solid #cbd5e1;
+  border-radius: 14px;
+  padding: 12px;
+  background: #e2e8f0;
+  color: #18243c;
+  font: 400 16px/22px Fregat, sans-serif;
+}
+
+.bonusList {
+  display: grid;
+  gap: 10px;
+  margin: 8px 0 14px;
+  padding: 0;
+  list-style: none;
+}
+
+.bonusItem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 42px;
+  font: 700 18px/22px Fregat, sans-serif;
+}
+
+.bonusIndex {
+  display: grid;
+  width: 30px;
+  height: 30px;
+  place-items: center;
+  border-radius: 50%;
+  background: #f1f5f9;
+  color: #94a3b8;
+  font-size: 14px;
+}
+
+.envelopePanel {
+  display: grid;
+  grid-template-columns: 74px 1fr;
+  align-items: center;
+  border: 1px solid #d8e0ec;
+  border-radius: 14px;
+  padding: 8px;
+}
+
+.envelopePanel img {
+  width: 70px;
+  height: 56px;
+  object-fit: contain;
+}
+
+.envelopePanel strong,
+.envelopePanel small {
+  display: block;
+}
+
+.envelopePanel small {
+  margin-top: 4px;
+  color: #64748b;
+}
+
+.rewardModal {
+  top: 72px;
+  min-height: 560px;
+}
+
+.rewardTitle {
+  margin: 0 0 16px;
+  text-align: center;
+  font: 700 27px/34px Fregat, sans-serif;
+}
+
+.rewardGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.rewardCard {
+  min-height: 300px;
+  border: 2px solid #d8e0ec;
+  border-radius: 20px;
+  padding: 14px 10px;
+  background: #ffffff;
+  color: #18243c;
+  text-align: center;
+  cursor: pointer;
+}
+
+.rewardCard.selected {
+  border-color: #3b5bdb;
+  box-shadow: inset 0 0 0 2px #3b5bdb;
+}
+
+.rewardCard img {
+  width: 150px;
+  height: 160px;
+  margin: 0 auto 8px;
+  object-fit: contain;
+}
+
+.rewardCard h3 {
+  margin: 0;
+  font: 700 23px/28px Fregat, sans-serif;
+}
+
+.rewardCard p {
+  margin: 6px 0 0;
+  color: #64748b;
+  font: 400 17px/22px Fregat, sans-serif;
+}
+
+.rewardAction {
+  margin-top: 20px;
+}
+
+.toast {
+  position: absolute;
+  z-index: 3;
+  top: 80px;
+  right: 16px;
+  left: 16px;
+  border-radius: 14px;
+  padding: 14px 16px;
+  background: #ffffff;
+  color: #18243c;
+  box-shadow: 0 8px 28px rgb(5 12 28 / 28%);
+  text-align: center;
+  pointer-events: none;
+  font: 700 18px/22px Fregat, sans-serif;
+}
+
+.toast.success {
+  border-left: 5px solid #22c55e;
+}
+
+.toast.error {
+  border-left: 5px solid #ef4444;
+}
+
+@media (max-height: 760px) {
+  .modal {
+    top: 16px;
+    max-height: calc(100% - 32px);
+  }
+
+  .offerModal {
+    min-height: min(500px, calc(100% - 32px));
+  }
+
+  .rewardModal {
+    top: 12px;
+    min-height: 0;
+  }
+
+  .rewardCard {
+    min-height: 250px;
+  }
+
+  .rewardCard img {
+    height: 120px;
+  }
+}

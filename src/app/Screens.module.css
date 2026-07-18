@@ -1,0 +1,554 @@
+.screen {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background: #111a33;
+  color: #ffffff;
+}
+
+.header {
+  display: grid;
+  height: 56px;
+  grid-template-columns: 48px 1fr 48px;
+  align-items: center;
+  margin: 16px;
+}
+
+.headerTitle {
+  overflow: hidden;
+  margin: 0;
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font: 700 24px/30px Fregat, sans-serif;
+}
+
+.knowledgeBadge {
+  display: flex;
+  width: 96px;
+  height: 56px;
+  align-items: center;
+  justify-content: space-between;
+  justify-self: end;
+  border-radius: 12px;
+  padding: 6px 12px 6px 8px;
+  background: #ffffff;
+  color: #18243c;
+  font: 700 24px/30px Fregat, sans-serif;
+}
+
+.knowledgeBadge img {
+  width: 42px;
+  height: 42px;
+  object-fit: contain;
+}
+
+.homeHeader {
+  margin-top: 16px;
+}
+
+.homeHeader .headerTitle {
+  font-size: 24px;
+}
+
+.homeActions {
+  position: absolute;
+  top: 80px;
+  right: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.homeKnowledge {
+  position: absolute;
+  top: 112px;
+  left: 50%;
+  width: 141px;
+  transform: translateX(-50%);
+}
+
+.chapterRail {
+  position: absolute;
+  top: 224px;
+  left: 0;
+  display: flex;
+  width: 100%;
+  align-items: center;
+  gap: 24px;
+  overflow: hidden;
+  padding-left: calc(50% - 93px);
+}
+
+.chapterCard {
+  position: relative;
+  display: flex;
+  width: 186px;
+  height: 226px;
+  flex: 0 0 186px;
+  flex-direction: column;
+  align-items: center;
+  border: 3px solid #3b5bdb;
+  border-radius: 24px;
+  padding: 18px 12px 14px;
+  background: #38bdf8;
+  color: #ffffff;
+}
+
+.chapterCard::after {
+  position: absolute;
+  top: 50%;
+  right: -28px;
+  width: 24px;
+  height: 8px;
+  border-radius: 99px;
+  background: #e2e8f0;
+  content: '';
+}
+
+.chapterCard img {
+  width: 132px;
+  height: 132px;
+  object-fit: contain;
+}
+
+.chapterValue {
+  margin-top: -2px;
+  font: 400 30px/34px Fregat, sans-serif;
+}
+
+.chapterLabel {
+  margin-top: 2px;
+  text-align: center;
+  font: 700 15px/18px Fregat, sans-serif;
+}
+
+.nextChapter {
+  width: 150px;
+  height: 154px;
+  flex: 0 0 150px;
+  border: 1px solid #d8e0ec;
+  border-radius: 18px;
+  padding: 12px;
+  background: #f1f5f9;
+  color: #18243c;
+  text-align: center;
+}
+
+.nextChapter img {
+  width: 94px;
+  height: 94px;
+  margin: 0 auto;
+  object-fit: contain;
+}
+
+.nextChapter strong,
+.nextChapter small {
+  display: block;
+}
+
+.nextChapter strong {
+  font-size: 14px;
+}
+
+.nextChapter small {
+  color: #64748b;
+  font-size: 11px;
+}
+
+.goldenCard {
+  position: absolute;
+  right: 16px;
+  bottom: 124px;
+  left: 16px;
+  display: grid;
+  height: 88px;
+  grid-template-columns: 80px 1fr;
+  align-items: center;
+  border: 0;
+  border-radius: 14px;
+  padding: 10px 14px 10px 8px;
+  background: #ffffff;
+  color: #18243c;
+  text-align: left;
+  cursor: pointer;
+}
+
+.goldenCard:disabled {
+  cursor: default;
+}
+
+.goldenCard img {
+  width: 76px;
+  height: 66px;
+  object-fit: contain;
+}
+
+.progressCopy {
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+}
+
+.progressCopy strong {
+  font-size: 16px;
+}
+
+.progressCopy small {
+  color: #64748b;
+  font-size: 14px;
+}
+
+.homeCta {
+  position: absolute;
+  right: 16px;
+  bottom: 16px;
+  left: 16px;
+}
+
+.narrativeContent {
+  position: absolute;
+  right: 16px;
+  bottom: 20px;
+  left: 16px;
+  display: flex;
+  min-height: 586px;
+  flex-direction: column;
+  align-items: center;
+  border-radius: 28px;
+  padding: 24px 20px 20px;
+  background: #ffffff;
+  color: #18243c;
+}
+
+.narrativeEyebrow {
+  margin: 0;
+  color: #3b5bdb;
+  font: 700 18px/24px Fregat, sans-serif;
+}
+
+.narrativeTitle {
+  margin: 6px 0 4px;
+  text-align: center;
+  font: 700 30px/36px Fregat, sans-serif;
+}
+
+.narrativeCharacter {
+  width: 252px;
+  height: 252px;
+  margin: 4px auto 0;
+  object-fit: contain;
+}
+
+.narrativeSpeech {
+  margin: -2px 0 18px;
+  text-align: center;
+  color: #64748b;
+  font: 400 20px/28px Fregat, sans-serif;
+}
+
+.narrativeContent > button {
+  margin-top: auto;
+}
+
+.game {
+  position: relative;
+  height: 100%;
+}
+
+.gameHeader {
+  margin-bottom: 0;
+}
+
+.gameHeader .knowledgeBadge {
+  width: 96px;
+  height: 48px;
+}
+
+.gameBoardSlot {
+  position: absolute;
+  top: 72px;
+  right: 0;
+  left: 0;
+}
+
+.mentorTip {
+  position: absolute;
+  z-index: 4;
+  top: 80px;
+  right: 16px;
+  left: 16px;
+  display: grid;
+  height: 64px;
+  grid-template-columns: 52px 1fr;
+  align-items: center;
+  border: 1px solid #d8e0ec;
+  border-radius: 16px;
+  padding: 5px 12px 5px 6px;
+  background: #ffffff;
+  color: #18243c;
+  box-shadow: 0 4px 0 rgb(184 196 214 / 55%);
+}
+
+.mentorTip img {
+  width: 52px;
+  height: 52px;
+  object-fit: contain;
+}
+
+.mentorTip p {
+  display: -webkit-box;
+  overflow: hidden;
+  margin: 0;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  font: 400 16px/22px Fregat, sans-serif;
+}
+
+.gameControls {
+  position: absolute;
+  right: 16px;
+  bottom: 10px;
+  left: 16px;
+  display: grid;
+  grid-template-columns: 86px 1fr 86px;
+  align-items: end;
+  justify-items: center;
+}
+
+.hintButton {
+  position: relative;
+  display: grid;
+  width: 82px;
+  height: 82px;
+  place-items: end center;
+  overflow: visible;
+  border: 1px solid #d8e0ec;
+  border-radius: 14px;
+  padding: 0;
+  background: #ffffff;
+  cursor: pointer;
+}
+
+.hintButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.hintButton img {
+  width: 72px;
+  height: 72px;
+  object-fit: contain;
+}
+
+.hintCount {
+  position: absolute;
+  top: -8px;
+  right: -6px;
+  display: grid;
+  width: 30px;
+  height: 30px;
+  place-items: center;
+  border: 2px solid #ffffff;
+  border-radius: 50%;
+  background: #3b5bdb;
+  color: #ffffff;
+  font: 700 16px/1 Fregat, sans-serif;
+}
+
+.envelopeProgress {
+  position: relative;
+  display: grid;
+  width: 142px;
+  justify-items: center;
+}
+
+.envelopeProgress img {
+  position: absolute;
+  z-index: 1;
+  top: 19px;
+  width: 94px;
+  height: 76px;
+  object-fit: contain;
+}
+
+.envelopeValue {
+  margin-top: -2px;
+  font: 700 24px/30px Fregat, sans-serif;
+}
+
+.bonusListButton {
+  width: 48px;
+  height: 48px;
+  border: 0;
+  border-radius: 12px;
+  background: rgb(255 255 255 / 12%);
+  color: #ffffff;
+  font: 700 18px/1 Fregat, sans-serif;
+  cursor: pointer;
+}
+
+.resultsContent {
+  padding: 12px 16px 16px;
+}
+
+.resultsHeading {
+  display: grid;
+  grid-template-columns: 48px 1fr;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 12px;
+}
+
+.resultsHeading h1 {
+  margin: 0;
+  font: 700 28px/34px Fregat, sans-serif;
+}
+
+.resultsKnowledge {
+  width: 141px;
+  margin: 0 auto 16px;
+}
+
+.resultsSummary {
+  display: grid;
+  gap: 12px;
+  border-radius: 16px;
+  padding: 16px;
+  background: #f1f5f9;
+  color: #18243c;
+}
+
+.summaryRow {
+  display: flex;
+  justify-content: space-between;
+  font: 700 16px/20px Fregat, sans-serif;
+}
+
+.resultsPercent {
+  margin: 2px 0 0;
+  color: #94a3b8;
+  text-align: center;
+  font-size: 16px;
+}
+
+.chapterResult {
+  display: grid;
+  grid-template-columns: 112px 1fr;
+  align-items: center;
+  gap: 8px;
+  margin: 26px 8px 18px;
+}
+
+.chapterResult h2 {
+  margin: 0 0 4px;
+  font: 700 22px/28px Fregat, sans-serif;
+}
+
+.chapterResult p {
+  margin: 0;
+  font-size: 16px;
+}
+
+.resultsGolden {
+  position: static;
+  display: grid;
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+.resultsActions {
+  display: grid;
+  gap: 12px;
+}
+
+.appearanceContent {
+  padding: 0 16px 16px;
+}
+
+.appearanceTabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin: 12px 0 20px;
+}
+
+.appearanceGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.appearanceCard {
+  min-height: 230px;
+  border: 2px solid #d8e0ec;
+  border-radius: 20px;
+  padding: 12px;
+  background: #ffffff;
+  color: #18243c;
+  text-align: center;
+}
+
+.appearanceCard.selected {
+  border-color: #3b5bdb;
+  box-shadow: inset 0 0 0 2px #3b5bdb;
+}
+
+.appearanceCard img {
+  width: 132px;
+  height: 132px;
+  margin: 0 auto;
+  object-fit: contain;
+}
+
+.appearanceCard h2 {
+  margin: 8px 0 0;
+  font-size: 20px;
+}
+
+.appearanceCard p {
+  margin: 4px 0 0;
+  color: #64748b;
+  font-size: 15px;
+}
+
+@media (max-height: 760px) {
+  .homeKnowledge {
+    top: 82px;
+  }
+
+  .chapterRail {
+    top: 182px;
+  }
+
+  .goldenCard {
+    bottom: 104px;
+  }
+
+  .narrativeContent {
+    min-height: calc(100% - 88px);
+  }
+
+  .narrativeCharacter {
+    width: 220px;
+    height: 220px;
+  }
+}
+
+@media (max-width: 340px) {
+  .header {
+    margin-right: 10px;
+    margin-left: 10px;
+  }
+
+  .gameControls {
+    right: 10px;
+    left: 10px;
+  }
+
+  .resultsContent,
+  .appearanceContent {
+    padding-right: 10px;
+    padding-left: 10px;
+  }
+}

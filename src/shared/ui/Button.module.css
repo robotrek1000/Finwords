@@ -1,0 +1,68 @@
+.button {
+  --button-surface: #3b5bdb;
+  --button-step: #2d46b7;
+  --button-text: #ffffff;
+  appearance: none;
+  width: 100%;
+  min-height: 48px;
+  border: 0;
+  border-radius: 12px;
+  padding: 8px 18px;
+  background: var(--button-surface);
+  color: var(--button-text);
+  box-shadow: 0 4px 0 var(--button-step);
+  font: 700 24px/30px Fregat, sans-serif;
+  cursor: pointer;
+  transition:
+    transform 100ms ease,
+    box-shadow 100ms ease,
+    filter 150ms ease;
+  touch-action: manipulation;
+}
+
+.button:hover:not(:disabled) {
+  filter: brightness(1.03);
+}
+
+.button:active:not(:disabled),
+.pressed {
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 var(--button-step);
+}
+
+.large {
+  min-height: 56px;
+}
+
+.secondary {
+  --button-surface: #ffffff;
+  --button-step: #b8c4d6;
+  --button-text: #64748b;
+  border: solid #d8e0ec;
+  border-width: 1px 1px 0;
+}
+
+.ghost {
+  --button-surface: transparent;
+  --button-step: #b8c4d6;
+  --button-text: #ffffff;
+}
+
+.button:disabled {
+  --button-surface: #e2e8f0;
+  --button-step: #b4c0d0;
+  --button-text: #64748b;
+  cursor: not-allowed;
+  filter: none;
+}
+
+.compactText {
+  font-size: 20px;
+  line-height: 26px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .button {
+    transition: none;
+  }
+}

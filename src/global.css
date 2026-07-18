@@ -1,0 +1,101 @@
+@font-face {
+  font-family: Fregat;
+  src: url('/fonts/Fregat-Regular.otf') format('opentype');
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: Fregat;
+  src: url('/fonts/Fregat-Bold.otf') format('opentype');
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: Fregat;
+  src: url('/fonts/Fregat-Italic.otf') format('opentype');
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: Fregat;
+  src: url('/fonts/Fregat-BoldItalic.otf') format('opentype');
+  font-style: italic;
+  font-weight: 700;
+  font-display: swap;
+}
+
+:root {
+  font-family: Fregat, system-ui, sans-serif;
+  color: #ffffff;
+  background: #091124;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  --host-blue: #315dcc;
+  --navy: #111a33;
+  --surface: #ffffff;
+  --surface-muted: #f1f5f9;
+  --text: #18243c;
+  --muted: #64748b;
+  --border: #d8e0ec;
+  --primary: #3b5bdb;
+  --primary-step: #2d46b7;
+  --bonus: #38bdf8;
+  --reward: #f6c945;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  width: 100%;
+  min-width: 320px;
+  height: 100%;
+  min-height: 100%;
+  margin: 0;
+}
+
+body {
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 50% 10%, rgb(49 93 204 / 18%), transparent 36%),
+    #091124;
+}
+
+button,
+textarea,
+input {
+  font: inherit;
+}
+
+button:focus-visible,
+textarea:focus-visible,
+input:focus-visible {
+  outline: 3px solid #93c5fd;
+  outline-offset: 2px;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
