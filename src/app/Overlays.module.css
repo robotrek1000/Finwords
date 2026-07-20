@@ -12,16 +12,24 @@
   pointer-events: auto;
 }
 
-.modal {
+.modalPositioner {
   position: absolute;
   z-index: 1;
-  top: 108px;
-  left: max(16px, calc(50% - 179px));
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  pointer-events: none;
+}
+
+.modal {
+  position: relative;
   display: flex;
-  width: calc(100% - 32px);
+  width: 100%;
   max-width: 358px;
-  max-height: calc(100% - 124px);
+  max-height: 100%;
   flex-direction: column;
+  overflow-y: auto;
   border-radius: 28px;
   padding: 20px;
   background: #ffffff;
@@ -51,6 +59,14 @@
 
 .modalHeader button {
   color: #18243c;
+}
+
+.lightClose {
+  color: #18243c;
+}
+
+.lightClose:hover {
+  background: rgb(24 36 60 / 6%);
 }
 
 .modalBody {
@@ -175,6 +191,17 @@
   font: 700 18px/22px Fregat, sans-serif;
 }
 
+.toggleLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.toggleLabel svg {
+  width: 24px;
+  height: 24px;
+}
+
 .switch {
   position: relative;
   width: 52px;
@@ -212,6 +239,12 @@
   justify-content: center;
   gap: 8px;
   margin: 4px 0 16px;
+}
+
+.feedbackQuestion {
+  margin: 0 0 6px;
+  text-align: center;
+  font: 700 16px/22px Fregat, sans-serif;
 }
 
 .star {
@@ -252,12 +285,42 @@
   font: 400 16px/22px Fregat, sans-serif;
 }
 
+.feedbackCounter {
+  margin: -26px 12px 10px;
+  color: #64748b;
+  text-align: right;
+  pointer-events: none;
+  font: 400 12px/16px Fregat, sans-serif;
+}
+
+.bonusModal {
+  height: min(516px, calc(100% - 32px));
+}
+
 .bonusList {
   display: grid;
   gap: 10px;
+  min-height: 0;
+  overflow-y: auto;
   margin: 8px 0 14px;
   padding: 0;
   list-style: none;
+}
+
+.bonusModalEmpty {
+  height: min(444px, calc(100% - 32px));
+}
+
+.bonusListEmpty {
+  flex: 1;
+  place-items: center;
+  overflow: hidden;
+}
+
+.emptyBonusMessage {
+  color: #64748b;
+  text-align: center;
+  font: 700 18px/24px Fregat, sans-serif;
 }
 
 .bonusItem {
@@ -266,6 +329,13 @@
   gap: 12px;
   min-height: 42px;
   font: 700 18px/22px Fregat, sans-serif;
+}
+
+.bonusFoundCount {
+  margin: 12px 0 0;
+  color: #64748b;
+  text-align: center;
+  font: 400 14px/14px Fregat, sans-serif;
 }
 
 .bonusIndex {
@@ -305,7 +375,6 @@
 }
 
 .rewardModal {
-  top: 72px;
   min-height: 560px;
 }
 
@@ -384,17 +453,11 @@
 }
 
 @media (max-height: 760px) {
-  .modal {
-    top: 16px;
-    max-height: calc(100% - 32px);
-  }
-
   .offerModal {
     min-height: min(500px, calc(100% - 32px));
   }
 
   .rewardModal {
-    top: 12px;
     min-height: 0;
   }
 

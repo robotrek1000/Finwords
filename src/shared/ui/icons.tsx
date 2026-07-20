@@ -9,7 +9,10 @@ export type IconName =
   | 'product'
   | 'star'
   | 'check'
-  | 'hint';
+  | 'hint'
+  | 'music'
+  | 'sound'
+  | 'alert';
 
 interface IconProps extends SVGProps<SVGSVGElement> {
   name: IconName;
@@ -87,6 +90,28 @@ export function Icon({ name, ...props }: IconProps) {
       return (
         <svg {...common}>
           <path d="M9 18h6M10 22h4M8.5 14.5A6 6 0 1 1 15.5 14c-.9.7-1.5 1.6-1.5 2.5h-4c0-.8-.6-1.5-1.5-2Z" />
+        </svg>
+      );
+    case 'music':
+      return (
+        <svg {...common}>
+          <path d="M9 18V5l10-2v13" />
+          <circle cx="6" cy="18" r="3" />
+          <circle cx="16" cy="16" r="3" />
+        </svg>
+      );
+    case 'sound':
+      return (
+        <svg {...common}>
+          <path d="M5 9v6h4l5 4V5L9 9H5Z" />
+          <path d="M17 9a4 4 0 0 1 0 6M19 6a8 8 0 0 1 0 12" />
+        </svg>
+      );
+    case 'alert':
+      return (
+        <svg {...common}>
+          <circle cx="12" cy="12" r="9" />
+          <path d="M12 7v6M12 17h.01" />
         </svg>
       );
   }

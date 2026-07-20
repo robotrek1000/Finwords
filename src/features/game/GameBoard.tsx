@@ -2,6 +2,7 @@ import { useMemo, useRef, useState } from 'react';
 import type { PointerEvent } from 'react';
 import type { CellId, LevelConfig, TargetWord } from '../../app/types';
 import {
+  cellToCoordinates,
   evaluateSelection,
   extendSelection,
   lockedCellMap,
@@ -17,6 +18,7 @@ interface GameBoardProps {
   hintRevealedCount?: number;
   onSubmit: (result: SelectionResult, path: CellId[]) => void;
   onOpenTarget: (target: TargetWord) => void;
+  onSelectionChange: (word: string, path: CellId[]) => void;
 }
 
 export function GameBoard({
@@ -26,6 +28,7 @@ export function GameBoard({
   hintRevealedCount = 0,
   onSubmit,
   onOpenTarget,
+  onSelectionChange,
 }: GameBoardProps) {
   const boardRef = useRef<HTMLDivElement>(null);
   const pointerIdRef = useRef<number | undefined>(undefined);
@@ -40,11 +43,20 @@ export function GameBoard({
   const lockedCellIds = useMemo(() => new Set(lockedCells.keys()), [lockedCells]);
   const selectedCells = useMemo(() => new Set(selection), [selection]);
   const bonusFlashCells = useMemo(() => new Set(bonusFlash), [bonusFlash]);
-  const hintedCells = useMemo(
-    () => new Set(hintTarget?.path.slice(0, hintRevealedCount) ?? []),
+  const revealedHintPath = useMemo(
+    () => hintTarget?.path.slice(0, hintRevealedCount) ?? [],
     [hintRevealedCount, hintTarget],
   );
-  const nextHintCell = hintTarget?.path[hintRevealedCount];
+  const previousHintCells = useMemo(
+    () => new Set(revealedHintPath.slice(0, -1)),
+    [revealedHintPath],
+  );
+  const currentHintCell = revealedHintPath.at(-1);
+
+  function setActiveSelection(next: CellId[]) {
+    setSelection(next);
+    onSelectionChange(next.length ? wordFromPath(level, next) : '', next);
+  }
 
   function finishSelection() {
     const targetTap = tappedTargetRef.current;
@@ -63,7 +75,7 @@ export function GameBoard({
       window.setTimeout(() => setBonusFlash([]), 700);
     }
     onSubmit(result, path);
-    setSelection([]);
+    setActiveSelection([]);
   }
 
   function handlePointerDown(event: PointerEvent<HTMLButtonElement>, cellId: CellId) {
@@ -76,7 +88,7 @@ export function GameBoard({
 
     pointerIdRef.current = event.pointerId;
     isSelectingRef.current = true;
-    setSelection([cellId]);
+    setActiveSelection([cellId]);
     boardRef.current?.setPointerCapture(event.pointerId);
   }
 
@@ -90,7 +102,13 @@ export function GameBoard({
     if (!nextCell) {
       return;
     }
-    setSelection((current) => extendSelection(current, nextCell, lockedCellIds));
+    setSelection((current) => {
+      const next = extendSelection(current, nextCell, lockedCellIds);
+      if (next !== current) {
+        onSelectionChange(next.length ? wordFromPath(level, next) : '', next);
+      }
+      return next;
+    });
   }
 
   function handlePointerUp(event: PointerEvent<HTMLDivElement>) {
@@ -109,25 +127,53 @@ export function GameBoard({
     pointerIdRef.current = undefined;
     isSelectingRef.current = false;
     tappedTargetRef.current = undefined;
-    setSelection([]);
+    setActiveSelection([]);
   }
 
   return (
-    <div className={styles.gameArea}>
-      <div
-        className={`${styles.selectionLabel} ${selection.length ? '' : styles.empty}`}
-        aria-live="polite"
-      >
-        {selection.length ? wordFromPath(level, selection) : 'Выберите слово'}
-      </div>
-      <div
-        ref={boardRef}
-        className={styles.board}
-        onPointerMove={handlePointerMove}
-        onPointerUp={handlePointerUp}
-        onPointerCancel={handlePointerCancel}
-        aria-label={`Игровое поле уровня ${level.id}`}
-      >
+    <div
+      ref={boardRef}
+      className={styles.board}
+      onPointerMove={handlePointerMove}
+      onPointerUp={handlePointerUp}
+      onPointerCancel={handlePointerCancel}
+      aria-label={`Игровое поле уровня ${level.id}`}
+    >
+      {revealedHintPath.length > 1 ? (
+        <svg
+          className={styles.hintArrows}
+          viewBox="0 0 100 100"
+          preserveAspectRatio="none"
+          aria-hidden="true"
+        >
+          <defs>
+            <marker
+              id="hint-arrowhead"
+              markerWidth="5"
+              markerHeight="5"
+              refX="4"
+              refY="2.5"
+              orient="auto"
+            >
+              <path d="M0,0 L5,2.5 L0,5 Z" />
+            </marker>
+          </defs>
+          {revealedHintPath.slice(1).map((cellId, index) => {
+            const [fromRow, fromColumn] = cellToCoordinates(revealedHintPath[index]);
+            const [toRow, toColumn] = cellToCoordinates(cellId);
+            return (
+              <line
+                key={`${revealedHintPath[index]}-${cellId}`}
+                x1={((fromColumn - 0.5) / 6) * 100}
+                y1={((fromRow - 0.5) / 6) * 100}
+                x2={((toColumn - 0.5) / 6) * 100}
+                y2={((toRow - 0.5) / 6) * 100}
+                markerEnd="url(#hint-arrowhead)"
+              />
+            );
+          })}
+        </svg>
+      ) : null}
         {level.grid.flatMap((row, rowIndex) =>
           row.map((letter, columnIndex) => {
             const cellId = `${rowIndex + 1}:${columnIndex + 1}` as CellId;
@@ -137,8 +183,8 @@ export function GameBoard({
               selectedCells.has(cellId) ? styles.selected : '',
               foundTarget ? styles.found : '',
               bonusFlashCells.has(cellId) ? styles.bonusFlash : '',
-              hintedCells.has(cellId) ? styles.hinted : '',
-              nextHintCell === cellId ? styles.hintNext : '',
+              previousHintCells.has(cellId) ? styles.hintPrevious : '',
+              currentHintCell === cellId ? styles.hintCurrent : '',
             ]
               .filter(Boolean)
               .join(' ');
@@ -163,7 +209,6 @@ export function GameBoard({
             );
           }),
         )}
-      </div>
     </div>
   );
 }

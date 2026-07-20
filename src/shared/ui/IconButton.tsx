@@ -6,19 +6,30 @@ interface IconButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   icon: IconName;
   label: string;
   variant?: 'surface' | 'ghost';
+  depth?: 'flat' | 'raised';
 }
 
 export function IconButton({
   icon,
   label,
   variant = 'surface',
+  depth = variant === 'surface' ? 'raised' : 'flat',
   className = '',
   ...props
 }: IconButtonProps) {
+  const classes = [
+    styles.button,
+    variant === 'ghost' ? styles.ghost : styles.surface,
+    depth === 'raised' ? styles.raised : styles.flat,
+    className,
+  ]
+    .filter(Boolean)
+    .join(' ');
+
   return (
     <button
       type="button"
-      className={`${styles.button} ${variant === 'ghost' ? styles.ghost : ''} ${className}`}
+      className={classes}
       aria-label={label}
       {...props}
     >

@@ -121,12 +121,12 @@ export function App() {
   }, [finishToast, state.toast]);
 
   useEffect(() => {
-    if (!state.currentMentor) {
+    if (!state.currentMentor || state.toast || state.overlay !== 'none') {
       return;
     }
     const timer = window.setTimeout(() => dispatch({ type: 'DISMISS_MENTOR' }), 3200);
     return () => window.clearTimeout(timer);
-  }, [state.currentMentor]);
+  }, [state.currentMentor, state.overlay, state.toast]);
 
   useEffect(() => {
     function advanceTransient(event: Event) {
@@ -349,11 +349,33 @@ export function App() {
       return;
     }
 
+    if (result.type === 'target-wrong-path' && result.target) {
+      if (progress.foundTargetIds.includes(result.target.id)) {
+        setToast('Это слово уже найдено', 'info');
+        return;
+      }
+      dispatch({ type: 'REGISTER_INVALID' });
+      track('invalid_word_submitted', {
+        levelId: level.id,
+        word: result.word,
+        path,
+        reason: 'noncanonical_target_path',
+        targetId: result.target.id,
+      });
+      setToast('Попробуйте собрать слово по-другому', 'info');
+      if (progress.invalidStreak + 1 >= 3) {
+        queueMentor(INVALID_CUE);
+        dispatch({ type: 'RESET_INVALID_STREAK' });
+      }
+      return;
+    }
+
     dispatch({ type: 'REGISTER_INVALID' });
     track('invalid_word_submitted', {
       levelId: level.id,
       word: result.word,
       path,
+      reason: 'unknown_word',
     });
     setToast('Это слово не загадано', 'error');
     if (progress.invalidStreak + 1 >= 3) {

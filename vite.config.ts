@@ -5,7 +5,7 @@ export default defineConfig({
   base: process.env.VITE_BASE_URL ?? '/',
   plugins: [react()],
   test: {
-    include: ['src/**/*.test.ts'],
+    include: ['src/**/*.test.{ts,tsx}'],
     environment: 'jsdom',
     setupFiles: './src/test/setup.ts',
     css: true,

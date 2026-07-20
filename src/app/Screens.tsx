@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import { getLevel } from '../content/levels';
 import { GameBoard } from '../features/game/GameBoard';
@@ -12,6 +13,7 @@ import type {
 } from './types';
 import { Button } from '../shared/ui/Button';
 import { IconButton } from '../shared/ui/IconButton';
+import { Icon } from '../shared/ui/icons';
 import { CircularProgress, LinearProgress } from '../shared/ui/Progress';
 import styles from './Screens.module.css';
 
@@ -26,12 +28,22 @@ const ASSETS = {
 
 interface KnowledgeBadgeProps {
   value: number;
+  size?: 'compact' | 'feature';
   className?: string;
 }
 
-function KnowledgeBadge({ value, className = '' }: KnowledgeBadgeProps) {
+function KnowledgeBadge({
+  value,
+  size = 'compact',
+  className = '',
+}: KnowledgeBadgeProps) {
   return (
-    <div className={`${styles.knowledgeBadge} ${className}`} aria-label={`Знания: ${value}`}>
+    <div
+      className={`${styles.knowledgeBadge} ${
+        size === 'feature' ? styles.knowledgeFeature : styles.knowledgeCompact
+      } ${className}`}
+      aria-label={`Знания: ${value}`}
+    >
       <img src={ASSETS.certificate} alt="" />
       <span>{value}</span>
     </div>
@@ -72,11 +84,25 @@ export function HomeScreen({
         <IconButton icon="palette" label="Облики" onClick={onOpenAppearance} />
       </div>
 
-      <KnowledgeBadge value={state.knowledge} className={styles.homeKnowledge} />
+      <KnowledgeBadge
+        value={state.knowledge}
+        size="feature"
+        className={styles.homeKnowledge}
+      />
 
       <div className={styles.chapterRail}>
         <article className={styles.chapterCard}>
-          <img src={ASSETS.cushion} alt="" />
+          <div className={styles.chapterVisual}>
+            <CircularProgress
+              current={completed}
+              max={2}
+              color="#3B5BDB"
+              size={152}
+              strokeWidth={12}
+              showValue={false}
+            />
+            <img src={ASSETS.cushion} alt="" />
+          </div>
           <strong className={styles.chapterValue}>{completed}/2</strong>
           <span className={styles.chapterLabel}>Финансовая подушка</span>
         </article>
@@ -124,22 +150,37 @@ interface NarrativeScreenProps {
 export function NarrativeScreen({ onClose, onContinue }: NarrativeScreenProps) {
   return (
     <section className={styles.screen} aria-label="Начало главы">
-      <header className={styles.header}>
-        <IconButton icon="close" label="Вернуться на главный экран" onClick={onClose} />
-        <h1 className={styles.headerTitle}>Новая глава</h1>
-        <span aria-hidden="true" />
-      </header>
+      <div className={styles.narrativeIntro}>
+        <h1>Новая глава</h1>
+        <p>Глава 1</p>
+      </div>
       <motion.div
         className={styles.narrativeContent}
         initial={{ opacity: 0, y: 24, scale: 0.98 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
       >
-        <p className={styles.narrativeEyebrow}>Глава 1</p>
-        <h2 className={styles.narrativeTitle}>Финансовая подушка</h2>
-        <img className={styles.narrativeCharacter} src={ASSETS.analyst} alt="Наставник" />
-        <p className={styles.narrativeSpeech}>
-          Начните с коротких слов — так легче увидеть связи.
-        </p>
+        <header className={styles.narrativeModalHeader}>
+          <span aria-hidden="true" />
+          <h2 className={styles.narrativeTitle}>Финансовая подушка</h2>
+          <IconButton
+            icon="close"
+            label="Вернуться на главный экран"
+            variant="ghost"
+            depth="flat"
+            className={styles.narrativeClose}
+            onClick={onClose}
+          />
+        </header>
+        <div className={styles.narrativePanel}>
+          <img
+            className={styles.narrativeCharacter}
+            src={ASSETS.analyst}
+            alt="Наставник"
+          />
+          <p className={styles.narrativeSpeech}>
+            Начните с основ: найдите слова о капитале, риске, рынке и доходе.
+          </p>
+        </div>
         <Button data-testid="narrative-continue" onClick={onContinue}>
           Продолжить
         </Button>
@@ -169,6 +210,7 @@ export function GameScreen({
   onUseHint,
   onOpenBonusWords,
 }: GameScreenProps) {
+  const [selectionWord, setSelectionWord] = useState('');
   const progress = state.levelProgress[level.id];
   const activeHintTarget = progress.activeHintWordId
     ? level.targets.find((target) => target.id === progress.activeHintWordId)
@@ -184,8 +226,50 @@ export function GameScreen({
         <header className={`${styles.header} ${styles.gameHeader}`}>
           <IconButton icon="back" label="Выйти из уровня" variant="ghost" onClick={onBack} />
           <h1 className={styles.headerTitle}>Уровень {level.id}</h1>
-          <KnowledgeBadge value={state.knowledge} />
+          <KnowledgeBadge value={state.knowledge} size="compact" />
         </header>
+
+        <div className={styles.statusSlot} aria-live="polite">
+          <AnimatePresence mode="wait">
+            {selectionWord ? (
+              <motion.div
+                key="selection"
+                className={styles.selectionStatus}
+                initial={{ opacity: 0, y: -4 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -4 }}
+              >
+                {selectionWord}
+              </motion.div>
+            ) : state.toast ? (
+              <motion.div
+                key={`toast-${state.toast.id}`}
+                className={`${styles.gameBanner} ${styles[state.toast.kind]}`}
+                initial={{ opacity: 0, y: -8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -8 }}
+              >
+                <span className={styles.gameBannerIcon}>
+                  <Icon name={state.toast.kind === 'success' ? 'check' : 'alert'} />
+                </span>
+                <p>{state.toast.message}</p>
+              </motion.div>
+            ) : mentor ? (
+              <motion.aside
+                key={mentor.id}
+                className={styles.mentorTip}
+                initial={{ opacity: 0, y: -8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -8 }}
+              >
+                <img src={ASSETS.analyst} alt="" />
+                <p>{mentor.message}</p>
+              </motion.aside>
+            ) : (
+              <span key="neutral" aria-hidden="true" />
+            )}
+          </AnimatePresence>
+        </div>
 
         <div className={styles.gameBoardSlot}>
           <GameBoard
@@ -195,24 +279,9 @@ export function GameScreen({
             hintRevealedCount={hintRevealedCount}
             onSubmit={onSubmit}
             onOpenTarget={onOpenTarget}
+            onSelectionChange={(word) => setSelectionWord(word)}
           />
         </div>
-
-        <AnimatePresence>
-          {mentor ? (
-            <motion.aside
-              key={mentor.id}
-              className={styles.mentorTip}
-              initial={{ opacity: 0, y: -8 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -8 }}
-              aria-live="polite"
-            >
-              <img src={ASSETS.analyst} alt="" />
-              <p>{mentor.message}</p>
-            </motion.aside>
-          ) : null}
-        </AnimatePresence>
 
         <div className={styles.gameControls}>
           <button
@@ -226,7 +295,12 @@ export function GameScreen({
             <span className={styles.hintCount}>{state.hints}</span>
           </button>
 
-          <div className={styles.envelopeProgress}>
+          <button
+            type="button"
+            className={styles.envelopeProgress}
+            onClick={onOpenBonusWords}
+            aria-label={`Показать бонусные слова. Найдено: ${progress.foundBonusWords.length}. Прогресс конверта: ${state.bonusEnvelopeProgress} из ${threshold}`}
+          >
             <CircularProgress
               current={state.bonusEnvelopeProgress}
               max={threshold}
@@ -239,15 +313,6 @@ export function GameScreen({
             <strong className={styles.envelopeValue}>
               {state.bonusEnvelopeProgress}/{threshold}
             </strong>
-          </div>
-
-          <button
-            type="button"
-            className={styles.bonusListButton}
-            onClick={onOpenBonusWords}
-            aria-label="Показать бонусные слова"
-          >
-            {progress.foundBonusWords.length}
           </button>
         </div>
       </div>
@@ -280,7 +345,11 @@ export function ResultsScreen({
           <IconButton icon="back" label="На главный экран" onClick={onBack} />
           <h1>Уровень пройден!</h1>
         </div>
-        <KnowledgeBadge value={level.targets.length} className={styles.resultsKnowledge} />
+        <KnowledgeBadge
+          value={level.targets.length}
+          size="feature"
+          className={styles.resultsKnowledge}
+        />
         <div className={styles.resultsSummary}>
           <div className={styles.summaryRow}>
             <span>Целевые слова</span>

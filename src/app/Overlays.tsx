@@ -45,15 +45,17 @@ function ModalFrame({
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
       />
-      <motion.div
-        className={`${styles.modal} ${className}`}
-        initial={{ opacity: 0, y: 14, scale: 0.96 }}
-        animate={{ opacity: 1, y: 0, scale: 1 }}
-        exit={{ opacity: 0, y: 10, scale: 0.98 }}
-        transition={{ duration: 0.18, ease: 'easeOut' }}
-      >
-        {children}
-      </motion.div>
+      <div className={styles.modalPositioner}>
+        <motion.div
+          className={`${styles.modal} ${className}`}
+          initial={{ opacity: 0, y: 14, scale: 0.96 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          exit={{ opacity: 0, y: 10, scale: 0.98 }}
+          transition={{ duration: 0.18, ease: 'easeOut' }}
+        >
+          {children}
+        </motion.div>
+      </div>
     </>
   );
 }
@@ -86,7 +88,14 @@ function SheetHeader({ title, onClose }: { title: string; onClose: () => void })
     <header className={styles.sheetHeader}>
       <span aria-hidden="true" />
       <h2>{title}</h2>
-      <IconButton icon="close" label="Закрыть" onClick={onClose} />
+      <IconButton
+        icon="close"
+        label="Закрыть"
+        variant="ghost"
+        depth="flat"
+        className={styles.lightClose}
+        onClick={onClose}
+      />
     </header>
   );
 }
@@ -110,11 +119,12 @@ export function Overlays({
 
   const levelProgress = state.levelProgress[state.currentLevelId];
   const threshold = envelopeThreshold(state.bonusEnvelopeIndex);
+  const hasBonusWords = levelProgress.foundBonusWords.length > 0;
 
   return (
     <div className={styles.layer} aria-live="polite">
       <AnimatePresence>
-        {state.toast ? (
+        {state.toast && state.view !== 'game' ? (
           <motion.div
             key={state.toast.id}
             className={`${styles.toast} ${styles[state.toast.kind] ?? ''}`}
@@ -133,7 +143,14 @@ export function Overlays({
             <header className={styles.modalHeader}>
               <span aria-hidden="true" />
               <h2>{selectedTarget.word}</h2>
-              <IconButton icon="close" label="Закрыть" onClick={onClose} />
+              <IconButton
+                icon="close"
+                label="Закрыть"
+                variant="ghost"
+                depth="flat"
+                className={styles.lightClose}
+                onClick={onClose}
+              />
             </header>
             <div className={styles.modalBody}>
               <p className={styles.definition}>{selectedTarget.definition}</p>
@@ -153,6 +170,9 @@ export function Overlays({
               <IconButton
                 icon="close"
                 label="Закрыть"
+                variant="ghost"
+                depth="flat"
+                className={styles.lightClose}
                 onClick={() => onCloseOffer('close_icon')}
               />
             </header>
@@ -183,14 +203,30 @@ export function Overlays({
         ) : null}
 
         {state.overlay === 'bonus-words' ? (
-          <ModalFrame key="bonus-words">
+          <ModalFrame
+            key="bonus-words"
+            className={`${styles.bonusModal} ${
+              hasBonusWords ? '' : styles.bonusModalEmpty
+            }`}
+          >
             <header className={styles.modalHeader}>
               <span aria-hidden="true" />
               <h2>Бонусные слова</h2>
-              <IconButton icon="close" label="Закрыть" onClick={onClose} />
+              <IconButton
+                icon="close"
+                label="Закрыть"
+                variant="ghost"
+                depth="flat"
+                className={styles.lightClose}
+                onClick={onClose}
+              />
             </header>
-            <ol className={styles.bonusList}>
-              {levelProgress.foundBonusWords.length ? (
+            <ol
+              className={`${styles.bonusList} ${
+                hasBonusWords ? '' : styles.bonusListEmpty
+              }`}
+            >
+              {hasBonusWords ? (
                 levelProgress.foundBonusWords.map((word, index) => (
                   <li key={word} className={styles.bonusItem}>
                     <span className={styles.bonusIndex}>{index + 1}</span>
@@ -198,7 +234,7 @@ export function Overlays({
                   </li>
                 ))
               ) : (
-                <li className={styles.bonusItem}>Пока бонусных слов нет</li>
+                <li className={styles.emptyBonusMessage}>Пока бонусных слов нет</li>
               )}
             </ol>
             <div className={styles.envelopePanel}>
@@ -215,6 +251,11 @@ export function Overlays({
                 </small>
               </div>
             </div>
+            {!hasBonusWords ? (
+              <p className={styles.bonusFoundCount}>
+                На этом уровне найдено 0 из {threshold}
+              </p>
+            ) : null}
             <div className={styles.actions}>
               <Button variant="secondary" onClick={onClose}>
                 Закрыть
@@ -243,25 +284,29 @@ export function Overlays({
             <SheetHeader title="Настройки" onClose={onClose} />
             <div className={styles.toggleList}>
               <div className={styles.toggleRow}>
-                <span>Звуки</span>
+                <span className={styles.toggleLabel}>
+                  <Icon name="music" />
+                  Музыка
+                </span>
+                <button
+                  type="button"
+                  className={`${styles.switch} ${state.settings.music ? styles.on : ''}`}
+                  aria-pressed={state.settings.music}
+                  aria-label="Музыка"
+                  onClick={() => onToggleSetting('music')}
+                />
+              </div>
+              <div className={styles.toggleRow}>
+                <span className={styles.toggleLabel}>
+                  <Icon name="sound" />
+                  Звук
+                </span>
                 <button
                   type="button"
                   className={`${styles.switch} ${state.settings.sound ? styles.on : ''}`}
                   aria-pressed={state.settings.sound}
-                  aria-label="Звуки"
+                  aria-label="Звук"
                   onClick={() => onToggleSetting('sound')}
-                />
-              </div>
-              <div className={styles.toggleRow}>
-                <span>Меньше анимации</span>
-                <button
-                  type="button"
-                  className={`${styles.switch} ${
-                    state.settings.reducedMotion ? styles.on : ''
-                  }`}
-                  aria-pressed={state.settings.reducedMotion}
-                  aria-label="Меньше анимации"
-                  onClick={() => onToggleSetting('reducedMotion')}
                 />
               </div>
             </div>
@@ -274,6 +319,7 @@ export function Overlays({
         {state.overlay === 'feedback' ? (
           <SheetFrame key="feedback">
             <SheetHeader title="Обратная связь" onClose={onClose} />
+            <h3 className={styles.feedbackQuestion}>Как вам игра?</h3>
             <div className={styles.rating} aria-label="Оценка">
               {[1, 2, 3, 4, 5].map((value) => (
                 <button
@@ -295,8 +341,12 @@ export function Overlays({
               className={styles.textarea}
               value={feedback}
               onChange={(event) => setFeedback(event.target.value)}
-              placeholder="Расскажите, что можно улучшить"
+              placeholder="Что можно улучшить?"
+              maxLength={500}
             />
+            <p className={styles.feedbackCounter}>
+              {feedback.length ? `${feedback.length}/500` : 'До 500 символов'}
+            </p>
             <div className={styles.actions}>
               <Button disabled={rating === 0} onClick={onClose}>
                 Отправить

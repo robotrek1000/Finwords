@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import type { LevelConfig } from '../../app/types';
 import { getLevel } from '../../content/levels';
 import {
   areOrthogonallyAdjacent,
@@ -49,6 +50,32 @@ describe('gameEngine', () => {
     expect(evaluateSelection(level, [...stock.path].reverse())).toEqual({
       type: 'invalid',
       word: 'ЯИЦКА',
+    });
+  });
+
+  it('recognizes a target word assembled through a noncanonical path', () => {
+    const alternateLevel: LevelConfig = {
+      ...level,
+      grid: [
+        ['А', 'К'],
+        ['А', 'К'],
+      ],
+      targets: [
+        {
+          id: 'alternate',
+          word: 'АК',
+          path: ['1:1', '1:2'],
+          definition: 'Тестовое определение.',
+          color: '#52C7B8',
+        },
+      ],
+      bonusWords: [],
+    };
+
+    expect(evaluateSelection(alternateLevel, ['2:1', '2:2'])).toMatchObject({
+      type: 'target-wrong-path',
+      word: 'АК',
+      target: alternateLevel.targets[0],
     });
   });
 

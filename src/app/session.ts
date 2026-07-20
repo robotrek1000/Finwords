@@ -102,8 +102,8 @@ export function createInitialSession(search = ''): SessionState {
     mentorQueue: [],
     shownMentorCueIds: [],
     settings: {
+      music: true,
       sound: true,
-      reducedMotion: false,
     },
     appearance: {
       tab: 'characters',

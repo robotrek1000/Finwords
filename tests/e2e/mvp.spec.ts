@@ -134,8 +134,13 @@ test('opens and closes supporting MVP screens without losing progress', async ({
 
   await page.getByRole('button', { name: 'Настройки' }).click();
   await expect(page.getByRole('heading', { name: 'Настройки' })).toBeVisible();
-  await page.getByRole('button', { name: 'Звуки' }).click();
-  await expect(page.getByRole('button', { name: 'Звуки' })).toHaveAttribute(
+  await page.getByRole('button', { name: 'Музыка' }).click();
+  await expect(page.getByRole('button', { name: 'Музыка' })).toHaveAttribute(
+    'aria-pressed',
+    'false',
+  );
+  await page.getByRole('button', { name: 'Звук' }).click();
+  await expect(page.getByRole('button', { name: 'Звук' })).toHaveAttribute(
     'aria-pressed',
     'false',
   );
@@ -150,8 +155,10 @@ test('opens and closes supporting MVP screens without losing progress', async ({
   await page.getByTestId('narrative-continue').click();
   await page.getByRole('button', { name: /Использовать подсказку/ }).click();
   expect((await readGameState(page)).hints).toBe(4);
-  await page.getByRole('button', { name: 'Показать бонусные слова' }).click();
+  await page.getByRole('button', { name: /Показать бонусные слова/ }).click();
   await expect(page.getByRole('heading', { name: 'Бонусные слова' })).toBeVisible();
+  await expect(page.getByText('Пока бонусных слов нет')).toBeVisible();
+  await expect(page.getByText('На этом уровне найдено 0 из 4')).toBeVisible();
   await page.getByRole('button', { name: 'Закрыть', exact: true }).last().click();
 
   await selectPath(page, LEVELS[1].targets[3].path);
@@ -194,6 +201,18 @@ test('keeps the core UI inside all supported viewports', async ({ page }) => {
     expect(cellBox!.width).toBeGreaterThanOrEqual(48);
     expect(cellBox!.height).toBeGreaterThanOrEqual(48);
 
+    for (const control of [
+      page.getByRole('button', { name: /Использовать подсказку/ }),
+      page.getByRole('button', { name: /Показать бонусные слова/ }),
+    ]) {
+      const controlBox = await control.boundingBox();
+      expect(controlBox).not.toBeNull();
+      expect(controlBox!.x).toBeGreaterThanOrEqual(0);
+      expect(controlBox!.x + controlBox!.width).toBeLessThanOrEqual(viewport.width);
+      expect(controlBox!.y).toBeGreaterThanOrEqual(0);
+      expect(controlBox!.y + controlBox!.height).toBeLessThanOrEqual(viewport.height);
+    }
+
     const metrics = await page.evaluate(() => ({
       scrollWidth: document.documentElement.scrollWidth,
       clientWidth: document.documentElement.clientWidth,
@@ -202,5 +221,77 @@ test('keeps the core UI inside all supported viewports', async ({ page }) => {
     }));
     expect(metrics.scrollWidth).toBe(metrics.clientWidth);
     expect(metrics.scrollHeight).toBe(metrics.clientHeight);
+  }
+});
+
+test('reports a noncanonical target route without awarding the word', async ({ page }) => {
+  await page.goto('/?screen=game&level=1');
+  const alternateIncomePath: CellId[] = ['4:4', '4:3', '4:2', '5:2', '6:2'];
+
+  await selectPath(page, alternateIncomePath);
+  await expect(page.getByText('Попробуйте собрать слово по-другому')).toBeVisible();
+
+  const gameState = await readGameState(page);
+  expect(gameState.knowledge).toBe(0);
+  expect(gameState.foundTargets).toEqual([]);
+
+  const event = await page.evaluate(() =>
+    window.__FINWORDS_ANALYTICS__
+      ?.filter((candidate) => candidate.name === 'invalid_word_submitted')
+      .at(-1),
+  );
+  expect(event?.payload).toMatchObject({
+    reason: 'noncanonical_target_path',
+    targetId: 'income',
+    word: 'ДОХОД',
+  });
+});
+
+test('centers offer and reward modals in the WebView', async ({ page }) => {
+  const states = [
+    {
+      url: '/?screen=game&level=1&overlay=course',
+      heading: 'АКЦИЯ',
+    },
+    {
+      url: '/?screen=game&level=2&overlay=product',
+      heading: 'ИИС',
+    },
+    {
+      url: '/?screen=game&level=1&overlay=regular-reward',
+      heading: 'Выберите награду',
+    },
+    {
+      url: '/?screen=home&overlay=golden-reward',
+      heading: 'Золотая награда',
+    },
+  ];
+
+  await page.setViewportSize({ width: 390, height: 716 });
+  for (const state of states) {
+    await page.goto(state.url);
+    await expect(page.getByRole('heading', { name: state.heading })).toBeVisible();
+    await page.waitForTimeout(220);
+    const gaps = await page.evaluate((heading) => {
+      const title = [...document.querySelectorAll('h2')].find(
+        (candidate) => candidate.textContent === heading,
+      );
+      const modal = title?.closest('div[class*="modal_"]');
+      const rect = modal?.getBoundingClientRect();
+      return rect
+        ? {
+            top: rect.top,
+            bottom: window.innerHeight - rect.bottom,
+            left: rect.left,
+            right: window.innerWidth - rect.right,
+          }
+        : null;
+    }, state.heading);
+
+    expect(gaps).not.toBeNull();
+    expect(Math.abs(gaps!.top - gaps!.bottom)).toBeLessThanOrEqual(1);
+    expect(Math.abs(gaps!.left - gaps!.right)).toBeLessThanOrEqual(1);
+    expect(gaps!.top).toBeGreaterThanOrEqual(16);
+    expect(gaps!.left).toBeGreaterThanOrEqual(16);
   }
 });

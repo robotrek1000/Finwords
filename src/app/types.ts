@@ -92,8 +92,8 @@ export interface SessionState {
   mentorQueue: MentorCue[];
   shownMentorCueIds: string[];
   settings: {
+    music: boolean;
     sound: boolean;
-    reducedMotion: boolean;
   };
   appearance: {
     tab: 'characters' | 'themes';

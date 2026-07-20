@@ -25,21 +25,40 @@
 
 .knowledgeBadge {
   display: flex;
-  width: 96px;
-  height: 56px;
   align-items: center;
   justify-content: space-between;
   justify-self: end;
   border-radius: 12px;
-  padding: 6px 12px 6px 8px;
   background: #ffffff;
   color: #18243c;
   font: 700 24px/30px Fregat, sans-serif;
 }
 
+.knowledgeCompact {
+  width: 96px;
+  height: 41px;
+  padding: 3px 10px 3px 4px;
+}
+
+.knowledgeCompact img {
+  width: 48px;
+  height: 48px;
+  margin-left: -4px;
+}
+
+.knowledgeFeature {
+  width: 141px;
+  height: 72px;
+  padding: 6px 14px 6px 8px;
+  font-size: 30px;
+}
+
+.knowledgeFeature img {
+  width: 70px;
+  height: 66px;
+}
+
 .knowledgeBadge img {
-  width: 42px;
-  height: 42px;
   object-fit: contain;
 }
 
@@ -53,7 +72,7 @@
 
 .homeActions {
   position: absolute;
-  top: 80px;
+  top: 20px;
   right: 16px;
   display: flex;
   flex-direction: column;
@@ -62,15 +81,14 @@
 
 .homeKnowledge {
   position: absolute;
-  top: 112px;
+  top: 82px;
   left: 50%;
-  width: 141px;
   transform: translateX(-50%);
 }
 
 .chapterRail {
   position: absolute;
-  top: 224px;
+  top: 213px;
   left: 0;
   display: flex;
   width: 100%;
@@ -84,13 +102,13 @@
   position: relative;
   display: flex;
   width: 186px;
-  height: 226px;
+  height: 242px;
   flex: 0 0 186px;
   flex-direction: column;
   align-items: center;
   border: 3px solid #3b5bdb;
   border-radius: 24px;
-  padding: 18px 12px 14px;
+  padding: 12px 12px 14px;
   background: #38bdf8;
   color: #ffffff;
 }
@@ -106,21 +124,30 @@
   content: '';
 }
 
-.chapterCard img {
-  width: 132px;
-  height: 132px;
+.chapterVisual {
+  position: relative;
+  display: grid;
+  width: 152px;
+  height: 152px;
+  place-items: center;
+}
+
+.chapterVisual img {
+  position: absolute;
+  width: 112px;
+  height: 112px;
   object-fit: contain;
 }
 
 .chapterValue {
-  margin-top: -2px;
-  font: 400 30px/34px Fregat, sans-serif;
+  margin-top: 0;
+  font: 700 30px/34px Fregat, sans-serif;
 }
 
 .chapterLabel {
   margin-top: 2px;
   text-align: center;
-  font: 700 15px/18px Fregat, sans-serif;
+  font: 700 16px/19px Fregat, sans-serif;
 }
 
 .nextChapter {
@@ -158,8 +185,8 @@
 
 .goldenCard {
   position: absolute;
+  top: 503px;
   right: 16px;
-  bottom: 124px;
   left: 16px;
   display: grid;
   height: 88px;
@@ -201,59 +228,102 @@
 
 .homeCta {
   position: absolute;
+  top: 644px;
   right: 16px;
-  bottom: 16px;
   left: 16px;
+}
+
+.narrativeIntro {
+  position: absolute;
+  top: 28px;
+  right: 16px;
+  left: 16px;
+  text-align: center;
+}
+
+.narrativeIntro h1,
+.narrativeIntro p {
+  margin: 0;
+}
+
+.narrativeIntro h1 {
+  font: 700 24px/30px Fregat, sans-serif;
+}
+
+.narrativeIntro p {
+  margin-top: 18px;
+  font: 700 16px/20px Fregat, sans-serif;
 }
 
 .narrativeContent {
   position: absolute;
+  top: 132px;
   right: 16px;
-  bottom: 20px;
   left: 16px;
   display: flex;
-  min-height: 586px;
+  height: 524px;
   flex-direction: column;
   align-items: center;
-  border-radius: 28px;
-  padding: 24px 20px 20px;
+  border-radius: 24px;
+  padding: 20px;
   background: #ffffff;
   color: #18243c;
 }
 
-.narrativeEyebrow {
-  margin: 0;
-  color: #3b5bdb;
-  font: 700 18px/24px Fregat, sans-serif;
+.narrativeModalHeader {
+  display: grid;
+  width: 318px;
+  height: 64px;
+  grid-template-columns: 48px 1fr 48px;
+  align-items: start;
+}
+
+.narrativeClose {
+  color: #18243c;
+}
+
+.narrativeClose:hover {
+  background: rgb(24 36 60 / 6%);
 }
 
 .narrativeTitle {
-  margin: 6px 0 4px;
+  margin: 4px 0 0;
   text-align: center;
-  font: 700 30px/36px Fregat, sans-serif;
+  font: 700 24px/30px Fregat, sans-serif;
+}
+
+.narrativePanel {
+  display: flex;
+  width: 318px;
+  height: 332px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  border-radius: 18px;
+  padding: 8px 16px 16px;
+  background: #f1f5f9;
 }
 
 .narrativeCharacter {
   width: 252px;
   height: 252px;
-  margin: 4px auto 0;
   object-fit: contain;
 }
 
 .narrativeSpeech {
-  margin: -2px 0 18px;
+  margin: 0;
   text-align: center;
   color: #64748b;
-  font: 400 20px/28px Fregat, sans-serif;
+  font: 400 16px/22px Fregat, sans-serif;
 }
 
 .narrativeContent > button {
-  margin-top: auto;
+  margin-top: 16px;
 }
 
 .game {
-  position: relative;
-  height: 100%;
+  position: absolute;
+  inset: 0;
 }
 
 .gameHeader {
@@ -261,24 +331,40 @@
 }
 
 .gameHeader .knowledgeBadge {
-  width: 96px;
-  height: 48px;
+  height: 41px;
+  align-self: center;
 }
 
 .gameBoardSlot {
   position: absolute;
-  top: 72px;
+  top: 152px;
   right: 0;
   left: 0;
 }
 
-.mentorTip {
+.statusSlot {
   position: absolute;
   z-index: 4;
   top: 80px;
   right: 16px;
   left: 16px;
+  height: 64px;
+}
+
+.selectionStatus {
+  display: flex;
+  height: 64px;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  font: 700 24px/30px Fregat, sans-serif;
+  letter-spacing: 0.04em;
+}
+
+.mentorTip,
+.gameBanner {
   display: grid;
+  width: 100%;
   height: 64px;
   grid-template-columns: 52px 1fr;
   align-items: center;
@@ -288,6 +374,47 @@
   background: #ffffff;
   color: #18243c;
   box-shadow: 0 4px 0 rgb(184 196 214 / 55%);
+}
+
+.gameBanner {
+  grid-template-columns: 40px 1fr;
+  gap: 10px;
+  padding: 8px 14px 8px 10px;
+}
+
+.gameBannerIcon {
+  display: grid;
+  width: 36px;
+  height: 36px;
+  place-items: center;
+  border-radius: 50%;
+  background: #e2e8f0;
+  color: #18243c;
+}
+
+.gameBannerIcon svg {
+  width: 22px;
+  height: 22px;
+}
+
+.gameBanner.success .gameBannerIcon {
+  background: #0f766e;
+  color: #ffffff;
+}
+
+.gameBanner.error .gameBannerIcon {
+  background: #dc2626;
+  color: #ffffff;
+}
+
+.gameBanner.info .gameBannerIcon {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.gameBanner p {
+  margin: 0;
+  font: 700 16px/21px Fregat, sans-serif;
 }
 
 .mentorTip img {
@@ -307,20 +434,17 @@
 
 .gameControls {
   position: absolute;
-  right: 16px;
-  bottom: 10px;
-  left: 16px;
-  display: grid;
-  grid-template-columns: 86px 1fr 86px;
-  align-items: end;
-  justify-items: center;
+  inset: 0;
+  pointer-events: none;
 }
 
 .hintButton {
-  position: relative;
+  position: absolute;
+  top: 558px;
+  left: 19px;
   display: grid;
-  width: 82px;
-  height: 82px;
+  width: 83px;
+  height: 83px;
   place-items: end center;
   overflow: visible;
   border: 1px solid #d8e0ec;
@@ -328,6 +452,7 @@
   padding: 0;
   background: #ffffff;
   cursor: pointer;
+  pointer-events: auto;
 }
 
 .hintButton:disabled {
@@ -357,10 +482,20 @@
 }
 
 .envelopeProgress {
-  position: relative;
+  position: absolute;
+  top: 525px;
+  left: 109px;
   display: grid;
-  width: 142px;
+  width: 173px;
+  height: 182px;
+  place-items: start center;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: #ffffff;
   justify-items: center;
+  cursor: pointer;
+  pointer-events: auto;
 }
 
 .envelopeProgress img {
@@ -373,19 +508,9 @@
 }
 
 .envelopeValue {
-  margin-top: -2px;
+  position: absolute;
+  top: 142px;
   font: 700 24px/30px Fregat, sans-serif;
-}
-
-.bonusListButton {
-  width: 48px;
-  height: 48px;
-  border: 0;
-  border-radius: 12px;
-  background: rgb(255 255 255 / 12%);
-  color: #ffffff;
-  font: 700 18px/1 Fregat, sans-serif;
-  cursor: pointer;
 }
 
 .resultsContent {
@@ -406,7 +531,6 @@
 }
 
 .resultsKnowledge {
-  width: 141px;
   margin: 0 auto 16px;
 }
 
@@ -512,26 +636,57 @@
   font-size: 15px;
 }
 
-@media (max-height: 760px) {
+@media (max-height: 620px) {
   .homeKnowledge {
-    top: 82px;
+    top: 72px;
   }
 
   .chapterRail {
-    top: 182px;
+    top: 150px;
+    transform: scale(0.72);
+    transform-origin: top center;
   }
 
   .goldenCard {
-    bottom: 104px;
+    top: auto;
+    bottom: 96px;
   }
 
   .narrativeContent {
-    min-height: calc(100% - 88px);
+    top: 72px;
+    height: calc(100% - 88px);
   }
 
   .narrativeCharacter {
-    width: 220px;
-    height: 220px;
+    width: min(220px, 42vh);
+    height: min(220px, 42vh);
+  }
+
+  .narrativePanel {
+    height: auto;
+    min-height: 0;
+    flex: 1;
+  }
+
+  .narrativeIntro {
+    display: none;
+  }
+
+  .homeCta {
+    top: auto;
+    bottom: 16px;
+  }
+
+  .hintButton {
+    top: auto;
+    bottom: 8px;
+  }
+
+  .envelopeProgress {
+    top: auto;
+    bottom: 0;
+    transform: scale(0.59);
+    transform-origin: bottom center;
   }
 }
 
@@ -539,11 +694,6 @@
   .header {
     margin-right: 10px;
     margin-left: 10px;
-  }
-
-  .gameControls {
-    right: 10px;
-    left: 10px;
   }
 
   .resultsContent,

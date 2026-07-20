@@ -1,24 +1,5 @@
-.gameArea {
-  position: relative;
-  width: 100%;
-}
-
-.selectionLabel {
-  display: flex;
-  height: 64px;
-  align-items: center;
-  justify-content: center;
-  padding: 0 12px;
-  color: #ffffff;
-  font: 700 24px/30px Fregat, sans-serif;
-  letter-spacing: 0.04em;
-}
-
-.selectionLabel.empty {
-  color: transparent;
-}
-
 .board {
+  position: relative;
   display: grid;
   width: min(358px, calc(100vw - 32px));
   aspect-ratio: 1;
@@ -31,8 +12,29 @@
   -webkit-user-select: none;
 }
 
+.hintArrows {
+  position: absolute;
+  z-index: 3;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.hintArrows line {
+  stroke: #3b5bdb;
+  stroke-width: 0.8;
+  stroke-linecap: round;
+}
+
+.hintArrows marker path {
+  fill: #3b5bdb;
+}
+
 .cell {
   position: relative;
+  z-index: 1;
   display: grid;
   min-width: 48px;
   min-height: 48px;
@@ -79,32 +81,23 @@
   transform: scale(1.03);
 }
 
-.hinted::after {
-  position: absolute;
-  right: 4px;
-  bottom: 3px;
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: #f6c945;
-  box-shadow: 0 0 0 3px rgb(246 201 69 / 28%);
-  content: '';
+.hintPrevious {
+  border: 2px dashed #3b5bdb;
+  background: #f8fafc;
+  color: #18243c;
 }
 
-.hintNext {
-  animation: hintPulse 1s ease-in-out infinite;
+.hintCurrent {
+  z-index: 4;
+  border-color: #d79d00;
+  background: #fff0b3;
+  color: #18243c;
   box-shadow: inset 0 0 0 2px #f6c945;
-}
-
-@keyframes hintPulse {
-  50% {
-    transform: scale(1.06);
-  }
 }
 
 @media (max-width: 340px) {
   .board {
-    width: calc(100vw - 20px);
+    width: calc(100vw - 12px);
     gap: 4px;
   }
 
@@ -115,9 +108,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .cell,
-  .hintNext {
-    animation: none;
+  .cell {
     transition: none;
   }
 }

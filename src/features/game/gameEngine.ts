@@ -1,7 +1,14 @@
 import type { CellId, LevelConfig, TargetWord } from '../../app/types';
 
+export type SelectionResultType =
+  | 'target'
+  | 'target-wrong-path'
+  | 'bonus'
+  | 'invalid'
+  | 'none';
+
 export interface SelectionResult {
-  type: 'target' | 'bonus' | 'invalid' | 'none';
+  type: SelectionResultType;
   word: string;
   target?: TargetWord;
 }
@@ -65,6 +72,11 @@ export function evaluateSelection(level: LevelConfig, path: CellId[]): Selection
   const target = level.targets.find((candidate) => pathsEqual(candidate.path, path));
   if (target) {
     return { type: 'target', word, target };
+  }
+
+  const targetWithSameWord = level.targets.find((candidate) => candidate.word === word);
+  if (targetWithSameWord) {
+    return { type: 'target-wrong-path', word, target: targetWithSameWord };
   }
 
   if (level.bonusWords.includes(word)) {

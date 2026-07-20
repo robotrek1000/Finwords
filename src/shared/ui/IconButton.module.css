@@ -7,20 +7,37 @@
   appearance: none;
   border: 0;
   border-radius: 12px;
-  background: #ffffff;
   color: #18243c;
   cursor: pointer;
   transition:
     transform 120ms ease,
-    background-color 120ms ease;
+    background-color 120ms ease,
+    box-shadow 120ms ease;
 }
 
-.button:hover {
+.surface {
+  background: #ffffff;
+}
+
+.surface:hover {
   background: #f1f5f9;
 }
 
-.button:active {
-  transform: translateY(2px);
+.raised {
+  box-shadow: 0 4px 0 #b8c4d6;
+}
+
+.raised:active {
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 #b8c4d6;
+}
+
+.flat {
+  box-shadow: none;
+}
+
+.flat:active {
+  transform: translateY(1px);
 }
 
 .button svg {
@@ -35,4 +52,10 @@
 
 .ghost:hover {
   background: rgb(255 255 255 / 10%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .button {
+    transition: none;
+  }
 }
