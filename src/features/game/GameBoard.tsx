@@ -12,6 +12,7 @@ import {
 import styles from './GameBoard.module.css';
 
 interface GameBoardProps {
+  mode?: 'play' | 'review';
   level: LevelConfig;
   foundTargetIds: string[];
   hintTarget?: TargetWord;
@@ -22,6 +23,7 @@ interface GameBoardProps {
 }
 
 export function GameBoard({
+  mode = 'play',
   level,
   foundTargetIds,
   hintTarget,
@@ -80,6 +82,9 @@ export function GameBoard({
 
   function handlePointerDown(event: PointerEvent<HTMLButtonElement>, cellId: CellId) {
     event.preventDefault();
+    if (mode === 'review') {
+      return;
+    }
     const lockedTarget = lockedCells.get(cellId);
     if (lockedTarget) {
       tappedTargetRef.current = lockedTarget;
@@ -93,7 +98,7 @@ export function GameBoard({
   }
 
   function handlePointerMove(event: PointerEvent<HTMLDivElement>) {
-    if (!isSelectingRef.current) {
+    if (mode === 'review' || !isSelectingRef.current) {
       return;
     }
     const element = document.elementFromPoint(event.clientX, event.clientY);
@@ -112,6 +117,9 @@ export function GameBoard({
   }
 
   function handlePointerUp(event: PointerEvent<HTMLDivElement>) {
+    if (mode === 'review') {
+      return;
+    }
     if (
       pointerIdRef.current !== undefined &&
       boardRef.current?.hasPointerCapture(pointerIdRef.current)
@@ -134,9 +142,10 @@ export function GameBoard({
     <div
       ref={boardRef}
       className={styles.board}
-      onPointerMove={handlePointerMove}
-      onPointerUp={handlePointerUp}
-      onPointerCancel={handlePointerCancel}
+      data-mode={mode}
+      onPointerMove={mode === 'play' ? handlePointerMove : undefined}
+      onPointerUp={mode === 'play' ? handlePointerUp : undefined}
+      onPointerCancel={mode === 'play' ? handlePointerCancel : undefined}
       aria-label={`Игровое поле уровня ${level.id}`}
     >
       {revealedHintPath.length > 1 ? (
@@ -195,14 +204,25 @@ export function GameBoard({
                 type="button"
                 className={classes}
                 data-cell-id={cellId}
-                aria-label={`${letter}, строка ${rowIndex + 1}, столбец ${columnIndex + 1}`}
+                aria-label={
+                  mode === 'review' && foundTarget
+                    ? `${letter}, строка ${rowIndex + 1}, столбец ${columnIndex + 1}. Найденное слово ${foundTarget.word}. Открыть информацию`
+                    : `${letter}, строка ${rowIndex + 1}, столбец ${columnIndex + 1}`
+                }
                 aria-pressed={selectedCells.has(cellId)}
                 style={
                   foundTarget
                     ? ({ '--word-color': foundTarget.color } as React.CSSProperties)
                     : undefined
                 }
-                onPointerDown={(event) => handlePointerDown(event, cellId)}
+                onPointerDown={
+                  mode === 'play' ? (event) => handlePointerDown(event, cellId) : undefined
+                }
+                onClick={
+                  mode === 'review' && foundTarget
+                    ? () => onOpenTarget(foundTarget)
+                    : undefined
+                }
               >
                 {letter}
               </button>

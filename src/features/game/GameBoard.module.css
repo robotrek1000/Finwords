@@ -59,6 +59,14 @@
   transform: scale(0.96);
 }
 
+.board[data-mode='review'] {
+  touch-action: manipulation;
+}
+
+.board[data-mode='review'] .cell:not(.found) {
+  cursor: default;
+}
+
 .selected {
   border-color: #60a5fa;
   background: #dbeafe;

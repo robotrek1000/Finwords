@@ -1,6 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
+import { getLevel } from '../content/levels';
 import { Overlays } from './Overlays';
 import { createInitialSession } from './session';
 
@@ -64,5 +65,29 @@ describe('supporting overlays', () => {
     expect(screen.getByText('Пока бонусных слов нет')).toBeInTheDocument();
     expect(screen.getByText('На этом уровне найдено 0 из 4')).toBeInTheDocument();
     expect(screen.getAllByRole('button', { name: 'Закрыть', hidden: true })).toHaveLength(2);
+  });
+
+  it('returns Course and Product offers to Field Review', async () => {
+    const user = userEvent.setup();
+    const onCloseOffer = vi.fn();
+    const state = createInitialSession('?screen=results-field&level=1&overlay=course');
+
+    render(
+      <Overlays
+        state={state}
+        selectedTarget={getLevel(1).targets.find((target) => target.id === 'stock')}
+        onClose={vi.fn()}
+        onCloseOffer={onCloseOffer}
+        onOfferCta={vi.fn()}
+        onExitConfirmed={vi.fn()}
+        onOpenFeedback={vi.fn()}
+        onToggleSetting={vi.fn()}
+        onClaimRegular={vi.fn()}
+        onClaimGolden={vi.fn()}
+      />,
+    );
+
+    await user.click(screen.getByRole('button', { name: 'Вернуться к полю' }));
+    expect(onCloseOffer).toHaveBeenCalledWith('return_to_field');
   });
 });

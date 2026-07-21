@@ -113,8 +113,33 @@ test('complete MVP flow across both levels', async ({ page }) => {
   await expect(page.getByRole('button', { name: 'На главный экран' })).toBeVisible();
   await page.waitForTimeout(250);
   await page.screenshot({ path: 'output/visual-qa/results-level-1-complete.png' });
-  await page.getByRole('button', { name: 'Уровень 2' }).click();
+
+  await page.getByRole('button', { name: 'Показать поле' }).click();
+  await expect(page.getByLabel('Просмотр поля уровня 1')).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Уровень пройден!' })).toBeHidden();
+  await page.locator('[data-cell-id="2:5"]').click();
+  await expect(page.getByRole('heading', { name: 'ФОНД' })).toBeVisible();
+  await page.getByRole('button', { name: 'Понятно' }).click();
+  await expect(page.getByLabel('Просмотр поля уровня 1')).toBeVisible();
+
+  await page.locator('[data-cell-id="1:3"]').click();
+  await expect(page.getByRole('heading', { name: 'АКЦИЯ' })).toBeVisible();
+  await page.getByRole('button', { name: 'Открыть курс' }).click();
+  await expect(page.getByRole('heading', { name: 'АКЦИЯ' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Вернуться к полю' })).toBeVisible();
+  await page.goBack();
+  await expect(page.getByLabel('Просмотр поля уровня 1')).toBeVisible();
+  await page.goBack();
+  await expect(page.getByRole('heading', { name: 'Уровень пройден!' })).toBeVisible();
+
+  await page.getByRole('button', { name: 'Показать поле' }).click();
+  await page.getByRole('button', { name: 'Скрыть поле' }).click();
+  await expect(page.getByRole('heading', { name: 'Уровень пройден!' })).toBeVisible();
+
+  await page.getByRole('button', { name: 'Показать поле' }).click();
+  await page.getByTestId('results-field-primary').click();
   await expect(page.getByRole('heading', { name: 'Уровень 2' })).toBeVisible();
+  await page.waitForTimeout(220);
 
   for (const target of LEVELS[2].targets) {
     await selectPath(page, target.path);
@@ -132,11 +157,20 @@ test('complete MVP flow across both levels', async ({ page }) => {
   await expect(page.getByRole('heading', { name: 'Уровень пройден!' })).toBeVisible();
   await page.waitForTimeout(250);
   await page.screenshot({ path: 'output/visual-qa/results-level-2-complete.png' });
-  await page.getByRole('button', { name: 'На главный экран' }).click();
-  await expect(page.getByRole('heading', { name: 'Финворды' })).toBeVisible();
-  await expect(page.getByText('2/2')).toHaveCount(2);
 
-  await page.getByRole('button', { name: /Золотой конверт/ }).click();
+  await page.getByRole('button', { name: 'Показать поле' }).click();
+  await expect(page.getByLabel('Просмотр поля уровня 2')).toBeVisible();
+  await page.locator('[data-cell-id="3:3"]').click();
+  await expect(page.getByRole('heading', { name: 'ИИС' })).toBeVisible();
+  await page.getByRole('button', { name: 'Подробнее об ИИС' }).click();
+  await expect(page.getByRole('heading', { name: 'ИИС' })).toBeVisible();
+  await page.getByRole('button', { name: 'Вернуться к полю' }).click();
+  await expect(page.getByLabel('Просмотр поля уровня 2')).toBeVisible();
+  await page.getByRole('button', { name: 'Скрыть поле' }).click();
+  await expect(page.getByRole('heading', { name: 'Уровень пройден!' })).toBeVisible();
+
+  await page.getByRole('button', { name: 'Показать поле' }).click();
+  await page.getByTestId('results-field-primary').click();
   await expect(page.getByRole('heading', { name: 'Золотая награда' })).toBeVisible();
   await page.getByRole('button', { name: /Подсказки/ }).click();
   await page.getByRole('button', { name: 'Забрать' }).click();
@@ -145,6 +179,36 @@ test('complete MVP flow across both levels', async ({ page }) => {
   expect(finalState.completedLevels).toEqual([1, 2]);
   expect(finalState.goldenRewardClaimed).toBe(true);
   expect(finalState.hints).toBe(9);
+
+  const reviewEvents = await page.evaluate(() => window.__FINWORDS_ANALYTICS__ ?? []);
+  expect(
+    reviewEvents.some(
+      (event) =>
+        event.name === 'word_definition_opened' &&
+        event.payload.source === 'results_field',
+    ),
+  ).toBe(true);
+  expect(
+    reviewEvents.some(
+      (event) =>
+        event.name === 'word_offer_shown' &&
+        event.payload.openSource === 'results_field',
+    ),
+  ).toBe(true);
+  expect(
+    reviewEvents.some(
+      (event) =>
+        event.name === 'word_offer_closed' &&
+        event.payload.closeMethod === 'return_to_field',
+    ),
+  ).toBe(true);
+  expect(
+    reviewEvents.some(
+      (event) =>
+        event.name === 'results_field_closed' &&
+        event.payload.closeMethod === 'primary_action',
+    ),
+  ).toBe(true);
 });
 
 test('opens and closes supporting MVP screens without losing progress', async ({ page }) => {
@@ -206,6 +270,7 @@ test('keeps the core UI inside all supported viewports', async ({ page }) => {
   for (const viewport of [
     { width: 320, height: 568 },
     { width: 390, height: 716 },
+    { width: 393, height: 663 },
     { width: 430, height: 932 },
   ]) {
     await page.setViewportSize(viewport);
@@ -237,6 +302,16 @@ test('keeps the core UI inside all supported viewports', async ({ page }) => {
       expect(controlBox!.y + controlBox!.height).toBeLessThanOrEqual(viewport.height);
     }
 
+    await expectNoDocumentScroll(page);
+
+    await page.goto('/?screen=results-field&level=1');
+    await expect(page.getByLabel('Просмотр поля уровня 1')).toBeVisible();
+    await expectInsideVisualViewport(page, '[data-testid="results-field-primary"]');
+    await expectInsideVisualViewport(page, '[data-testid="results-field-hide"]');
+    const reviewBoard = page.getByLabel('Игровое поле уровня 1');
+    const reviewBoardBox = await reviewBoard.boundingBox();
+    expect(reviewBoardBox).not.toBeNull();
+    expect(reviewBoardBox!.width).toBeGreaterThanOrEqual(308);
     await expectNoDocumentScroll(page);
   }
 });

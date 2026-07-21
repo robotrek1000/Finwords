@@ -53,6 +53,7 @@ export type View =
   | 'narrative'
   | 'game'
   | 'results'
+  | 'results-field'
   | 'appearance';
 
 export type Overlay =

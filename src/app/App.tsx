@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useReducer, useRef } from 'react';
+import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
 import type { CellId, LevelId, Overlay, TargetWord } from './types';
 import type { SelectionResult } from '../features/game/gameEngine';
 import { getLevel } from '../content/levels';
@@ -15,6 +16,7 @@ import {
   GameScreen,
   HomeScreen,
   NarrativeScreen,
+  ResultsFieldScreen,
   ResultsScreen,
 } from './Screens';
 import { Overlays } from './Overlays';
@@ -38,14 +40,24 @@ const INVALID_CUE = {
   message: 'Начните с другой буквы. Диагонали не работают.',
 };
 
+const FIELD_HISTORY_STATE = 'results-field';
+const FIELD_OVERLAY_HISTORY_STATE = 'results-field-overlay';
+
+type FieldCloseMethod = 'hide_button' | 'system_back' | 'primary_action';
+type FieldHistoryIntent =
+  | { type: 'close'; method: FieldCloseMethod }
+  | { type: 'primary' };
+
 export function App() {
   const viewport = useVisualViewport();
+  const reduceMotion = useReducedMotion();
   const [state, dispatch] = useReducer(
     sessionReducer,
     window.location.search,
     createInitialSession,
   );
   const stateRef = useRef(state);
+  const fieldHistoryIntentRef = useRef<FieldHistoryIntent | undefined>(undefined);
   const toastId = useRef(0);
   const level = getLevel(state.currentLevelId);
   const progress = state.levelProgress[state.currentLevelId];
@@ -200,15 +212,20 @@ export function App() {
     };
     window.render_game_to_text = () => {
       const current = stateRef.current;
-      const currentLevel = getLevel(current.currentLevelId);
-      const currentProgress = current.levelProgress[current.currentLevelId];
+      const activeLevelId =
+        current.view === 'results-field' ? current.resultsLevelId : current.currentLevelId;
+      const currentLevel = getLevel(activeLevelId);
+      const currentProgress = current.levelProgress[activeLevelId];
       return JSON.stringify({
         coordinateSystem:
           'Grid cells use 1-based row:column coordinates; origin is top-left, rows increase downward, columns increase rightward.',
         view: current.view,
         overlay: current.overlay,
-        levelId: current.currentLevelId,
-        grid: current.view === 'game' ? currentLevel.grid : undefined,
+        levelId: activeLevelId,
+        grid:
+          current.view === 'game' || current.view === 'results-field'
+            ? currentLevel.grid
+            : undefined,
         foundTargets: currentProgress.foundTargetIds,
         foundBonusWords: currentProgress.foundBonusWords,
         activeHintWordId: currentProgress.activeHintWordId ?? null,
@@ -256,23 +273,150 @@ export function App() {
     }
   }
 
-  function openTarget(target: TargetWord) {
+  function performResultsPrimary(levelId: LevelId) {
+    if (levelId === 1) {
+      startLevel(2);
+    } else {
+      if (stateRef.current.view === 'results-field') {
+        dispatch({ type: 'CLOSE_RESULTS_FIELD' });
+      }
+      dispatch({ type: 'SET_OVERLAY', overlay: 'golden-reward' });
+    }
+  }
+
+  function recordFieldClosed(method: FieldCloseMethod, levelId: LevelId) {
+    track('results_field_closed', {
+      levelId,
+      chapterId: 'financial-cushion',
+      closeMethod: method,
+    });
+  }
+
+  function recordOfferClosed(
+    method: 'close_icon' | 'continue_game' | 'return_to_field',
+  ) {
+    const current = stateRef.current;
+    const levelId =
+      current.view === 'results-field' ? current.resultsLevelId : current.currentLevelId;
+    const target = current.selectedWordId
+      ? getLevel(levelId).targets.find(
+          (candidate) => candidate.id === current.selectedWordId,
+        )
+      : undefined;
+    if (!target?.offer) {
+      return;
+    }
+    track('word_offer_closed', {
+      offerType: target.offer.type,
+      offerId: target.offer.id,
+      wordId: target.id,
+      levelId,
+      chapterId: 'financial-cushion',
+      campaignId: target.offer.campaignId,
+      closeMethod: method,
+      destination: target.offer.destination,
+    });
+  }
+
+  function openResultsField() {
+    window.history.pushState(
+      { ...window.history.state, finwordsView: FIELD_HISTORY_STATE },
+      '',
+    );
+    dispatch({ type: 'OPEN_RESULTS_FIELD' });
+    track('results_field_opened', {
+      levelId: state.resultsLevelId,
+      chapterId: 'financial-cushion',
+    });
+  }
+
+  function finishFieldClose(method: FieldCloseMethod) {
+    const levelId = stateRef.current.resultsLevelId;
+    recordFieldClosed(method, levelId);
+    if (method === 'primary_action') {
+      performResultsPrimary(levelId);
+      return;
+    }
+    dispatch({ type: 'CLOSE_RESULTS_FIELD' });
+  }
+
+  function closeResultsField(method: Exclude<FieldCloseMethod, 'system_back'>) {
+    if (window.history.state?.finwordsView === FIELD_HISTORY_STATE) {
+      fieldHistoryIntentRef.current =
+        method === 'primary_action' ? { type: 'primary' } : { type: 'close', method };
+      window.history.back();
+      return;
+    }
+    finishFieldClose(method);
+  }
+
+  function closeOverlay() {
+    if (
+      state.view === 'results-field' &&
+      state.overlay !== 'none' &&
+      window.history.state?.finwordsView === FIELD_OVERLAY_HISTORY_STATE
+    ) {
+      window.history.back();
+      return;
+    }
+    dispatch({ type: 'CLOSE_OVERLAY' });
+  }
+
+  useEffect(() => {
+    function handlePopState() {
+      const current = stateRef.current;
+      if (current.view !== 'results-field') {
+        return;
+      }
+
+      if (current.overlay !== 'none') {
+        if (current.overlay === 'course' || current.overlay === 'product') {
+          recordOfferClosed('return_to_field');
+        }
+        dispatch({ type: 'CLOSE_OVERLAY' });
+        return;
+      }
+
+      const intent = fieldHistoryIntentRef.current;
+      fieldHistoryIntentRef.current = undefined;
+      if (intent?.type === 'primary') {
+        finishFieldClose('primary_action');
+        return;
+      }
+      finishFieldClose(intent?.method ?? 'system_back');
+    }
+
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  });
+
+  function openTarget(
+    target: TargetWord,
+    source: 'word_tap' | 'results_field' = 'word_tap',
+  ) {
     const overlay: Overlay = target.offer?.type ?? 'word-definition';
+    const levelId = source === 'results_field' ? state.resultsLevelId : state.currentLevelId;
+    if (source === 'results_field') {
+      window.history.pushState(
+        { ...window.history.state, finwordsView: FIELD_OVERLAY_HISTORY_STATE },
+        '',
+      );
+    }
     dispatch({ type: 'OPEN_WORD', targetId: target.id, overlay });
     track('word_definition_opened', {
       wordId: target.id,
-      levelId: state.currentLevelId,
-      source: 'word_tap',
+      levelId,
+      source,
     });
     if (target.offer) {
       track('word_offer_shown', {
         offerType: target.offer.type,
         offerId: target.offer.id,
         wordId: target.id,
-        levelId: state.currentLevelId,
+        levelId,
         chapterId: 'financial-cushion',
         campaignId: target.offer.campaignId,
-        openSource: 'word_tap',
+        openSource: source,
         destination: target.offer.destination,
       });
     }
@@ -417,20 +561,18 @@ export function App() {
     });
   }
 
-  function closeOffer(method: 'close_icon' | 'continue_game') {
-    const target = targetForOverlay;
-    if (target?.offer) {
-      track('word_offer_closed', {
-        offerType: target.offer.type,
-        offerId: target.offer.id,
-        wordId: target.id,
-        levelId: state.currentLevelId,
-        chapterId: 'financial-cushion',
-        campaignId: target.offer.campaignId,
-        closeMethod: method,
-        destination: target.offer.destination,
-      });
+  function closeOffer(
+    method: 'close_icon' | 'continue_game' | 'return_to_field',
+  ) {
+    if (
+      method === 'return_to_field' &&
+      state.view === 'results-field' &&
+      window.history.state?.finwordsView === FIELD_OVERLAY_HISTORY_STATE
+    ) {
+      window.history.back();
+      return;
     }
+    recordOfferClosed(method);
     dispatch({ type: 'CLOSE_OVERLAY' });
   }
 
@@ -438,11 +580,13 @@ export function App() {
     if (!target.offer) {
       return;
     }
+    const levelId =
+      state.view === 'results-field' ? state.resultsLevelId : state.currentLevelId;
     track('word_offer_cta_clicked', {
       offerType: target.offer.type,
       offerId: target.offer.id,
       wordId: target.id,
-      levelId: state.currentLevelId,
+      levelId,
       chapterId: 'financial-cushion',
       campaignId: target.offer.campaignId,
       destination: target.offer.destination,
@@ -479,7 +623,7 @@ export function App() {
             mentor={state.currentMentor}
             onBack={() => dispatch({ type: 'SET_OVERLAY', overlay: 'exit' })}
             onSubmit={handleSelection}
-            onOpenTarget={openTarget}
+            onOpenTarget={(target) => openTarget(target, 'word_tap')}
             onUseHint={useHint}
             onOpenBonusWords={() =>
               dispatch({ type: 'SET_OVERLAY', overlay: 'bonus-words' })
@@ -491,20 +635,17 @@ export function App() {
           <ResultsScreen
             state={state}
             onBack={() => dispatch({ type: 'NAVIGATE', view: 'home' })}
-            onPrimary={() => {
-              if (state.resultsLevelId === 1) {
-                startLevel(2);
-              } else {
-                dispatch({ type: 'SET_OVERLAY', overlay: 'golden-reward' });
-              }
-            }}
-            onShowField={() =>
-              dispatch({
-                type: 'START_LEVEL',
-                levelId: state.resultsLevelId,
-                showNarrative: false,
-              })
-            }
+            onPrimary={() => performResultsPrimary(state.resultsLevelId)}
+            onShowField={openResultsField}
+          />
+        );
+      case 'results-field':
+        return (
+          <ResultsFieldScreen
+            state={state}
+            onOpenTarget={(target) => openTarget(target, 'results_field')}
+            onPrimary={() => closeResultsField('primary_action')}
+            onHideField={() => closeResultsField('hide_button')}
           />
         );
       case 'appearance':
@@ -541,12 +682,23 @@ export function App() {
       <div className={styles.device} data-density={viewport.density}>
         <div className={styles.hostBand} aria-hidden="true" />
         <main className={styles.webview}>
-          {renderScreen()}
+          <AnimatePresence initial={false} mode="sync">
+            <motion.div
+              key={state.view}
+              className={styles.viewTransition}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0, pointerEvents: 'none' }}
+              transition={{ duration: reduceMotion ? 0 : 0.2 }}
+            >
+              {renderScreen()}
+            </motion.div>
+          </AnimatePresence>
           <Overlays
             key={state.overlay}
             state={state}
             selectedTarget={targetForOverlay}
-            onClose={() => dispatch({ type: 'CLOSE_OVERLAY' })}
+            onClose={closeOverlay}
             onCloseOffer={closeOffer}
             onOfferCta={clickOfferCta}
             onExitConfirmed={() => {

@@ -12,6 +12,8 @@ export const BONUS_ENVELOPE_THRESHOLDS = [4, 6, 8, 10] as const;
 
 export type SessionAction =
   | { type: 'NAVIGATE'; view: View }
+  | { type: 'OPEN_RESULTS_FIELD' }
+  | { type: 'CLOSE_RESULTS_FIELD' }
   | { type: 'START_LEVEL'; levelId: LevelId; showNarrative?: boolean }
   | { type: 'BEGIN_GAME' }
   | { type: 'FIND_TARGET'; targetId: string }
@@ -55,7 +57,14 @@ const overlayValues: Overlay[] = [
   'golden-reward',
 ];
 
-const viewValues: View[] = ['home', 'narrative', 'game', 'results', 'appearance'];
+const viewValues: View[] = [
+  'home',
+  'narrative',
+  'game',
+  'results',
+  'results-field',
+  'appearance',
+];
 
 function numberParam(params: URLSearchParams, key: string, fallback: number): number {
   const rawValue = params.get(key);
@@ -81,6 +90,21 @@ export function createInitialSession(search = ''): SessionState {
     selectedWordId = 'stock';
   } else if (overlay === 'product') {
     selectedWordId = 'iis';
+  } else if (overlay === 'word-definition') {
+    selectedWordId = LEVELS[currentLevelId].targets[0]?.id;
+  }
+
+  const levelProgress: Record<LevelId, LevelProgress> = {
+    1: createLevelProgress(),
+    2: createLevelProgress(),
+  };
+  const completedLevelIds: LevelId[] = [];
+  if (view === 'results-field') {
+    levelProgress[currentLevelId].foundTargetIds = LEVELS[currentLevelId].targets.map(
+      (target) => target.id,
+    );
+    const reviewCompletedLevelIds: LevelId[] = currentLevelId === 1 ? [1] : [1, 2];
+    completedLevelIds.push(...reviewCompletedLevelIds);
   }
 
   return {
@@ -89,11 +113,8 @@ export function createInitialSession(search = ''): SessionState {
     selectedWordId,
     currentLevelId,
     resultsLevelId: currentLevelId,
-    completedLevelIds: [],
-    levelProgress: {
-      1: createLevelProgress(),
-      2: createLevelProgress(),
-    },
+    completedLevelIds,
+    levelProgress,
     knowledge: numberParam(params, 'knowledge', 0),
     hints: numberParam(params, 'hints', 5),
     bonusEnvelopeIndex: 0,
@@ -134,6 +155,22 @@ export function sessionReducer(state: SessionState, action: SessionAction): Sess
   switch (action.type) {
     case 'NAVIGATE':
       return { ...state, view: action.view, overlay: 'none', toast: undefined };
+    case 'OPEN_RESULTS_FIELD':
+      return {
+        ...state,
+        view: 'results-field',
+        overlay: 'none',
+        toast: undefined,
+        selectedWordId: undefined,
+      };
+    case 'CLOSE_RESULTS_FIELD':
+      return {
+        ...state,
+        view: 'results',
+        overlay: 'none',
+        toast: undefined,
+        selectedWordId: undefined,
+      };
     case 'START_LEVEL':
       return {
         ...state,
@@ -303,8 +340,9 @@ export function sessionReducer(state: SessionState, action: SessionAction): Sess
 }
 
 export function selectedTarget(state: SessionState) {
+  const levelId = state.view === 'results-field' ? state.resultsLevelId : state.currentLevelId;
   return state.selectedWordId
-    ? getTarget(state.currentLevelId, state.selectedWordId)
+    ? getTarget(levelId, state.selectedWordId)
     : undefined;
 }
 

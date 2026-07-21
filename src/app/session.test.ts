@@ -142,4 +142,26 @@ describe('session state', () => {
     expect(state.goldenRewardClaimed).toBe(true);
     expect(state.view).toBe('home');
   });
+
+  it('opens and closes Field Review without changing session progress', () => {
+    let state = createInitialSession('?hints=8&knowledge=12&envelope=3');
+    state = sessionReducer(state, { type: 'FIND_TARGET', targetId: 'risk' });
+    state = sessionReducer(state, { type: 'COMPLETE_LEVEL', levelId: 1 });
+    const beforeReview = state;
+
+    state = sessionReducer(state, { type: 'OPEN_RESULTS_FIELD' });
+    expect(state).toMatchObject({
+      view: 'results-field',
+      currentLevelId: beforeReview.currentLevelId,
+      resultsLevelId: beforeReview.resultsLevelId,
+      knowledge: beforeReview.knowledge,
+      hints: beforeReview.hints,
+      bonusEnvelopeProgress: beforeReview.bonusEnvelopeProgress,
+      levelProgress: beforeReview.levelProgress,
+    });
+
+    state = sessionReducer(state, { type: 'CLOSE_RESULTS_FIELD' });
+    expect(state.view).toBe('results');
+    expect(state.levelProgress).toBe(beforeReview.levelProgress);
+  });
 });

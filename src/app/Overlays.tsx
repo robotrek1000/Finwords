@@ -15,7 +15,7 @@ const ASSETS = {
   cushion: `${import.meta.env.BASE_URL}assets/chapter-financial-cushion.png`,
 };
 
-type OfferCloseMethod = 'close_icon' | 'continue_game';
+type OfferCloseMethod = 'close_icon' | 'continue_game' | 'return_to_field';
 
 interface OverlaysProps {
   state: SessionState;
@@ -173,7 +173,11 @@ export function Overlays({
                 variant="ghost"
                 depth="flat"
                 className={styles.lightClose}
-                onClick={() => onCloseOffer('close_icon')}
+                onClick={() =>
+                  onCloseOffer(
+                    state.view === 'results-field' ? 'return_to_field' : 'close_icon',
+                  )
+                }
               />
             </header>
             <div className={`${styles.modalBody} ${styles.offerBody}`}>
@@ -194,9 +198,15 @@ export function Overlays({
               </Button>
               <Button
                 variant="secondary"
-                onClick={() => onCloseOffer('continue_game')}
+                onClick={() =>
+                  onCloseOffer(
+                    state.view === 'results-field'
+                      ? 'return_to_field'
+                      : 'continue_game',
+                  )
+                }
               >
-                Продолжить игру
+                {state.view === 'results-field' ? 'Вернуться к полю' : 'Продолжить игру'}
               </Button>
             </div>
           </ModalFrame>

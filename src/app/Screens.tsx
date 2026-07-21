@@ -405,6 +405,56 @@ export function ResultsScreen({
   );
 }
 
+interface ResultsFieldScreenProps {
+  state: SessionState;
+  onOpenTarget: (target: TargetWord) => void;
+  onPrimary: () => void;
+  onHideField: () => void;
+}
+
+const ignoreReviewSelection = () => undefined;
+
+export function ResultsFieldScreen({
+  state,
+  onOpenTarget,
+  onPrimary,
+  onHideField,
+}: ResultsFieldScreenProps) {
+  const levelId = state.resultsLevelId;
+  const level = getLevel(levelId);
+  const progress = state.levelProgress[levelId];
+
+  return (
+    <section
+      className={`${styles.screen} ${styles.resultsFieldScreen}`}
+      aria-label={`Просмотр поля уровня ${levelId}`}
+    >
+      <div className={styles.resultsFieldBoard}>
+        <GameBoard
+          mode="review"
+          level={level}
+          foundTargetIds={progress.foundTargetIds}
+          onSubmit={ignoreReviewSelection}
+          onOpenTarget={onOpenTarget}
+          onSelectionChange={ignoreReviewSelection}
+        />
+      </div>
+      <div className={styles.resultsFieldActions}>
+        <Button data-testid="results-field-primary" onClick={onPrimary}>
+          {levelId === 1 ? 'Уровень 2' : 'Завершить главу'}
+        </Button>
+        <Button
+          data-testid="results-field-hide"
+          variant="secondary"
+          onClick={onHideField}
+        >
+          Скрыть поле
+        </Button>
+      </div>
+    </section>
+  );
+}
+
 interface AppearanceScreenProps {
   state: SessionState;
   onBack: () => void;

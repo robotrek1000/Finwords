@@ -36,6 +36,11 @@
   background: #111a33;
 }
 
+.viewTransition {
+  position: absolute;
+  inset: 0;
+}
+
 @media (max-height: 760px) {
   .device {
     height: var(--finwords-viewport-height, 100dvh);

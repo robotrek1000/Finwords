@@ -2,7 +2,7 @@ import { render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import { getLevel } from '../content/levels';
 import { createInitialSession } from './session';
-import { GameScreen, ResultsScreen } from './Screens';
+import { GameScreen, ResultsFieldScreen, ResultsScreen } from './Screens';
 
 const screenCallbacks = {
   onBack: vi.fn(),
@@ -70,5 +70,45 @@ describe('ResultsScreen navigation', () => {
     const back = screen.getByRole('button', { name: 'На главный экран' });
     expect(back.className).toContain('ghost');
     expect(back.className).toContain('flat');
+  });
+
+  it('renders an empty review header and the correct Level 1 actions', () => {
+    const state = createInitialSession('?level=1');
+    state.view = 'results-field';
+    state.resultsLevelId = 1;
+    state.levelProgress[1].foundTargetIds = getLevel(1).targets.map(
+      (target) => target.id,
+    );
+
+    render(
+      <ResultsFieldScreen
+        state={state}
+        onOpenTarget={vi.fn()}
+        onPrimary={vi.fn()}
+        onHideField={vi.fn()}
+      />,
+    );
+
+    expect(screen.queryByText('Уровень пройден!')).not.toBeInTheDocument();
+    expect(screen.queryByLabelText(/Знания:/)).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Уровень 2' })).toBeVisible();
+    expect(screen.getByRole('button', { name: 'Скрыть поле' })).toBeVisible();
+  });
+
+  it('uses the Level 2 primary action in Field Review', () => {
+    const state = createInitialSession('?level=2');
+    state.view = 'results-field';
+    state.resultsLevelId = 2;
+
+    render(
+      <ResultsFieldScreen
+        state={state}
+        onOpenTarget={vi.fn()}
+        onPrimary={vi.fn()}
+        onHideField={vi.fn()}
+      />,
+    );
+
+    expect(screen.getByRole('button', { name: 'Завершить главу' })).toBeVisible();
   });
 });

@@ -1,5 +1,6 @@
-import { render, screen } from '@testing-library/react';
-import { describe, expect, it, vi } from 'vitest';
+import { fireEvent, render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { getLevel } from '../../content/levels';
 import { GameBoard } from './GameBoard';
 
@@ -49,5 +50,41 @@ describe('GameBoard hints', () => {
     expect(
       screen.getByLabelText('Х, строка 4, столбец 2').className,
     ).toContain('hintCurrent');
+  });
+});
+
+describe('GameBoard review mode', () => {
+  const level = getLevel(1);
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('ignores drag selection and opens a found target on tap', async () => {
+    const user = userEvent.setup();
+    render(
+      <GameBoard
+        {...callbacks}
+        mode="review"
+        level={level}
+        foundTargetIds={['risk']}
+      />,
+    );
+
+    const firstCell = screen.getByRole('button', {
+      name: 'И, строка 1, столбец 1. Найденное слово РИСК. Открыть информацию',
+    });
+    const secondCell = screen.getByLabelText('Я, строка 1, столбец 3');
+    fireEvent.pointerDown(firstCell, { pointerId: 1 });
+    fireEvent.pointerMove(secondCell, { pointerId: 1 });
+    fireEvent.pointerUp(secondCell, { pointerId: 1 });
+
+    expect(callbacks.onSubmit).not.toHaveBeenCalled();
+    expect(callbacks.onSelectionChange).not.toHaveBeenCalled();
+
+    await user.click(firstCell);
+    expect(callbacks.onOpenTarget).toHaveBeenCalledWith(
+      expect.objectContaining({ id: 'risk' }),
+    );
   });
 });
