@@ -367,7 +367,7 @@ export function Overlays({
 
         {state.overlay === 'regular-reward' ? (
           <ModalFrame key="regular-reward" className={styles.rewardModal}>
-            <h2 className={styles.rewardTitle}>Выбери награду</h2>
+            <h2 className={styles.rewardTitle}>Выберите награду</h2>
             <div className={styles.rewardGrid}>
               <button
                 type="button"
@@ -405,7 +405,7 @@ export function Overlays({
 
         {state.overlay === 'golden-reward' ? (
           <ModalFrame key="golden-reward" className={styles.rewardModal}>
-            <h2 className={styles.rewardTitle}>Выбери награду</h2>
+            <h2 className={styles.rewardTitle}>Выберите награду</h2>
             <div className={styles.rewardGrid}>
               <button
                 type="button"

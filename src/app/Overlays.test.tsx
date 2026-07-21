@@ -69,11 +69,11 @@ describe('supporting overlays', () => {
 
   it('uses the same compact title for regular and golden rewards', () => {
     const { unmount } = renderOverlay('regular-reward');
-    expect(screen.getByRole('heading', { name: 'Выбери награду' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Выберите награду' })).toBeInTheDocument();
     unmount();
 
     renderOverlay('golden-reward');
-    expect(screen.getByRole('heading', { name: 'Выбери награду' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Выберите награду' })).toBeInTheDocument();
   });
 
   it('returns Course and Product offers to Field Review', async () => {
