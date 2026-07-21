@@ -34,6 +34,30 @@ async function readGameState(page: Page) {
   });
 }
 
+async function expectInsideVisualViewport(page: Page, selector: string) {
+  const bounds = await page.locator(selector).boundingBox();
+  expect(bounds).not.toBeNull();
+  const viewport = await page.evaluate(() => ({
+    width: window.visualViewport?.width ?? window.innerWidth,
+    height: window.visualViewport?.height ?? window.innerHeight,
+  }));
+  expect(bounds!.x).toBeGreaterThanOrEqual(0);
+  expect(bounds!.y).toBeGreaterThanOrEqual(0);
+  expect(bounds!.x + bounds!.width).toBeLessThanOrEqual(viewport.width + 1);
+  expect(bounds!.y + bounds!.height).toBeLessThanOrEqual(viewport.height + 1);
+}
+
+async function expectNoDocumentScroll(page: Page) {
+  const metrics = await page.evaluate(() => ({
+    scrollWidth: document.documentElement.scrollWidth,
+    clientWidth: document.documentElement.clientWidth,
+    scrollHeight: document.documentElement.scrollHeight,
+    clientHeight: document.documentElement.clientHeight,
+  }));
+  expect(metrics.scrollWidth).toBe(metrics.clientWidth);
+  expect(metrics.scrollHeight).toBe(metrics.clientHeight);
+}
+
 test('complete MVP flow across both levels', async ({ page }) => {
   await page.goto('/');
   await expect(page.getByRole('heading', { name: 'Финворды' })).toBeVisible();
@@ -213,15 +237,72 @@ test('keeps the core UI inside all supported viewports', async ({ page }) => {
       expect(controlBox!.y + controlBox!.height).toBeLessThanOrEqual(viewport.height);
     }
 
-    const metrics = await page.evaluate(() => ({
-      scrollWidth: document.documentElement.scrollWidth,
-      clientWidth: document.documentElement.clientWidth,
-      scrollHeight: document.documentElement.scrollHeight,
-      clientHeight: document.documentElement.clientHeight,
-    }));
-    expect(metrics.scrollWidth).toBe(metrics.clientWidth);
-    expect(metrics.scrollHeight).toBe(metrics.clientHeight);
+    await expectNoDocumentScroll(page);
   }
+});
+
+test('fits Home, Game, and Results above open iPhone browser panels', async ({ page }) => {
+  await page.setViewportSize({ width: 393, height: 663 });
+
+  await page.goto('/');
+  await expect(page.locator('[data-density="compact"]')).toBeVisible();
+  await expectInsideVisualViewport(page, '[data-testid="home-primary"]');
+  await expectInsideVisualViewport(page, 'button:has-text("Золотой конверт")');
+  await expectNoDocumentScroll(page);
+
+  await page.goto('/?screen=game&level=1');
+  const envelope = page.getByRole('button', { name: /Показать бонусные слова/ });
+  await expect(envelope).toBeVisible();
+  await expectInsideVisualViewport(page, 'button[aria-label^="Показать бонусные слова"]');
+  await expect(envelope.getByText('0/4')).toBeVisible();
+  const envelopeAlignment = await envelope.evaluate((element) => {
+    const ring = element.querySelector<HTMLElement>('[role="progressbar"]');
+    const image = element.querySelector<HTMLImageElement>('img');
+    const ringRect = ring?.getBoundingClientRect();
+    const imageRect = image?.getBoundingClientRect();
+    return ringRect && imageRect
+      ? {
+          x: Math.abs(
+            ringRect.left + ringRect.width / 2 - (imageRect.left + imageRect.width / 2),
+          ),
+          y: Math.abs(
+            ringRect.top + ringRect.height / 2 - (imageRect.top + imageRect.height / 2),
+          ),
+        }
+      : null;
+  });
+  expect(envelopeAlignment).not.toBeNull();
+  expect(envelopeAlignment!.x).toBeLessThanOrEqual(1);
+  expect(envelopeAlignment!.y).toBeLessThanOrEqual(1);
+
+  const hint = page.getByRole('button', { name: /Использовать подсказку/ });
+  await hint.click();
+  await hint.click();
+  const stacking = await page.getByLabel('Игровое поле уровня 1').evaluate((board) => {
+    const arrow = board.querySelector<SVGElement>('svg');
+    const current = board.querySelector<HTMLElement>('button[class*="hintCurrent"]');
+    return arrow && current
+      ? {
+          arrow: Number.parseInt(getComputedStyle(arrow).zIndex, 10),
+          current: Number.parseInt(getComputedStyle(current).zIndex, 10),
+        }
+      : null;
+  });
+  expect(stacking).not.toBeNull();
+  expect(stacking!.arrow).toBeGreaterThan(stacking!.current);
+  await expectNoDocumentScroll(page);
+
+  await page.goto('/?screen=results&level=1');
+  await expectInsideVisualViewport(page, 'button:has-text("Уровень 2")');
+  await expectInsideVisualViewport(page, 'button:has-text("Показать поле")');
+  const resultsBack = page.getByRole('button', { name: 'На главный экран' });
+  const backStyle = await resultsBack.evaluate((button) => {
+    const style = getComputedStyle(button);
+    return { background: style.backgroundColor, shadow: style.boxShadow };
+  });
+  expect(backStyle.background).toBe('rgba(0, 0, 0, 0)');
+  expect(backStyle.shadow).toBe('none');
+  await expectNoDocumentScroll(page);
 });
 
 test('reports a noncanonical target route without awarding the word', async ({ page }) => {

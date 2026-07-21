@@ -42,7 +42,7 @@ export function LinearProgress({
 }
 
 interface CircularProgressProps extends ProgressProps {
-  size?: number;
+  size?: number | string;
   strokeWidth?: number;
   showValue?: boolean;
 }
@@ -59,6 +59,7 @@ export function CircularProgress({
   const radius = 50 - strokeWidth / 2;
   const circumference = 2 * Math.PI * radius;
   const progress = ratio(current, max);
+  const ringSize = typeof size === 'number' ? `${size}px` : size;
 
   return (
     <div
@@ -70,7 +71,7 @@ export function CircularProgress({
       style={
         {
           '--progress-color': color,
-          '--ring-size': `${size}px`,
+          '--ring-size': ringSize,
           '--ring-width': strokeWidth,
         } as React.CSSProperties
       }

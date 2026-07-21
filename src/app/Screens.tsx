@@ -305,7 +305,7 @@ export function GameScreen({
               current={state.bonusEnvelopeProgress}
               max={threshold}
               color="#38BDF8"
-              size={136}
+              size="var(--envelope-ring-size)"
               strokeWidth={12}
               showValue={false}
             />
@@ -339,10 +339,18 @@ export function ResultsScreen({
   const completed = state.completedLevelIds.length;
 
   return (
-    <section className={styles.screen} aria-label={`Результаты уровня ${levelId}`}>
+    <section
+      className={`${styles.screen} ${styles.resultsScreen}`}
+      aria-label={`Результаты уровня ${levelId}`}
+    >
       <div className={styles.resultsContent}>
         <div className={styles.resultsHeading}>
-          <IconButton icon="back" label="На главный экран" onClick={onBack} />
+          <IconButton
+            icon="back"
+            label="На главный экран"
+            variant="ghost"
+            onClick={onBack}
+          />
           <h1>Уровень пройден!</h1>
         </div>
         <KnowledgeBadge
@@ -368,7 +376,7 @@ export function ResultsScreen({
             current={completed}
             max={2}
             color="#3B5BDB"
-            size={112}
+            size="var(--results-ring-size)"
             strokeWidth={12}
           />
           <div>

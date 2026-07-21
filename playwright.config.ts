@@ -13,11 +13,18 @@ export default defineConfig({
   },
   projects: [
     {
-      name: 'mobile-390',
+      name: 'chromium-mobile',
       use: {
         ...devices['Desktop Chrome'],
         viewport: { width: 390, height: 844 },
         hasTouch: true,
+      },
+    },
+    {
+      name: 'webkit-iphone',
+      use: {
+        ...devices['iPhone 15'],
+        viewport: { width: 390, height: 844 },
       },
     },
   ],

@@ -18,6 +18,7 @@ import {
   ResultsScreen,
 } from './Screens';
 import { Overlays } from './Overlays';
+import { useVisualViewport } from './useVisualViewport';
 import styles from './App.module.css';
 
 declare global {
@@ -38,6 +39,7 @@ const INVALID_CUE = {
 };
 
 export function App() {
+  const viewport = useVisualViewport();
   const [state, dispatch] = useReducer(
     sessionReducer,
     window.location.search,
@@ -527,8 +529,16 @@ export function App() {
   );
 
   return (
-    <div className={styles.stage} data-game-state={JSON.stringify(textState)}>
-      <div className={styles.device}>
+    <div
+      className={styles.stage}
+      data-game-state={JSON.stringify(textState)}
+      style={
+        {
+          '--finwords-viewport-height': `${viewport.height}px`,
+        } as React.CSSProperties
+      }
+    >
+      <div className={styles.device} data-density={viewport.density}>
         <div className={styles.hostBand} aria-hidden="true" />
         <main className={styles.webview}>
           {renderScreen()}
