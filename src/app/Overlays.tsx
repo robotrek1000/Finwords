@@ -9,10 +9,10 @@ import { envelopeThreshold } from './session';
 import styles from './Overlays.module.css';
 
 const ASSETS = {
-  analyst: `${import.meta.env.BASE_URL}assets/character-analyst.png`,
-  regularEnvelope: `${import.meta.env.BASE_URL}assets/envelope-regular.png`,
-  goldenEnvelope: `${import.meta.env.BASE_URL}assets/envelope-golden.png`,
-  cushion: `${import.meta.env.BASE_URL}assets/chapter-financial-cushion.png`,
+  analyst: `${import.meta.env.BASE_URL}assets/character-analyst.webp`,
+  regularEnvelope: `${import.meta.env.BASE_URL}assets/envelope-regular.webp`,
+  goldenEnvelope: `${import.meta.env.BASE_URL}assets/envelope-golden.webp`,
+  cushion: `${import.meta.env.BASE_URL}assets/chapter-financial-cushion.webp`,
 };
 
 type OfferCloseMethod = 'close_icon' | 'continue_game' | 'return_to_field';

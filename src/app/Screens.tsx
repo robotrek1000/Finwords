@@ -18,12 +18,12 @@ import { CircularProgress, LinearProgress } from '../shared/ui/Progress';
 import styles from './Screens.module.css';
 
 const ASSETS = {
-  certificate: `${import.meta.env.BASE_URL}assets/certificate.png`,
-  cushion: `${import.meta.env.BASE_URL}assets/chapter-financial-cushion.png`,
-  home: `${import.meta.env.BASE_URL}assets/chapter-home-family.png`,
-  goldenEnvelope: `${import.meta.env.BASE_URL}assets/envelope-golden.png`,
-  regularEnvelope: `${import.meta.env.BASE_URL}assets/envelope-regular.png`,
-  analyst: `${import.meta.env.BASE_URL}assets/character-analyst.png`,
+  certificate: `${import.meta.env.BASE_URL}assets/certificate.webp`,
+  cushion: `${import.meta.env.BASE_URL}assets/chapter-financial-cushion.webp`,
+  home: `${import.meta.env.BASE_URL}assets/chapter-home-family.webp`,
+  goldenEnvelope: `${import.meta.env.BASE_URL}assets/envelope-golden.webp`,
+  regularEnvelope: `${import.meta.env.BASE_URL}assets/envelope-regular.webp`,
+  analyst: `${import.meta.env.BASE_URL}assets/character-analyst.webp`,
 };
 
 interface KnowledgeBadgeProps {
