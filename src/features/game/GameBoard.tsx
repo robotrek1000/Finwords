@@ -13,6 +13,7 @@ import styles from './GameBoard.module.css';
 
 interface GameBoardProps {
   mode?: 'play' | 'review';
+  inputDisabled?: boolean;
   level: LevelConfig;
   foundTargetIds: string[];
   hintTarget?: TargetWord;
@@ -24,6 +25,7 @@ interface GameBoardProps {
 
 export function GameBoard({
   mode = 'play',
+  inputDisabled = false,
   level,
   foundTargetIds,
   hintTarget,
@@ -35,6 +37,7 @@ export function GameBoard({
   const boardRef = useRef<HTMLDivElement>(null);
   const pointerIdRef = useRef<number | undefined>(undefined);
   const isSelectingRef = useRef(false);
+  const selectionRef = useRef<CellId[]>([]);
   const tappedTargetRef = useRef<TargetWord | undefined>(undefined);
   const [selection, setSelection] = useState<CellId[]>([]);
   const [bonusFlash, setBonusFlash] = useState<CellId[]>([]);
@@ -56,6 +59,7 @@ export function GameBoard({
   const currentHintCell = revealedHintPath.at(-1);
 
   function setActiveSelection(next: CellId[]) {
+    selectionRef.current = next;
     setSelection(next);
     onSelectionChange(next.length ? wordFromPath(level, next) : '', next);
   }
@@ -70,7 +74,7 @@ export function GameBoard({
       return;
     }
 
-    const path = selection;
+    const path = selectionRef.current;
     const result = evaluateSelection(level, path);
     if (result.type === 'bonus') {
       setBonusFlash(path);
@@ -82,7 +86,7 @@ export function GameBoard({
 
   function handlePointerDown(event: PointerEvent<HTMLButtonElement>, cellId: CellId) {
     event.preventDefault();
-    if (mode === 'review') {
+    if (mode === 'review' || inputDisabled) {
       return;
     }
     const lockedTarget = lockedCells.get(cellId);
@@ -98,7 +102,7 @@ export function GameBoard({
   }
 
   function handlePointerMove(event: PointerEvent<HTMLDivElement>) {
-    if (mode === 'review' || !isSelectingRef.current) {
+    if (mode === 'review' || inputDisabled || !isSelectingRef.current) {
       return;
     }
     const element = document.elementFromPoint(event.clientX, event.clientY);
@@ -107,17 +111,15 @@ export function GameBoard({
     if (!nextCell) {
       return;
     }
-    setSelection((current) => {
-      const next = extendSelection(current, nextCell, lockedCellIds);
-      if (next !== current) {
-        onSelectionChange(next.length ? wordFromPath(level, next) : '', next);
-      }
-      return next;
-    });
+    const current = selectionRef.current;
+    const next = extendSelection(current, nextCell, lockedCellIds);
+    if (next !== current) {
+      setActiveSelection(next);
+    }
   }
 
   function handlePointerUp(event: PointerEvent<HTMLDivElement>) {
-    if (mode === 'review') {
+    if (mode === 'review' || inputDisabled) {
       return;
     }
     if (
@@ -143,9 +145,10 @@ export function GameBoard({
       ref={boardRef}
       className={styles.board}
       data-mode={mode}
-      onPointerMove={mode === 'play' ? handlePointerMove : undefined}
-      onPointerUp={mode === 'play' ? handlePointerUp : undefined}
-      onPointerCancel={mode === 'play' ? handlePointerCancel : undefined}
+      aria-disabled={inputDisabled || undefined}
+      onPointerMove={mode === 'play' && !inputDisabled ? handlePointerMove : undefined}
+      onPointerUp={mode === 'play' && !inputDisabled ? handlePointerUp : undefined}
+      onPointerCancel={mode === 'play' && !inputDisabled ? handlePointerCancel : undefined}
       aria-label={`Игровое поле уровня ${level.id}`}
     >
       {revealedHintPath.length > 1 ? (
@@ -210,13 +213,16 @@ export function GameBoard({
                     : `${letter}, строка ${rowIndex + 1}, столбец ${columnIndex + 1}`
                 }
                 aria-pressed={selectedCells.has(cellId)}
+                disabled={mode === 'play' && inputDisabled}
                 style={
                   foundTarget
                     ? ({ '--word-color': foundTarget.color } as React.CSSProperties)
                     : undefined
                 }
                 onPointerDown={
-                  mode === 'play' ? (event) => handlePointerDown(event, cellId) : undefined
+                  mode === 'play' && !inputDisabled
+                    ? (event) => handlePointerDown(event, cellId)
+                    : undefined
                 }
                 onClick={
                   mode === 'review' && foundTarget

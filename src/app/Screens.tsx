@@ -193,6 +193,7 @@ interface GameScreenProps {
   state: SessionState;
   level: LevelConfig;
   mentor?: MentorCue;
+  interactionLocked?: boolean;
   onBack: () => void;
   onSubmit: (result: SelectionResult, path: CellId[]) => void;
   onOpenTarget: (target: TargetWord) => void;
@@ -204,6 +205,7 @@ export function GameScreen({
   state,
   level,
   mentor,
+  interactionLocked = false,
   onBack,
   onSubmit,
   onOpenTarget,
@@ -224,7 +226,13 @@ export function GameScreen({
     <section className={styles.screen} aria-label={`Уровень ${level.id}`}>
       <div className={styles.game}>
         <header className={`${styles.header} ${styles.gameHeader}`}>
-          <IconButton icon="back" label="Выйти из уровня" variant="ghost" onClick={onBack} />
+          <IconButton
+            icon="back"
+            label="Выйти из уровня"
+            variant="ghost"
+            disabled={interactionLocked}
+            onClick={onBack}
+          />
           <h1 className={styles.headerTitle}>Уровень {level.id}</h1>
           <KnowledgeBadge value={state.knowledge} size="compact" />
         </header>
@@ -277,6 +285,7 @@ export function GameScreen({
             foundTargetIds={progress.foundTargetIds}
             hintTarget={activeHintTarget}
             hintRevealedCount={hintRevealedCount}
+            inputDisabled={interactionLocked}
             onSubmit={onSubmit}
             onOpenTarget={onOpenTarget}
             onSelectionChange={(word) => setSelectionWord(word)}
@@ -288,7 +297,11 @@ export function GameScreen({
             type="button"
             className={styles.hintButton}
             onClick={onUseHint}
-            disabled={state.hints <= 0 || progress.foundTargetIds.length === level.targets.length}
+            disabled={
+              interactionLocked ||
+              state.hints <= 0 ||
+              progress.foundTargetIds.length === level.targets.length
+            }
             aria-label={`Использовать подсказку. Осталось: ${state.hints}`}
           >
             <img src={ASSETS.analyst} alt="" />
@@ -299,6 +312,7 @@ export function GameScreen({
             type="button"
             className={styles.envelopeProgress}
             onClick={onOpenBonusWords}
+            disabled={interactionLocked}
             aria-label={`Показать бонусные слова. Найдено: ${progress.foundBonusWords.length}. Прогресс конверта: ${state.bonusEnvelopeProgress} из ${threshold}`}
           >
             <CircularProgress

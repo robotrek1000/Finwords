@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useReducer, useRef } from 'react';
+import { useCallback, useEffect, useMemo, useReducer, useRef, useState } from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
 import type { CellId, LevelId, Overlay, TargetWord } from './types';
 import type { SelectionResult } from '../features/game/gameEngine';
@@ -42,6 +42,7 @@ const INVALID_CUE = {
 
 const FIELD_HISTORY_STATE = 'results-field';
 const FIELD_OVERLAY_HISTORY_STATE = 'results-field-overlay';
+const REGULAR_REWARD_AUTO_OPEN_MS = 500;
 
 type FieldCloseMethod = 'hide_button' | 'system_back' | 'primary_action';
 type FieldHistoryIntent =
@@ -58,6 +59,9 @@ export function App() {
   );
   const stateRef = useRef(state);
   const fieldHistoryIntentRef = useRef<FieldHistoryIntent | undefined>(undefined);
+  const regularRewardTimerRef = useRef<number | undefined>(undefined);
+  const regularRewardPendingRef = useRef(false);
+  const [regularRewardPending, setRegularRewardPending] = useState(false);
   const toastId = useRef(0);
   const level = getLevel(state.currentLevelId);
   const progress = state.levelProgress[state.currentLevelId];
@@ -126,6 +130,41 @@ export function App() {
     }
   }, []);
 
+  const openPendingRegularReward = useCallback(() => {
+    if (!regularRewardPendingRef.current) {
+      return;
+    }
+    if (regularRewardTimerRef.current !== undefined) {
+      window.clearTimeout(regularRewardTimerRef.current);
+      regularRewardTimerRef.current = undefined;
+    }
+    regularRewardPendingRef.current = false;
+    setRegularRewardPending(false);
+    dispatch({ type: 'CLEAR_TOAST' });
+    dispatch({ type: 'SET_OVERLAY', overlay: 'regular-reward' });
+  }, []);
+
+  const scheduleRegularReward = useCallback(() => {
+    if (regularRewardTimerRef.current !== undefined) {
+      window.clearTimeout(regularRewardTimerRef.current);
+    }
+    regularRewardPendingRef.current = true;
+    setRegularRewardPending(true);
+    regularRewardTimerRef.current = window.setTimeout(
+      openPendingRegularReward,
+      REGULAR_REWARD_AUTO_OPEN_MS,
+    );
+  }, [openPendingRegularReward]);
+
+  useEffect(
+    () => () => {
+      if (regularRewardTimerRef.current !== undefined) {
+        window.clearTimeout(regularRewardTimerRef.current);
+      }
+    },
+    [],
+  );
+
   useEffect(() => {
     if (!state.toast) {
       return;
@@ -145,6 +184,9 @@ export function App() {
   useEffect(() => {
     function advanceTransient(event: Event) {
       const detail = (event as CustomEvent<number>).detail;
+      if (detail >= REGULAR_REWARD_AUTO_OPEN_MS) {
+        openPendingRegularReward();
+      }
       if (detail >= 1000) {
         finishToast();
       }
@@ -154,7 +196,7 @@ export function App() {
     }
     window.addEventListener('finwords:advance-time', advanceTransient);
     return () => window.removeEventListener('finwords:advance-time', advanceTransient);
-  }, [finishToast]);
+  }, [finishToast, openPendingRegularReward]);
 
   useEffect(() => {
     if (
@@ -490,8 +532,10 @@ export function App() {
       setToast(
         `${result.word} · бонусное слово`,
         'success',
-        willFill ? 'regular-reward' : undefined,
       );
+      if (willFill) {
+        scheduleRegularReward();
+      }
       return;
     }
 
@@ -621,6 +665,7 @@ export function App() {
             state={state}
             level={level}
             mentor={state.currentMentor}
+            interactionLocked={regularRewardPending}
             onBack={() => dispatch({ type: 'SET_OVERLAY', overlay: 'exit' })}
             onSubmit={handleSelection}
             onOpenTarget={(target) => openTarget(target, 'word_tap')}

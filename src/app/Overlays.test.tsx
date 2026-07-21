@@ -12,7 +12,7 @@ function renderOverlay(overlay: ReturnType<typeof createInitialSession>['overlay
     overlay,
   };
 
-  render(
+  const renderResult = render(
     <Overlays
       state={state}
       onClose={vi.fn()}
@@ -26,7 +26,7 @@ function renderOverlay(overlay: ReturnType<typeof createInitialSession>['overlay
     />,
   );
 
-  return { onToggleSetting };
+  return { onToggleSetting, unmount: renderResult.unmount };
 }
 
 describe('supporting overlays', () => {
@@ -65,6 +65,15 @@ describe('supporting overlays', () => {
     expect(screen.getByText('Пока бонусных слов нет')).toBeInTheDocument();
     expect(screen.getByText('На этом уровне найдено 0 из 4')).toBeInTheDocument();
     expect(screen.getAllByRole('button', { name: 'Закрыть', hidden: true })).toHaveLength(2);
+  });
+
+  it('uses the same compact title for regular and golden rewards', () => {
+    const { unmount } = renderOverlay('regular-reward');
+    expect(screen.getByRole('heading', { name: 'Выбери награду' })).toBeInTheDocument();
+    unmount();
+
+    renderOverlay('golden-reward');
+    expect(screen.getByRole('heading', { name: 'Выбери награду' })).toBeInTheDocument();
   });
 
   it('returns Course and Product offers to Field Review', async () => {

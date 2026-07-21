@@ -88,3 +88,31 @@ describe('GameBoard review mode', () => {
     );
   });
 });
+
+describe('GameBoard input lock', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('blocks a new selection while the reward auto-open is pending', () => {
+    const level = getLevel(1);
+    render(
+      <GameBoard
+        {...callbacks}
+        inputDisabled
+        level={level}
+        foundTargetIds={[]}
+      />,
+    );
+
+    const firstCell = screen.getByLabelText('И, строка 1, столбец 1');
+    fireEvent.pointerDown(firstCell, { pointerId: 1 });
+
+    expect(firstCell).toBeDisabled();
+    expect(screen.getByLabelText('Игровое поле уровня 1')).toHaveAttribute(
+      'aria-disabled',
+      'true',
+    );
+    expect(callbacks.onSelectionChange).not.toHaveBeenCalled();
+  });
+});

@@ -90,7 +90,7 @@ test('complete MVP flow across both levels', async ({ page }) => {
     await finishTransient(page);
   }
 
-  await expect(page.getByRole('heading', { name: 'Выберите награду' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Выбери награду' })).toBeVisible();
   await page.getByRole('button', { name: /Подсказка/ }).click();
   await page.getByRole('button', { name: 'Забрать' }).click();
   expect((await readGameState(page)).hints).toBe(6);
@@ -171,7 +171,7 @@ test('complete MVP flow across both levels', async ({ page }) => {
 
   await page.getByRole('button', { name: 'Показать поле' }).click();
   await page.getByTestId('results-field-primary').click();
-  await expect(page.getByRole('heading', { name: 'Золотая награда' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Выбери награду' })).toBeVisible();
   await page.getByRole('button', { name: /Подсказки/ }).click();
   await page.getByRole('button', { name: 'Забрать' }).click();
 
@@ -264,6 +264,20 @@ test('opens and closes supporting MVP screens without losing progress', async ({
   await page.getByTestId('home-primary').click();
   await expect(page.getByRole('heading', { name: 'Уровень 1' })).toBeVisible();
   expect((await readGameState(page)).foundTargets).toEqual(['risk']);
+});
+
+test('prioritizes the filled bonus envelope and auto-opens its reward', async ({ page }) => {
+  await page.goto('/?screen=game&level=1&envelope=3');
+  const finalBonusPath: CellId[] = ['4:5', '5:5', '5:6', '4:6'];
+
+  await selectPath(page, finalBonusPath);
+  await expect(page.locator('[data-cell-id="1:1"]')).toBeDisabled({ timeout: 250 });
+  expect((await readGameState(page)).foundBonusWords).toEqual(['ЛАПА']);
+
+  await expect(page.getByRole('heading', { name: 'Выбери награду' })).toBeVisible({
+    timeout: 900,
+  });
+  expect((await readGameState(page)).envelope).toEqual({ current: 4, max: 4 });
 });
 
 test('keeps the core UI inside all supported viewports', async ({ page }) => {
@@ -415,11 +429,11 @@ test('centers offer and reward modals in the WebView', async ({ page }) => {
     },
     {
       url: '/?screen=game&level=1&overlay=regular-reward',
-      heading: 'Выберите награду',
+      heading: 'Выбери награду',
     },
     {
       url: '/?screen=home&overlay=golden-reward',
-      heading: 'Золотая награда',
+      heading: 'Выбери награду',
     },
   ];
 
