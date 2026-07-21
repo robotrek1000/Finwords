@@ -1,5 +1,7 @@
 node_modules
 .npm-cache
+.vite
+.codex-tmp
 dist
 coverage
 playwright-report
@@ -7,5 +9,6 @@ test-results
 output
 progress.md
 .DS_Store
+**/.DS_Store
 *.local
 .playwright-cli
