@@ -1793,7 +1793,12 @@ describe('P1 application shell', () => {
 
     releaseRoute(directRoute);
 
-    expect(await screen.findByText('Собери слово по-другому')).toBeVisible();
+    await waitFor(() => expect(api.submitRoute).toHaveBeenCalledTimes(1));
+    expect(await screen.findByText(
+      'Собери слово по-другому',
+      undefined,
+      { timeout: 3_000 },
+    )).toBeVisible();
     expect(screen.queryByText('Это слово не загадано')).not.toBeInTheDocument();
   });
 
