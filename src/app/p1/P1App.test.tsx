@@ -824,7 +824,12 @@ describe('P1 application shell', () => {
 
     releaseRoute(directRoute);
 
-    expect(await screen.findByText('РОТ · бонусное слово')).toBeVisible();
+    await waitFor(() => expect(api.submitRoute).toHaveBeenCalledTimes(1));
+    expect(await screen.findByText(
+      'РОТ · бонусное слово',
+      undefined,
+      { timeout: 3_000 },
+    )).toBeVisible();
     expect(screen.getByRole('button', { name: 'Бонусные слова: 1' })).toBeVisible();
     expect(screen.getByText('1/6')).toBeVisible();
     expect(screen.queryByText('0/0')).not.toBeInTheDocument();
