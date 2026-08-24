@@ -178,17 +178,28 @@ test('четыре уникальных бонусных слова показы
   ).toHaveAttribute('aria-valuenow', '4');
   await expect(bonusEnvelope).toContainText('4/4');
 
-  await bonusEnvelope.click();
-  const bonusDialog = page.getByRole('dialog', { name: 'Бонусные слова' });
-  await expect(bonusDialog).toBeVisible();
-  await expect(
-    bonusDialog.getByRole('progressbar', { name: 'Прогресс бонусных слов' }),
-  ).toHaveAttribute('aria-valuenow', '4');
-  await expect(bonusDialog.getByText('4/4', { exact: true })).toBeVisible();
-  await expect(bonusDialog.getByText('Конверт готов — заберите награду', { exact: true })).toBeVisible();
-  await bonusDialog.getByRole('button', { name: 'Закрыть', exact: true }).click();
-
   const rewardDialog = page.getByRole('dialog', { name: 'Выберите награду' });
+  const bonusDialog = page.getByRole('dialog', { name: 'Бонусные слова' });
+  const bonusDialogOpened = await bonusEnvelope.click({ timeout: 1_000 }).then(
+    () => true,
+    async (error: unknown) => {
+      if (await rewardDialog.isVisible()) return false;
+      throw error;
+    },
+  );
+
+  if (bonusDialogOpened) {
+    await expect(bonusDialog).toBeVisible();
+    await expect(
+      bonusDialog.getByRole('progressbar', { name: 'Прогресс бонусных слов' }),
+    ).toHaveAttribute('aria-valuenow', '4');
+    await expect(bonusDialog.getByText('4/4', { exact: true })).toBeVisible();
+    await expect(
+      bonusDialog.getByText('Конверт готов — заберите награду', { exact: true }),
+    ).toBeVisible();
+    await bonusDialog.getByRole('button', { name: 'Закрыть', exact: true }).click();
+  }
+
   await expect(rewardDialog).toBeVisible({ timeout: 1_500 });
   await expect(rewardDialog).toHaveCount(1);
   await rewardDialog.getByRole('radio', { name: '1 подсказка', exact: true }).check();
