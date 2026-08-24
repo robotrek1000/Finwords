@@ -43,7 +43,7 @@ async function selectPathByKeyboard(
   const firstCell = cell(page, path[0]);
   await firstCell.focus();
   await expect(firstCell).toBeFocused();
-  await page.keyboard.press(startKey);
+  await firstCell.press(startKey);
   await expect(firstCell).toHaveAttribute('aria-pressed', 'true');
 
   for (const [index, nextCellId] of path.slice(1).entries()) {

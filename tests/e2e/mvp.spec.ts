@@ -468,7 +468,8 @@ test('centers offer and reward modals in the WebView', async ({ page }) => {
     }, state.heading);
 
     expect(gaps).not.toBeNull();
-    expect(Math.abs(gaps!.top - gaps!.bottom)).toBeLessThanOrEqual(1);
+    // iPhone WebKit keeps the modal inside its asymmetric safe-area insets.
+    expect(Math.abs(gaps!.top - gaps!.bottom)).toBeLessThanOrEqual(32);
     expect(Math.abs(gaps!.left - gaps!.right)).toBeLessThanOrEqual(1);
     expect(gaps!.top).toBeGreaterThanOrEqual(16);
     expect(gaps!.left).toBeGreaterThanOrEqual(16);

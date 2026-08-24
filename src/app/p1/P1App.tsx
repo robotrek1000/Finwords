@@ -1000,6 +1000,7 @@ export function P1App({
   const [gameRewardOpened, setGameRewardOpened] = useState(false);
   const clientStateRef = useRef<ClientStateResponse | null>(null);
   const phaseRef = useRef<Phase>('loading');
+  const modalRef = useRef<Modal>('none');
   const rewardOpenTimerRef = useRef<{ rewardId: string; timer: number } | null>(null);
   const [selectedTarget, setSelectedTarget] = useState<FoundTarget | null>(null);
   const [levelResults, setLevelResults] = useState<LevelResultsResponse | null>(null);
@@ -1047,15 +1048,19 @@ export function P1App({
       rewardId,
       timer: window.setTimeout(() => {
         const pendingReward = availablePendingReward(clientStateRef.current);
+        rewardOpenTimerRef.current = null;
         if (
           phaseRef.current === 'game' &&
           pendingReward?.rewardId === rewardId &&
           pendingReward.rewardType === RewardSummaryRewardTypeEnum.Regular
         ) {
+          if (modalRef.current !== 'none') {
+            scheduleRewardOpen(rewardId);
+            return;
+          }
           setRewardStatus('idle');
           setModal('reward');
         }
-        rewardOpenTimerRef.current = null;
       }, 500),
     };
   }
@@ -1236,7 +1241,8 @@ export function P1App({
   useEffect(() => {
     clientStateRef.current = clientState;
     phaseRef.current = phase;
-  }, [clientState, phase]);
+    modalRef.current = modal;
+  }, [clientState, modal, phase]);
 
   useEffect(() => {
     const startTimer = window.setTimeout(() => void load(), 0);
