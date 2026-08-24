@@ -5,9 +5,15 @@ import type { CellId } from '../../src/app/types';
 const LEVEL_ONE = LEVELS[1];
 const FUND_PATH = LEVEL_ONE.targets.find((target) => target.id === 'fund')!.path;
 
+async function waitForRouteReady(page: Page) {
+  const board = page.getByLabel('Игровое поле');
+  await expect(board).not.toHaveAttribute('aria-disabled', 'true');
+  await expect.poll(() => board.getAttribute('data-route-state')).toBeNull();
+  await expect(board.locator('[aria-pressed="true"]')).toHaveCount(0);
+}
+
 async function finishTransient(page: Page) {
-  await page.evaluate(() => window.advanceTime?.(1600));
-  await page.waitForTimeout(20);
+  await waitForRouteReady(page);
 }
 
 async function enterLevelOne(page: Page, url = '/') {
@@ -40,6 +46,7 @@ async function selectPathByKeyboard(
   path: readonly CellId[],
   startKey: 'Enter' | 'Space' = 'Space',
 ) {
+  await waitForRouteReady(page);
   const firstCell = cell(page, path[0]);
   await firstCell.focus();
   await expect(firstCell).toBeFocused();

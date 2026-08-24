@@ -6,7 +6,15 @@ const LEVEL_ONE = LEVELS[1];
 const FUND_TARGET = LEVEL_ONE.targets.find((target) => target.id === 'fund')!;
 const STOCK_TARGET = LEVEL_ONE.targets.find((target) => target.id === 'stock')!;
 
+async function waitForRouteReady(page: Page) {
+  const board = page.getByLabel('Игровое поле');
+  await expect(board).not.toHaveAttribute('aria-disabled', 'true');
+  await expect.poll(() => board.getAttribute('data-route-state')).toBeNull();
+  await expect(board.locator('[aria-pressed="true"]')).toHaveCount(0);
+}
+
 async function selectPath(page: Page, path: readonly CellId[]) {
+  await waitForRouteReady(page);
   const centers = [];
   for (const cellId of path) {
     const box = await page.locator(`[data-cell-id="${cellId}"]`).boundingBox();
@@ -38,7 +46,7 @@ async function selectPath(page: Page, path: readonly CellId[]) {
 }
 
 async function finishTransient(page: Page) {
-  await page.evaluate(() => window.advanceTime?.(1600));
+  await waitForRouteReady(page);
 }
 
 async function enterLevelOne(page: Page) {
@@ -84,7 +92,6 @@ async function completeLevelOne(page: Page) {
             || (await page.getByLabel(`Знания: ${initialKnowledge + index + 1}`).isVisible()),
           )
           .toBe(true);
-        await finishTransient(page);
         await expect(
           resultsHeading,
           'Seventh authoritative target success must replace the completed Game with Results',
@@ -98,7 +105,7 @@ async function completeLevelOne(page: Page) {
       await expect(
         page.getByLabel(`Осталось слов: ${LEVEL_ONE.targets.length - index - 1} из 7`),
       ).toBeVisible();
-       await finishTransient(page);
+      await finishTransient(page);
       await expect(board).not.toHaveAttribute('aria-disabled', 'true');
     });
   }

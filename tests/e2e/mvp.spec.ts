@@ -2,7 +2,15 @@ import { expect, test, type Page } from '@playwright/test';
 import { LEVELS } from '../../src/content/levels';
 import type { CellId } from '../../src/app/types';
 
+async function waitForRouteReady(page: Page) {
+  const board = page.getByLabel('Игровое поле');
+  await expect(board).not.toHaveAttribute('aria-disabled', 'true');
+  await expect.poll(() => board.getAttribute('data-route-state')).toBeNull();
+  await expect(board.locator('[aria-pressed="true"]')).toHaveCount(0);
+}
+
 async function selectPath(page: Page, path: readonly CellId[]) {
+  await waitForRouteReady(page);
   const centers = [];
   for (const cellId of path) {
     const box = await page.locator(`[data-cell-id="${cellId}"]`).boundingBox();
@@ -24,7 +32,7 @@ async function selectPath(page: Page, path: readonly CellId[]) {
 }
 
 async function finishTransient(page: Page) {
-  await page.evaluate(() => window.advanceTime?.(1600));
+  await waitForRouteReady(page);
 }
 
 async function readGameState(page: Page) {

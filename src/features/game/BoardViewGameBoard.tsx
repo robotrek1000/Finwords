@@ -266,6 +266,8 @@ export function BoardViewGameBoard({
   }
 
   function startSelection(cellId: CellId) {
+    window.cancelAnimationFrame(clearFrameRef.current ?? 0);
+    clearFrameRef.current = undefined;
     if (selectionRef.current.length === 0) {
       setRouteColor(TARGET_PALETTE[foundTargets.length % TARGET_PALETTE.length]);
     }
@@ -275,7 +277,6 @@ export function BoardViewGameBoard({
   function handlePointerDown(event: PointerEvent<HTMLButtonElement>, cellId: CellId) {
     event.preventDefault();
     if (inputDisabled || lockedCellIds.has(cellId)) return;
-    window.cancelAnimationFrame(clearFrameRef.current ?? 0);
     pointerIdRef.current = event.pointerId;
     selectingRef.current = true;
     startSelection(cellId);
