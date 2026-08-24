@@ -1,0 +1,57 @@
+.surface {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  background: var(--background-base);
+}
+
+.pattern {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  display: grid;
+  width: 576px;
+  grid-template-columns: repeat(3, 192px);
+  transform: translate(-50%, -50%) rotate(6.5deg);
+  transform-origin: center;
+  opacity: 0.08;
+  mix-blend-mode: soft-light;
+}
+
+.surface[data-background-id='background-error'] .pattern {
+  opacity: 0.09;
+}
+
+.surface[data-background-id='background-cabin'] .pattern,
+.surface[data-background-id='background-port'] .pattern,
+.surface[data-background-id='background-open-sea'] .pattern,
+.surface[data-background-id='background-business-harbor'] .pattern,
+.surface[data-background-id='background-bridge'] .pattern {
+  opacity: 0.1;
+}
+
+.surface[data-background-id='background-golden-bay'] .pattern,
+.surface[data-background-id='background-night-ocean'] .pattern,
+.surface[data-background-id='background-freedom-horizon'] .pattern {
+  opacity: 0.12;
+}
+
+.topFade,
+.bottomFade {
+  position: absolute;
+  right: 0;
+  left: 0;
+}
+
+.topFade {
+  top: 0;
+  height: 42%;
+  background: linear-gradient(to bottom, color-mix(in srgb, var(--background-base) 72%, transparent), transparent);
+}
+
+.bottomFade {
+  top: 68%;
+  bottom: 0;
+  background: linear-gradient(to bottom, transparent, color-mix(in srgb, var(--background-bottom) 86%, transparent));
+}

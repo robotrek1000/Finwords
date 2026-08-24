@@ -1,0 +1,197 @@
+.board {
+  --grid-gap: 10px;
+  position: relative;
+  display: grid;
+  width: min(328px, calc(100vw - 16px));
+  aspect-ratio: 1;
+  grid-template-columns: repeat(var(--board-size), minmax(0, 1fr));
+  grid-template-rows: repeat(var(--board-size), minmax(0, 1fr));
+  gap: var(--grid-gap);
+  margin: 0 auto;
+  overflow: hidden;
+  border-radius: 22px;
+  background: #f1f5f9;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.board[data-size='5'],
+.board[data-size='6'] {
+  --grid-gap: 6px;
+}
+
+.routeLayer {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.selectionShape {
+  fill: var(--selection-color, #86d3f4);
+}
+
+.hintConnector {
+  stroke: #315dcc;
+  stroke-width: 6;
+  stroke-linecap: round;
+}
+
+.cell {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  min-width: 0;
+  min-height: 44px;
+  place-items: center;
+  overflow: hidden;
+  appearance: none;
+  border: 1px solid #cbd5e1;
+  border-radius: clamp(10px, 3vw, 12px);
+  color: #18243c;
+  background: #fff;
+  font: 700 clamp(20px, 6.5vw, 30px) / 1 Fregat, sans-serif;
+  cursor: pointer;
+  transition:
+    color 140ms ease,
+    opacity 140ms ease,
+    transform 140ms ease;
+}
+
+.board[data-size='5'] .cell,
+.board[data-size='6'] .cell {
+  font-size: clamp(18px, 5.4vw, 21px);
+}
+
+.cell span {
+  position: relative;
+  z-index: 2;
+}
+
+.foundGroup[data-pulse-iterations] {
+  animation: foundPathPulse 800ms ease-in-out 4;
+}
+
+@keyframes foundPathPulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.45;
+  }
+}
+
+.cell:active:not(:disabled) {
+  transform: scale(0.96);
+}
+
+.cell:focus-visible {
+  outline: 3px solid #315dcc;
+  outline-offset: -3px;
+}
+
+.cell:disabled {
+  cursor: default;
+}
+
+.instructions {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.selected {
+  border-color: transparent;
+  background: transparent;
+  transform: scale(1.02);
+}
+
+.found {
+  border-color: transparent;
+  background: transparent;
+}
+
+.hintPrevious,
+.hintCurrent {
+  color: #315dcc;
+}
+
+.hintPrevious span {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 4px;
+}
+
+.hintCurrent span::after {
+  position: absolute;
+  right: 50%;
+  bottom: -7px;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: currentColor;
+  content: '';
+  transform: translateX(50%);
+}
+
+.board[data-route-state='invalid'] .selectionShape {
+  animation: routePulse 250ms ease-in-out;
+}
+
+.board[data-route-state='bonus'] .selectionShape,
+.board[data-route-state='repeated'] .selectionShape {
+  animation: routeDissolve 420ms ease-out forwards;
+}
+
+@keyframes routePulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.55;
+  }
+}
+
+@keyframes routeDissolve {
+  to {
+    opacity: 0;
+  }
+}
+
+@media (max-width: 340px) {
+  .board {
+    border-radius: 18px;
+  }
+
+  .cell {
+    border-radius: 10px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cell {
+    transition: none;
+  }
+
+  .foundGroup {
+    animation: none;
+  }
+
+  .board[data-route-state='invalid'] .selectionShape,
+  .board[data-route-state='bonus'] .selectionShape,
+  .board[data-route-state='repeated'] .selectionShape {
+    animation: none;
+  }
+}

@@ -45,6 +45,15 @@ jobs:
           VITE_BASE_URL: /Finwords/
         run: npm run build
 
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium webkit
+
+      - name: Mobile end-to-end tests
+        run: npm run test:e2e
+
+      - name: Production Pages smoke test
+        run: npm run test:e2e:pages
+
       - name: Disable Jekyll
         run: touch dist/.nojekyll
 

@@ -21,6 +21,7 @@ import {
 } from './Screens';
 import { Overlays } from './Overlays';
 import { useVisualViewport } from './useVisualViewport';
+import { P1App } from './p1/P1App';
 import styles from './App.module.css';
 
 declare global {
@@ -49,12 +50,18 @@ type FieldHistoryIntent =
   | { type: 'close'; method: FieldCloseMethod }
   | { type: 'primary' };
 
-export function App() {
+interface LegacyAppProps {
+  initialSearch?: string;
+}
+
+export function LegacyApp({
+  initialSearch = window.location.search,
+}: LegacyAppProps = {}) {
   const viewport = useVisualViewport();
   const reduceMotion = useReducedMotion();
   const [state, dispatch] = useReducer(
     sessionReducer,
-    window.location.search,
+    initialSearch,
     createInitialSession,
   );
   const stateRef = useRef(state);
@@ -764,6 +771,36 @@ export function App() {
         </main>
         <div className={styles.hostBand} aria-hidden="true" />
       </div>
+    </div>
+  );
+}
+
+export function App() {
+  const params = new URLSearchParams(window.location.search);
+  const legacyPreview = params.has('screen') || params.has('overlay');
+
+  if (legacyPreview) {
+    return <LegacyApp />;
+  }
+
+  return <StandaloneApp />;
+}
+
+function StandaloneApp() {
+  const viewport = useVisualViewport();
+
+  return (
+    <div
+      className={styles.standaloneStage}
+      style={
+        {
+          '--finwords-viewport-height': `${viewport.height}px`,
+        } as React.CSSProperties
+      }
+    >
+      <main className={styles.standaloneFrame} data-standalone-frame>
+        <P1App />
+      </main>
     </div>
   );
 }

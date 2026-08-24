@@ -61,3 +61,34 @@
     box-shadow: none;
   }
 }
+
+.standaloneStage {
+  display: grid;
+  width: 100%;
+  height: var(--finwords-viewport-height, 100dvh);
+  place-items: center;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 50% 8%, rgb(49 93 204 / 24%), transparent 38%),
+    #091124;
+}
+
+.standaloneFrame {
+  position: relative;
+  width: min(430px, 100vw);
+  height: min(932px, var(--finwords-viewport-height, 100dvh));
+  overflow: hidden;
+  border-radius: 28px;
+  background: #111a33;
+  box-shadow: 0 28px 80px rgb(0 0 0 / 42%);
+  isolation: isolate;
+}
+
+@media (max-width: 430px) {
+  .standaloneFrame {
+    width: 100%;
+    height: var(--finwords-viewport-height, 100dvh);
+    border-radius: 0;
+    box-shadow: none;
+  }
+}

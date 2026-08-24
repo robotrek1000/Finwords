@@ -7,6 +7,9 @@ export default defineConfig({
   test: {
     include: ['src/**/*.test.{ts,tsx}'],
     environment: 'jsdom',
+    environmentOptions: {
+      jsdom: { url: 'http://localhost/' },
+    },
     setupFiles: './src/test/setup.ts',
     css: true,
   },

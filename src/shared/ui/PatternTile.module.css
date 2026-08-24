@@ -1,0 +1,7 @@
+.tile {
+  display: block;
+  width: 192px;
+  height: 192px;
+  flex: 0 0 192px;
+  background: var(--pattern-image) center / contain no-repeat;
+}

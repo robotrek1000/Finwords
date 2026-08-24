@@ -1,0 +1,13 @@
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="172" height="162" viewBox="0 0 172 162" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="Group">
+<path id="Vector" d="M39 68C55.0163 68 68 55.0163 68 39C68 22.9837 55.0163 10 39 10C22.9837 10 10 22.9837 10 39C10 55.0163 22.9837 68 39 68Z" stroke="white" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+<path id="Vector_2" d="M39 49C44.5228 49 49 44.5228 49 39C49 33.4772 44.5228 29 39 29C33.4772 29 29 33.4772 29 39C29 44.5228 33.4772 49 39 49Z" stroke="white" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+<path id="Vector_3" d="M39 2V29M39 49V76M2 39H29M49 39H76M13 13L32 32M46 46L65 65M65 13L46 32M32 46L13 65" stroke="white" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+<path id="Vector_4" d="M102 66C102 56.9826 105.582 48.3346 111.958 41.9584C118.335 35.5821 126.983 32 136 32C145.017 32 153.665 35.5821 160.042 41.9584C166.418 48.3346 170 56.9826 170 66M112 66C112 59.6348 114.529 53.5303 119.029 49.0294C123.53 44.5286 129.635 42 136 42C142.365 42 148.47 44.5286 152.971 49.0294C157.471 53.5303 160 59.6348 160 66M122 66C122 62.287 123.475 58.726 126.101 56.1005C128.726 53.475 132.287 52 136 52C139.713 52 143.274 53.475 145.899 56.1005C148.525 58.726 150 62.287 150 66M136 66V33" stroke="white" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+<path id="Vector_5" d="M77 107H25C20.5817 107 17 110.582 17 115V147C17 151.418 20.5817 155 25 155H77C81.4183 155 85 151.418 85 147V115C85 110.582 81.4183 107 77 107Z" stroke="white" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+<path id="Vector_6" d="M40 141C45.5228 141 50 136.523 50 131C50 125.477 45.5228 121 40 121C34.4772 121 30 125.477 30 131C30 136.523 34.4772 141 40 141Z" stroke="white" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+<path id="Vector_7" d="M61 121H75M61 131H75M61 141H71" stroke="white" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+<path id="Vector_8" d="M134 160C150.016 160 163 147.016 163 131C163 114.984 150.016 102 134 102C117.984 102 105 114.984 105 131C105 147.016 117.984 160 134 160Z" stroke="white" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+<path id="Vector_9" d="M134 108V131L148 141" stroke="white" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+</svg>
