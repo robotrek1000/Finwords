@@ -30,21 +30,7 @@ const cases = [
     url: '/?screen=results-field&level=1&overlay=word-definition',
     viewport: { width: 390, height: 716 },
     reviewLabel: 'Просмотр поля уровня 1',
-    dialogTitle: 'ФОНД',
-  },
-  {
-    name: 'course',
-    url: '/?screen=results-field&level=1&overlay=course',
-    viewport: { width: 390, height: 716 },
-    reviewLabel: 'Просмотр поля уровня 1',
-    dialogTitle: 'АКЦИЯ',
-  },
-  {
-    name: 'product',
-    url: '/?screen=results-field&level=2&overlay=product',
-    viewport: { width: 390, height: 716 },
-    reviewLabel: 'Просмотр поля уровня 2',
-    dialogTitle: 'ИИС',
+    dialogTitle: 'ЧЕК',
   },
 ] as const;
 

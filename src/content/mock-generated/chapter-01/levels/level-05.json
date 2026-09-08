@@ -1,0 +1,164 @@
+{
+  "schemaVersion": "1",
+  "id": "level-05",
+  "number": 5,
+  "chapterId": "chapter-01",
+  "chapterTitle": "Азбука денег",
+  "microtheme": "Финансовый план",
+  "rows": 4,
+  "cols": 4,
+  "desiredTurns": {
+    "min": 0,
+    "max": 1
+  },
+  "difficulty": "Начальная",
+  "sourceWords": [
+    "ПЛАН",
+    "ЦЕЛЬ",
+    "СРОК",
+    "УЧЁТ"
+  ],
+  "gridStatus": "TBD_AFTER_DATA_MODEL",
+  "contentStatus": "Draft",
+  "validation": "VALID",
+  "grid": [
+    [
+      "Н",
+      "А",
+      "Л",
+      "П"
+    ],
+    [
+      "У",
+      "Ч",
+      "Е",
+      "Т"
+    ],
+    [
+      "К",
+      "О",
+      "Р",
+      "С"
+    ],
+    [
+      "Ц",
+      "Е",
+      "Л",
+      "Ь"
+    ]
+  ],
+  "targets": [
+    {
+      "targetId": "target-05-01",
+      "order": 1,
+      "word": "ПЛАН",
+      "normalized": "ПЛАН",
+      "definition": "Заранее определённая последовательность действий для достижения цели.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 0,
+          "col": 3
+        },
+        {
+          "row": 0,
+          "col": 2
+        },
+        {
+          "row": 0,
+          "col": 1
+        },
+        {
+          "row": 0,
+          "col": 0
+        }
+      ]
+    },
+    {
+      "targetId": "target-05-02",
+      "order": 2,
+      "word": "ЦЕЛЬ",
+      "normalized": "ЦЕЛЬ",
+      "definition": "Конкретный результат, к которому направлены действия и ресурсы.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 3,
+          "col": 0
+        },
+        {
+          "row": 3,
+          "col": 1
+        },
+        {
+          "row": 3,
+          "col": 2
+        },
+        {
+          "row": 3,
+          "col": 3
+        }
+      ]
+    },
+    {
+      "targetId": "target-05-03",
+      "order": 3,
+      "word": "СРОК",
+      "normalized": "СРОК",
+      "definition": "Установленный период, в течение которого должно произойти событие или исполниться обязательство.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 2,
+          "col": 3
+        },
+        {
+          "row": 2,
+          "col": 2
+        },
+        {
+          "row": 2,
+          "col": 1
+        },
+        {
+          "row": 2,
+          "col": 0
+        }
+      ]
+    },
+    {
+      "targetId": "target-05-04",
+      "order": 4,
+      "word": "УЧЁТ",
+      "normalized": "УЧЕТ",
+      "definition": "Систематическая фиксация и обработка данных о деньгах, имуществе или операциях.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 1,
+          "col": 0
+        },
+        {
+          "row": 1,
+          "col": 1
+        },
+        {
+          "row": 1,
+          "col": 2
+        },
+        {
+          "row": 1,
+          "col": 3
+        }
+      ]
+    }
+  ]
+}

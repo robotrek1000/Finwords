@@ -1,0 +1,294 @@
+{
+  "schemaVersion": "1",
+  "id": "level-43",
+  "number": 43,
+  "chapterId": "chapter-06",
+  "chapterTitle": "Акции и компании",
+  "microtheme": "Новости компании",
+  "rows": 6,
+  "cols": 6,
+  "desiredTurns": {
+    "min": 2,
+    "max": 4
+  },
+  "difficulty": "Продвинутая",
+  "sourceWords": [
+    "НОВОСТЬ",
+    "СОБЫТИЕ",
+    "РЕЛИЗ",
+    "СИГНАЛ",
+    "ФАКТ",
+    "САНКЦИЯ"
+  ],
+  "gridStatus": "TBD_AFTER_DATA_MODEL",
+  "contentStatus": "Draft",
+  "validation": "VALID",
+  "grid": [
+    [
+      "С",
+      "З",
+      "Е",
+      "Р",
+      "А",
+      "Ф"
+    ],
+    [
+      "О",
+      "И",
+      "Л",
+      "Л",
+      "К",
+      "Т"
+    ],
+    [
+      "Б",
+      "Ы",
+      "Т",
+      "А",
+      "Н",
+      "С"
+    ],
+    [
+      "И",
+      "Я",
+      "И",
+      "Е",
+      "Г",
+      "И"
+    ],
+    [
+      "Ц",
+      "А",
+      "С",
+      "Н",
+      "О",
+      "В"
+    ],
+    [
+      "К",
+      "Н",
+      "Ь",
+      "Т",
+      "С",
+      "О"
+    ]
+  ],
+  "targets": [
+    {
+      "targetId": "target-43-01",
+      "order": 1,
+      "word": "НОВОСТЬ",
+      "normalized": "НОВОСТЬ",
+      "definition": "Сообщение о новом событии, способном повлиять на решения участников.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 4,
+          "col": 3
+        },
+        {
+          "row": 4,
+          "col": 4
+        },
+        {
+          "row": 4,
+          "col": 5
+        },
+        {
+          "row": 5,
+          "col": 5
+        },
+        {
+          "row": 5,
+          "col": 4
+        },
+        {
+          "row": 5,
+          "col": 3
+        },
+        {
+          "row": 5,
+          "col": 2
+        }
+      ]
+    },
+    {
+      "targetId": "target-43-02",
+      "order": 2,
+      "word": "СОБЫТИЕ",
+      "normalized": "СОБЫТИЕ",
+      "definition": "Факт или изменение, произошедшее в определённый момент.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 0,
+          "col": 0
+        },
+        {
+          "row": 1,
+          "col": 0
+        },
+        {
+          "row": 2,
+          "col": 0
+        },
+        {
+          "row": 2,
+          "col": 1
+        },
+        {
+          "row": 2,
+          "col": 2
+        },
+        {
+          "row": 3,
+          "col": 2
+        },
+        {
+          "row": 3,
+          "col": 3
+        }
+      ]
+    },
+    {
+      "targetId": "target-43-03",
+      "order": 3,
+      "word": "РЕЛИЗ",
+      "normalized": "РЕЛИЗ",
+      "definition": "Официальная публикация информации, продукта или новой версии.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 0,
+          "col": 3
+        },
+        {
+          "row": 0,
+          "col": 2
+        },
+        {
+          "row": 1,
+          "col": 2
+        },
+        {
+          "row": 1,
+          "col": 1
+        },
+        {
+          "row": 0,
+          "col": 1
+        }
+      ]
+    },
+    {
+      "targetId": "target-43-04",
+      "order": 4,
+      "word": "СИГНАЛ",
+      "normalized": "СИГНАЛ",
+      "definition": "Наблюдаемый признак, который может указывать на изменение ситуации.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 2,
+          "col": 5
+        },
+        {
+          "row": 3,
+          "col": 5
+        },
+        {
+          "row": 3,
+          "col": 4
+        },
+        {
+          "row": 2,
+          "col": 4
+        },
+        {
+          "row": 2,
+          "col": 3
+        },
+        {
+          "row": 1,
+          "col": 3
+        }
+      ]
+    },
+    {
+      "targetId": "target-43-05",
+      "order": 5,
+      "word": "ФАКТ",
+      "normalized": "ФАКТ",
+      "definition": "Проверяемое событие или утверждение, подтверждённое данными.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 0,
+          "col": 5
+        },
+        {
+          "row": 0,
+          "col": 4
+        },
+        {
+          "row": 1,
+          "col": 4
+        },
+        {
+          "row": 1,
+          "col": 5
+        }
+      ]
+    },
+    {
+      "targetId": "target-43-06",
+      "order": 6,
+      "word": "САНКЦИЯ",
+      "normalized": "САНКЦИЯ",
+      "definition": "Ограничительная мера, вводимая государством или уполномоченным органом.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 4,
+          "col": 2
+        },
+        {
+          "row": 4,
+          "col": 1
+        },
+        {
+          "row": 5,
+          "col": 1
+        },
+        {
+          "row": 5,
+          "col": 0
+        },
+        {
+          "row": 4,
+          "col": 0
+        },
+        {
+          "row": 3,
+          "col": 0
+        },
+        {
+          "row": 3,
+          "col": 1
+        }
+      ]
+    }
+  ]
+}

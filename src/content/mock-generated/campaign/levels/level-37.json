@@ -1,0 +1,294 @@
+{
+  "schemaVersion": "1",
+  "id": "level-37",
+  "number": 37,
+  "chapterId": "chapter-05",
+  "chapterTitle": "Мир бизнеса",
+  "microtheme": "Конкуренция",
+  "rows": 6,
+  "cols": 6,
+  "desiredTurns": {
+    "min": 1,
+    "max": 3
+  },
+  "difficulty": "Средняя",
+  "sourceWords": [
+    "СОПЕРНИК",
+    "НИША",
+    "ИГРОК",
+    "РЕЙТИНГ",
+    "АНАЛОГ",
+    "БАРЬЕР"
+  ],
+  "gridStatus": "TBD_AFTER_DATA_MODEL",
+  "contentStatus": "Draft",
+  "validation": "VALID",
+  "grid": [
+    [
+      "Ь",
+      "Р",
+      "А",
+      "Б",
+      "Г",
+      "О"
+    ],
+    [
+      "Е",
+      "И",
+      "Н",
+      "Г",
+      "Р",
+      "Л"
+    ],
+    [
+      "Р",
+      "Ш",
+      "А",
+      "И",
+      "О",
+      "А"
+    ],
+    [
+      "С",
+      "Й",
+      "Е",
+      "Р",
+      "К",
+      "Н"
+    ],
+    [
+      "О",
+      "Т",
+      "И",
+      "Н",
+      "Г",
+      "А"
+    ],
+    [
+      "П",
+      "Е",
+      "Р",
+      "Н",
+      "И",
+      "К"
+    ]
+  ],
+  "targets": [
+    {
+      "targetId": "target-37-01",
+      "order": 1,
+      "word": "СОПЕРНИК",
+      "normalized": "СОПЕРНИК",
+      "definition": "Участник состязания; тот, кто стремится превзойти другого в достижении общей цели.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 3,
+          "col": 0
+        },
+        {
+          "row": 4,
+          "col": 0
+        },
+        {
+          "row": 5,
+          "col": 0
+        },
+        {
+          "row": 5,
+          "col": 1
+        },
+        {
+          "row": 5,
+          "col": 2
+        },
+        {
+          "row": 5,
+          "col": 3
+        },
+        {
+          "row": 5,
+          "col": 4
+        },
+        {
+          "row": 5,
+          "col": 5
+        }
+      ]
+    },
+    {
+      "targetId": "target-37-02",
+      "order": 2,
+      "word": "НИША",
+      "normalized": "НИША",
+      "definition": "Узкий сегмент рынка с определёнными потребностями клиентов.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 1,
+          "col": 2
+        },
+        {
+          "row": 1,
+          "col": 1
+        },
+        {
+          "row": 2,
+          "col": 1
+        },
+        {
+          "row": 2,
+          "col": 2
+        }
+      ]
+    },
+    {
+      "targetId": "target-37-03",
+      "order": 3,
+      "word": "ИГРОК",
+      "normalized": "ИГРОК",
+      "definition": "Участник игры или, в переносном смысле, участник рынка.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 2,
+          "col": 3
+        },
+        {
+          "row": 1,
+          "col": 3
+        },
+        {
+          "row": 1,
+          "col": 4
+        },
+        {
+          "row": 2,
+          "col": 4
+        },
+        {
+          "row": 3,
+          "col": 4
+        }
+      ]
+    },
+    {
+      "targetId": "target-37-04",
+      "order": 4,
+      "word": "РЕЙТИНГ",
+      "normalized": "РЕЙТИНГ",
+      "definition": "Упорядоченная оценка объектов по выбранным критериям.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 3,
+          "col": 3
+        },
+        {
+          "row": 3,
+          "col": 2
+        },
+        {
+          "row": 3,
+          "col": 1
+        },
+        {
+          "row": 4,
+          "col": 1
+        },
+        {
+          "row": 4,
+          "col": 2
+        },
+        {
+          "row": 4,
+          "col": 3
+        },
+        {
+          "row": 4,
+          "col": 4
+        }
+      ]
+    },
+    {
+      "targetId": "target-37-05",
+      "order": 5,
+      "word": "АНАЛОГ",
+      "normalized": "АНАЛОГ",
+      "definition": "Объект или продукт с похожими свойствами и назначением.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 4,
+          "col": 5
+        },
+        {
+          "row": 3,
+          "col": 5
+        },
+        {
+          "row": 2,
+          "col": 5
+        },
+        {
+          "row": 1,
+          "col": 5
+        },
+        {
+          "row": 0,
+          "col": 5
+        },
+        {
+          "row": 0,
+          "col": 4
+        }
+      ]
+    },
+    {
+      "targetId": "target-37-06",
+      "order": 6,
+      "word": "БАРЬЕР",
+      "normalized": "БАРЬЕР",
+      "definition": "Условие, которое затрудняет вход на рынок или выполнение действия.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 0,
+          "col": 3
+        },
+        {
+          "row": 0,
+          "col": 2
+        },
+        {
+          "row": 0,
+          "col": 1
+        },
+        {
+          "row": 0,
+          "col": 0
+        },
+        {
+          "row": 1,
+          "col": 0
+        },
+        {
+          "row": 2,
+          "col": 0
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+# Архивные бинарные docs/assets: не нормализовать как текст и не строить diff (убирает ложные срабатывания `git diff --check`).
+*.pdf    binary
+*.docx   binary
+*.xlsx   binary
+*.png    binary
+*.jpg    binary
+*.jpeg   binary
+*.ogg    binary
+
+# Markdown hard-break/source docs и generated SVG: не флагать trailing-space/blank-at-eof в `git diff --check`.
+# `trailing-space` в Git — shorthand для `blank-at-eol` + `blank-at-eof`, поэтому `-trailing-space` отключает оба.
+*.md  whitespace=-trailing-space
+*.svg whitespace=-trailing-space

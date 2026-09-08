@@ -1,0 +1,295 @@
+{
+  "schemaVersion": "1",
+  "id": "level-20",
+  "number": 20,
+  "chapterId": "chapter-03",
+  "chapterTitle": "Морская торговля",
+  "microtheme": "Торговые суда",
+  "rows": 6,
+  "cols": 6,
+  "desiredTurns": {
+    "min": 1,
+    "max": 2
+  },
+  "difficulty": "Базовая",
+  "sourceWords": [
+    "ТАНКЕР",
+    "ЛАЙНЕР",
+    "ФРЕГАТ",
+    "БАРКАС",
+    "КОРВЕТ",
+    "КЛИПЕР"
+  ],
+  "gridStatus": "TBD_AFTER_DATA_MODEL",
+  "contentStatus": "Draft",
+  "validation": "VALID",
+  "grid": [
+    [
+      "Л",
+      "И",
+      "К",
+      "Р",
+      "А",
+      "Б"
+    ],
+    [
+      "К",
+      "П",
+      "А",
+      "Г",
+      "А",
+      "Т"
+    ],
+    [
+      "Т",
+      "Е",
+      "С",
+      "Е",
+      "Р",
+      "Ф"
+    ],
+    [
+      "Е",
+      "Р",
+      "Т",
+      "Р",
+      "Л",
+      "Р"
+    ],
+    [
+      "В",
+      "К",
+      "А",
+      "Е",
+      "А",
+      "Е"
+    ],
+    [
+      "Р",
+      "О",
+      "Н",
+      "К",
+      "Й",
+      "Н"
+    ]
+  ],
+  "targets": [
+    {
+      "targetId": "target-20-01",
+      "order": 1,
+      "word": "ТАНКЕР",
+      "normalized": "ТАНКЕР",
+      "definition": "Судно для перевозки жидких грузов, например нефти или топлива.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "offerId": "offer-20",
+      "canonicalPath": [
+        {
+          "row": 3,
+          "col": 2
+        },
+        {
+          "row": 4,
+          "col": 2
+        },
+        {
+          "row": 5,
+          "col": 2
+        },
+        {
+          "row": 5,
+          "col": 3
+        },
+        {
+          "row": 4,
+          "col": 3
+        },
+        {
+          "row": 3,
+          "col": 3
+        }
+      ]
+    },
+    {
+      "targetId": "target-20-02",
+      "order": 2,
+      "word": "ЛАЙНЕР",
+      "normalized": "ЛАЙНЕР",
+      "definition": "Крупное судно, выполняющее регулярные пассажирские рейсы.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 3,
+          "col": 4
+        },
+        {
+          "row": 4,
+          "col": 4
+        },
+        {
+          "row": 5,
+          "col": 4
+        },
+        {
+          "row": 5,
+          "col": 5
+        },
+        {
+          "row": 4,
+          "col": 5
+        },
+        {
+          "row": 3,
+          "col": 5
+        }
+      ]
+    },
+    {
+      "targetId": "target-20-03",
+      "order": 3,
+      "word": "ФРЕГАТ",
+      "normalized": "ФРЕГАТ",
+      "definition": "Военный корабль среднего класса, используемый для охраны и сопровождения.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 2,
+          "col": 5
+        },
+        {
+          "row": 2,
+          "col": 4
+        },
+        {
+          "row": 2,
+          "col": 3
+        },
+        {
+          "row": 1,
+          "col": 3
+        },
+        {
+          "row": 1,
+          "col": 4
+        },
+        {
+          "row": 1,
+          "col": 5
+        }
+      ]
+    },
+    {
+      "targetId": "target-20-04",
+      "order": 4,
+      "word": "БАРКАС",
+      "normalized": "БАРКАС",
+      "definition": "Крупная шлюпка или небольшое судно для перевозок у берега.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 0,
+          "col": 5
+        },
+        {
+          "row": 0,
+          "col": 4
+        },
+        {
+          "row": 0,
+          "col": 3
+        },
+        {
+          "row": 0,
+          "col": 2
+        },
+        {
+          "row": 1,
+          "col": 2
+        },
+        {
+          "row": 2,
+          "col": 2
+        }
+      ]
+    },
+    {
+      "targetId": "target-20-05",
+      "order": 5,
+      "word": "КОРВЕТ",
+      "normalized": "КОРВЕТ",
+      "definition": "Небольшой боевой корабль, предназначенный для патрулирования и охраны.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 4,
+          "col": 1
+        },
+        {
+          "row": 5,
+          "col": 1
+        },
+        {
+          "row": 5,
+          "col": 0
+        },
+        {
+          "row": 4,
+          "col": 0
+        },
+        {
+          "row": 3,
+          "col": 0
+        },
+        {
+          "row": 2,
+          "col": 0
+        }
+      ]
+    },
+    {
+      "targetId": "target-20-06",
+      "order": 6,
+      "word": "КЛИПЕР",
+      "normalized": "КЛИПЕР",
+      "definition": "Быстроходное парусное судно, исторически использовавшееся для торговли.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 1,
+          "col": 0
+        },
+        {
+          "row": 0,
+          "col": 0
+        },
+        {
+          "row": 0,
+          "col": 1
+        },
+        {
+          "row": 1,
+          "col": 1
+        },
+        {
+          "row": 2,
+          "col": 1
+        },
+        {
+          "row": 3,
+          "col": 1
+        }
+      ]
+    }
+  ]
+}

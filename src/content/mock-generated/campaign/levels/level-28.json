@@ -1,0 +1,295 @@
+{
+  "schemaVersion": "1",
+  "id": "level-28",
+  "number": 28,
+  "chapterId": "chapter-04",
+  "chapterTitle": "История капитала",
+  "microtheme": "Рождение биржи",
+  "rows": 6,
+  "cols": 6,
+  "desiredTurns": {
+    "min": 1,
+    "max": 3
+  },
+  "difficulty": "Средняя",
+  "sourceWords": [
+    "БИРЖА",
+    "БРОКЕР",
+    "АКТИВ",
+    "ЭМИТЕНТ",
+    "ЗАЯВКА",
+    "ЛИСТИНГ"
+  ],
+  "gridStatus": "TBD_AFTER_DATA_MODEL",
+  "contentStatus": "Draft",
+  "validation": "VALID",
+  "grid": [
+    [
+      "Я",
+      "А",
+      "Н",
+      "И",
+      "Т",
+      "С"
+    ],
+    [
+      "В",
+      "З",
+      "Г",
+      "О",
+      "К",
+      "И"
+    ],
+    [
+      "К",
+      "Н",
+      "Т",
+      "Р",
+      "Е",
+      "Л"
+    ],
+    [
+      "А",
+      "Е",
+      "А",
+      "Б",
+      "Р",
+      "А"
+    ],
+    [
+      "Э",
+      "Т",
+      "К",
+      "В",
+      "Б",
+      "Ж"
+    ],
+    [
+      "М",
+      "И",
+      "Т",
+      "И",
+      "И",
+      "Р"
+    ]
+  ],
+  "targets": [
+    {
+      "targetId": "target-28-01",
+      "order": 1,
+      "word": "БИРЖА",
+      "normalized": "БИРЖА",
+      "definition": "Организованная площадка, на которой заключаются сделки с активами по установленным правилам.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 4,
+          "col": 4
+        },
+        {
+          "row": 5,
+          "col": 4
+        },
+        {
+          "row": 5,
+          "col": 5
+        },
+        {
+          "row": 4,
+          "col": 5
+        },
+        {
+          "row": 3,
+          "col": 5
+        }
+      ]
+    },
+    {
+      "targetId": "target-28-02",
+      "order": 2,
+      "word": "БРОКЕР",
+      "normalized": "БРОКЕР",
+      "definition": "Посредник с лицензией, который исполняет поручения клиента на финансовом рынке.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "offerId": "offer-28",
+      "canonicalPath": [
+        {
+          "row": 3,
+          "col": 3
+        },
+        {
+          "row": 2,
+          "col": 3
+        },
+        {
+          "row": 1,
+          "col": 3
+        },
+        {
+          "row": 1,
+          "col": 4
+        },
+        {
+          "row": 2,
+          "col": 4
+        },
+        {
+          "row": 3,
+          "col": 4
+        }
+      ]
+    },
+    {
+      "targetId": "target-28-03",
+      "order": 3,
+      "word": "АКТИВ",
+      "normalized": "АКТИВ",
+      "definition": "Ресурс или имущество, способное приносить выгоду и имеющее стоимость.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 3,
+          "col": 2
+        },
+        {
+          "row": 4,
+          "col": 2
+        },
+        {
+          "row": 5,
+          "col": 2
+        },
+        {
+          "row": 5,
+          "col": 3
+        },
+        {
+          "row": 4,
+          "col": 3
+        }
+      ]
+    },
+    {
+      "targetId": "target-28-04",
+      "order": 4,
+      "word": "ЭМИТЕНТ",
+      "normalized": "ЭМИТЕНТ",
+      "definition": "Организация или государство, выпускающее ценные бумаги.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 4,
+          "col": 0
+        },
+        {
+          "row": 5,
+          "col": 0
+        },
+        {
+          "row": 5,
+          "col": 1
+        },
+        {
+          "row": 4,
+          "col": 1
+        },
+        {
+          "row": 3,
+          "col": 1
+        },
+        {
+          "row": 2,
+          "col": 1
+        },
+        {
+          "row": 2,
+          "col": 2
+        }
+      ]
+    },
+    {
+      "targetId": "target-28-05",
+      "order": 5,
+      "word": "ЗАЯВКА",
+      "normalized": "ЗАЯВКА",
+      "definition": "Поручение купить или продать актив на заданных условиях.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 1,
+          "col": 1
+        },
+        {
+          "row": 0,
+          "col": 1
+        },
+        {
+          "row": 0,
+          "col": 0
+        },
+        {
+          "row": 1,
+          "col": 0
+        },
+        {
+          "row": 2,
+          "col": 0
+        },
+        {
+          "row": 3,
+          "col": 0
+        }
+      ]
+    },
+    {
+      "targetId": "target-28-06",
+      "order": 6,
+      "word": "ЛИСТИНГ",
+      "normalized": "ЛИСТИНГ",
+      "definition": "Процедура допуска ценной бумаги к организованным торгам.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 2,
+          "col": 5
+        },
+        {
+          "row": 1,
+          "col": 5
+        },
+        {
+          "row": 0,
+          "col": 5
+        },
+        {
+          "row": 0,
+          "col": 4
+        },
+        {
+          "row": 0,
+          "col": 3
+        },
+        {
+          "row": 0,
+          "col": 2
+        },
+        {
+          "row": 1,
+          "col": 2
+        }
+      ]
+    }
+  ]
+}

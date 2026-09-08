@@ -1,11 +1,9 @@
-export const LEGACY_MOCK_STORAGE_KEY = 'finwords:p1-mock-backend:v1';
-
-export type MockPersistenceMode = 'browser' | 'test';
-
 export interface MockPersistenceOptions {
   storage: Storage | null | undefined;
   storageKey: string;
-  mode: MockPersistenceMode;
+  isDev: boolean;
+  apiMode: string;
+  search: string;
 }
 
 export interface MockPersistence {
@@ -15,24 +13,24 @@ export interface MockPersistence {
   clear(): void;
 }
 
-export type MockPersistenceRuntimeOptions = Pick<MockPersistenceOptions, 'mode'>;
+export type MockPersistenceRuntimeOptions = Pick<
+  MockPersistenceOptions,
+  'isDev' | 'apiMode' | 'search'
+>;
 
-export function clearLegacyMockState(storage: Storage | null | undefined): void {
-  try {
-    storage?.removeItem(LEGACY_MOCK_STORAGE_KEY);
-  } catch {
-    // Storage may be unavailable in private browsing or restricted web views.
-  }
+function isDisabled({ isDev, apiMode, search }: MockPersistenceOptions): boolean {
+  return apiMode === 'mock' && (!isDev ||
+    new URLSearchParams(search).get('mockPersistence') === 'off');
 }
 
 export function createMockPersistence(options: MockPersistenceOptions): MockPersistence {
-  const disabled = options.mode !== 'test';
+  const disabled = isDisabled(options);
 
   function clear(): void {
     try {
       options.storage?.removeItem(options.storageKey);
     } catch {
-      // Standalone gameplay never depends on browser storage.
+      // Browser storage is optional for mock-only state.
     }
   }
 
@@ -42,12 +40,12 @@ export function createMockPersistence(options: MockPersistenceOptions): MockPers
     isDisabled: disabled,
     restore() {
       if (disabled) return null;
+      const raw = options.storage?.getItem(options.storageKey);
+      if (!raw) return null;
       try {
-        const raw = options.storage?.getItem(options.storageKey);
-        return raw ? JSON.parse(raw) as unknown : null;
-      } catch {
-        clear();
-        return null;
+        return JSON.parse(raw) as unknown;
+      } catch (error) {
+        throw new Error('Persisted mock state contains invalid JSON.', { cause: error });
       }
     },
     save(value) {
@@ -55,7 +53,7 @@ export function createMockPersistence(options: MockPersistenceOptions): MockPers
       try {
         options.storage?.setItem(options.storageKey, JSON.stringify(value));
       } catch {
-        // Test-only persistence remains optional.
+        // Browser storage is optional for mock-only state.
       }
     },
     clear,

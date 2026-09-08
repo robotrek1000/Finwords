@@ -1,13 +1,12 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import type { CSSProperties } from 'react';
 import type { CellId, LevelId } from '../../app/types';
 import type {
   Balance,
   FoundTarget,
   LevelPlayResponse,
-} from '../../shared/demoTypes';
+} from '../../infra/api/generated/data-contracts';
 import { BackgroundSurface } from '../../shared/ui/BackgroundSurface';
-import { assetUrl } from '../../shared/assetUrl';
 import { IconButton } from '../../shared/ui/IconButton';
 import {
   BoardViewGameBoard,
@@ -32,6 +31,7 @@ interface GameScreenProps {
   retainSelection?: boolean;
   routeState?: RouteAccentState;
   onBack: () => void;
+  onDismissNotice: () => void;
   onHint: () => void;
   onOpenBonusWords: () => void;
   onOpenTarget: (target: FoundTarget) => void;
@@ -44,6 +44,18 @@ export interface BonusProgress {
 }
 
 const MENTOR_TIP_DURATION_MS = 3_200;
+// Keep this boundary aligned with the separated status/selection layout in CSS.
+const TALL_HUD_QUERY = '(min-height: 720px)';
+
+function subscribeToHudLayout(onChange: () => void) {
+  const query = window.matchMedia?.(TALL_HUD_QUERY);
+  query?.addEventListener('change', onChange);
+  return () => query?.removeEventListener('change', onChange);
+}
+
+function isCompactHud() {
+  return window.matchMedia ? !window.matchMedia(TALL_HUD_QUERY).matches : false;
+}
 
 function GameBanner({ notice }: { notice: GameNotice }) {
   const icon = notice.tone === 'success' ? '✓' : notice.tone === 'error' ? '×' : 'i';
@@ -68,7 +80,7 @@ function SubmitLoader() {
 function MentorTip() {
   return (
     <div className={styles.mentorTip} role="status">
-      <img src={assetUrl('assets/character-analyst.webp')} alt="" />
+      <img src={`${import.meta.env.BASE_URL}assets/character-analyst.webp`} alt="" />
       <p>Подсказка ведёт по буквам одного слова по порядку.</p>
     </div>
   );
@@ -77,7 +89,7 @@ function MentorTip() {
 function KnowledgeBadge({ value }: { value: number }) {
   return (
     <div className={styles.knowledge} aria-label={`Знания: ${value}`}>
-      <img src={assetUrl('assets/p1/knowledge-badge.png')} alt="" />
+      <img src={`${import.meta.env.BASE_URL}assets/p1/knowledge-badge.png`} alt="" />
       <strong>{value}</strong>
     </div>
   );
@@ -102,13 +114,15 @@ function MentorHintButton({
       className={styles.hintButton}
       aria-label={pending ? 'Открываем подсказку' : 'Использовать подсказку'}
       disabled={disabled}
+      data-hint-pending={pending || undefined}
+      data-input-locked={(disabled && !pending) || undefined}
       onPointerEnter={() => onPreviewChange(true)}
       onPointerLeave={() => onPreviewChange(false)}
       onFocus={() => onPreviewChange(true)}
       onBlur={() => onPreviewChange(false)}
       onClick={onClick}
     >
-      <img src={assetUrl('assets/character-analyst.webp')} alt="" />
+      <img src={`${import.meta.env.BASE_URL}assets/character-analyst.webp`} alt="" />
       <strong aria-label={`Подсказок: ${balance}`}>{balance}</strong>
     </button>
   );
@@ -148,12 +162,12 @@ function BonusEnvelopeButton({
             aria-valuenow={current}
             style={ringStyle}
           >
-            <img src={assetUrl('assets/p1/home-envelope.png')} alt="" />
+            <img src={`${import.meta.env.BASE_URL}assets/p1/home-envelope.png`} alt="" />
           </span>
           <strong>{current}/{threshold}</strong>
         </>
       ) : (
-        <img src={assetUrl('assets/p1/home-envelope.png')} alt="" />
+        <img src={`${import.meta.env.BASE_URL}assets/p1/home-envelope.png`} alt="" />
       )}
     </button>
   );
@@ -181,37 +195,92 @@ export function GameScreen({
   retainSelection = false,
   routeState,
   onBack,
+  onDismissNotice,
   onHint,
   onOpenBonusWords,
   onOpenTarget,
   onSelectionEnd,
 }: GameScreenProps) {
   const [currentWord, setCurrentWord] = useState('');
+  const [selectionActive, setSelectionActive] = useState(false);
+  const compactHud = useSyncExternalStore(subscribeToHudLayout, isCompactHud, () => false);
   const [mentorTipVisible, setMentorTipVisible] = useState(true);
+  const mentorTipTimerRef = useRef<number | null>(null);
+  const mentorTipGenerationRef = useRef(0);
   const hintDisabled = hintPending || inputDisabled;
   const targetTotal = level.targetsRemaining + level.foundTargets.length;
-  const showMentorTip = mentorTipVisible && !notice && !currentWord && !submitLoading;
-  const statusKind = notice
+  // A retained submit/outcome route is not an active gesture and must not hide its result.
+  const selectionOwnsStatus = compactHud && selectionActive && !inputDisabled;
+  const visibleNotice = selectionOwnsStatus ? undefined : notice;
+  const isMentorTipVisible = mentorTipVisible && !visibleNotice && !currentWord && !submitLoading;
+  const statusKind = visibleNotice
     ? 'banner'
     : submitLoading
       ? 'banner'
-      : showMentorTip
+      : isMentorTipVisible
         ? 'mentor'
         : 'none';
 
   useEffect(() => {
-    const timer = window.setTimeout(() => setMentorTipVisible(false), MENTOR_TIP_DURATION_MS);
-    return () => window.clearTimeout(timer);
+    // Covers a late notice or a transition into the compact layout mid-gesture.
+    if (selectionOwnsStatus && notice) onDismissNotice();
+  }, [notice, onDismissNotice, selectionOwnsStatus]);
+
+  const clearMentorTipTimer = useCallback(() => {
+    if (mentorTipTimerRef.current === null) return;
+    window.clearTimeout(mentorTipTimerRef.current);
+    mentorTipTimerRef.current = null;
   }, []);
+
+  const showMentorTip = useCallback(() => {
+    clearMentorTipTimer();
+    const generation = mentorTipGenerationRef.current + 1;
+    mentorTipGenerationRef.current = generation;
+    setMentorTipVisible(true);
+    mentorTipTimerRef.current = window.setTimeout(() => {
+      if (mentorTipGenerationRef.current !== generation) return;
+      mentorTipTimerRef.current = null;
+      setMentorTipVisible(false);
+    }, MENTOR_TIP_DURATION_MS);
+  }, [clearMentorTipTimer]);
+
+  const hideMentorTip = useCallback(() => {
+    mentorTipGenerationRef.current += 1;
+    clearMentorTipTimer();
+    setMentorTipVisible(false);
+  }, [clearMentorTipTimer]);
+
+  useEffect(() => {
+    const startTimer = window.setTimeout(showMentorTip, 0);
+    return () => {
+      window.clearTimeout(startTimer);
+      mentorTipGenerationRef.current += 1;
+      clearMentorTipTimer();
+    };
+  }, [clearMentorTipTimer, showMentorTip]);
 
   function handleSelectionChange(word: string) {
     setCurrentWord(word);
-    if (word) setMentorTipVisible(false);
+    setSelectionActive(Boolean(word));
+    if (word) {
+      hideMentorTip();
+      if (compactHud && notice) onDismissNotice();
+    }
+  }
+
+  function handleSelectionEnd(path: CellId[]) {
+    setSelectionActive(false);
+    onSelectionEnd(path);
   }
 
   function handleHint() {
-    setMentorTipVisible(false);
+    hideMentorTip();
     onHint();
+  }
+
+  function handleMentorPreviewChange(visible: boolean) {
+    if (visible) showMentorTip();
+    else hideMentorTip();
   }
 
   return (
@@ -238,8 +307,8 @@ export function GameScreen({
       </header>
 
       <div className={styles.statusSlot}>
-        {notice ? <GameBanner notice={notice} /> : submitLoading ? <SubmitLoader /> : null}
-        {showMentorTip ? <MentorTip /> : null}
+        {visibleNotice ? <GameBanner notice={visibleNotice} /> : submitLoading ? <SubmitLoader /> : null}
+        {isMentorTipVisible ? <MentorTip /> : null}
       </div>
 
       <div className={styles.selectionLabel} aria-live="polite">
@@ -257,7 +326,7 @@ export function GameScreen({
           routeState={routeState}
           onOpenTarget={onOpenTarget}
           onSelectionChange={handleSelectionChange}
-          onSelectionEnd={onSelectionEnd}
+          onSelectionEnd={handleSelectionEnd}
         />
       </div>
 
@@ -267,7 +336,7 @@ export function GameScreen({
           disabled={hintDisabled}
           pending={hintPending}
           onClick={handleHint}
-          onPreviewChange={setMentorTipVisible}
+          onPreviewChange={handleMentorPreviewChange}
         />
         <BonusEnvelopeButton
           progress={bonusProgress}

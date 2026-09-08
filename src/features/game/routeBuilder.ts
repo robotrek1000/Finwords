@@ -1,4 +1,4 @@
-import type { CellRef } from '../../shared/demoTypes';
+import type { CellRef } from '../../infra/api/generated/data-contracts';
 
 export const ROUTE_MIN_LENGTH = 2;
 export const ROUTE_MAX_LENGTH = 36;

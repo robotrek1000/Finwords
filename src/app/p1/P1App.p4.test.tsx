@@ -26,7 +26,7 @@ import {
   AppearanceTypeEnum,
   SelectAppearanceResponseTypeEnum,
   SubmitFeedbackResponseStatusEnum,
-} from '../../shared/demoTypes';
+} from '../../infra/api/generated/data-contracts';
 import type {
   AcknowledgeLevelResultsResponse,
   AppearanceCatalogResponse,
@@ -40,9 +40,15 @@ import type {
   RewardSummary,
   RouteSubmissionResponse,
   SettingsResponse,
-} from '../../shared/demoTypes';
+} from '../../infra/api/generated/data-contracts';
 import type { P1Api as P1ApiContract } from './p1Api';
+import { openDeepLink } from './deepLink';
 import { P1App } from './P1App';
+
+vi.mock('./deepLink', async () => ({
+  ...(await vi.importActual<typeof import('./deepLink')>('./deepLink')),
+  openDeepLink: vi.fn(),
+}));
 
 const LEVEL_ID = 'c3f8ad5b-d9cb-469f-a165-808677289500';
 const LEVEL_VERSION_ID = 'c3f8ad5b-d9cb-469f-a165-808677289501';
@@ -189,7 +195,7 @@ const levelTwoTarget: FoundTarget = {
   courseOffer: {
     courseId: '8f8fad5b-d9cb-469f-a165-808677289598',
     locale: 'ru-RU',
-    badgeLabel: 'Учебный материал',
+    badgeLabel: 'Продукт БКС',
     title: 'ИИС',
   },
   cells: [
@@ -348,6 +354,12 @@ function makeApi(initialState = makeState()): P1ApiContract {
 
   return {
     loadState: vi.fn().mockResolvedValue(initialState),
+    resyncState: vi.fn().mockResolvedValue(initialState),
+    confirmNarrativeShown: vi.fn().mockResolvedValue({
+      chapterId: initialState.clientState.chapters[0].chapterId,
+      isNarrativeShown: true,
+      nextAction: NextAction.StartLevel,
+    }),
     updateSettings: vi.fn(async (body) => ({
       musicEnabled: body.musicEnabled ?? true,
       soundEnabled: body.soundEnabled ?? true,
@@ -363,6 +375,15 @@ function makeApi(initialState = makeState()): P1ApiContract {
     submitFeedback: vi.fn().mockResolvedValue({
       feedbackId: 'af8fad5b-d9cb-469f-a165-808677289521',
       status: SubmitFeedbackResponseStatusEnum.Submitted,
+      nextAction: NextAction.None,
+    }),
+    dismissFeedback: vi.fn().mockResolvedValue({
+      chapterId: initialState.clientState.chapters[0].chapterId,
+      feedbackPromptShownAt: '2026-09-03T12:00:00.000Z',
+      nextAction: NextAction.NextChapter,
+    }),
+    confirmCampaignCompleteShown: vi.fn().mockResolvedValue({
+      isCompletionShown: true,
       nextAction: NextAction.None,
     }),
     getLevelResults: vi.fn().mockResolvedValue(normalRewardlessResults),
@@ -406,7 +427,7 @@ function makeClaimResponse(option: ClaimRewardResponse['selectedOption']): Claim
       balance: { knowledgePoints: 63, hintBalance: 8 },
       decoration: { appearanceId: DECORATION_ID, type: ClaimResultTypeEnum.Character },
     },
-    nextAction: NextAction.StartLevel,
+    nextAction: NextAction.OpenFeedback,
   };
 }
 
@@ -453,7 +474,77 @@ afterEach(() => {
 });
 
 describe('P4 Results state machine', () => {
-  it('после завершения через submit-route один раз загружает level-results и выходит из disabled game state', async () => {
+  it.each([
+    [-4, 0],
+    [0, 0],
+    [3, 3],
+    [9, 9],
+    [12, 9],
+  ])(
+    'Home показывает только прогресс золотого конверта текущей главы и clamp при %i/9',
+    async (completedLevels, expectedCompletedLevels) => {
+      const state = makeState();
+      state.clientState.chapters[0] = {
+        ...state.clientState.chapters[0],
+        completedLevels,
+        status: completedLevels >= 9
+          ? ChapterProgressStatusEnum.Completed
+          : ChapterProgressStatusEnum.InProgress,
+      };
+
+      render(<P1App api={makeApi(state)} minimumLoadingMs={0} />);
+
+      const home = await screen.findByLabelText('Главный экран');
+      expect(within(home).getByText('Золотой конверт', { exact: true })).toBeVisible();
+      expect(within(home).getByRole('img', { name: 'Золотой конверт' }))
+        .toHaveAttribute('src', '/assets/envelope-golden.webp');
+      const progress = within(home).getByRole('progressbar', {
+        name: 'Прогресс золотого конверта',
+      });
+      expect(progress).toHaveAttribute('aria-valuenow', String(expectedCompletedLevels));
+      expect(progress).toHaveAttribute('aria-valuemax', '9');
+      expect(within(progress.closest('article')!).getByText(`${expectedCompletedLevels}/9`, { exact: true }))
+        .toBeVisible();
+      expect(within(home).queryByText('Бонусный конверт', { exact: true }))
+        .not.toBeInTheDocument();
+      expect(within(home).queryByText('0/4', { exact: true })).not.toBeInTheDocument();
+    },
+  );
+
+it.each([
+    [-4, 0, '0%'],
+    [12, 9, '100%'],
+  ])(
+    'Results ограничивает chapter progress в диапазоне 0..9 для значения %i',
+    async (completedLevels, expectedCompletedLevels, expectedWidth) => {
+      const results = {
+        ...normalRewardlessResults,
+        chapter: {
+          ...normalRewardlessResults.chapter,
+          completedLevels,
+          status: completedLevels >= 9
+            ? LevelResultsResponseStatusEnum1.Completed
+            : LevelResultsResponseStatusEnum1.InProgress,
+        },
+      } satisfies LevelResultsResponse;
+      const api = makeApi(makePendingState());
+      vi.mocked(api.getLevelResults).mockResolvedValue(results);
+
+      await renderPendingResults(api);
+
+      const resultsRegion = screen.getByLabelText('Результаты текущего уровня');
+      expectChapterProgress(resultsRegion, expectedCompletedLevels, 9);
+
+      const progress = within(resultsRegion).getByRole('progressbar', {
+        name: `Уровней ${expectedCompletedLevels} из 9`,
+      });
+      const fill = progress.querySelector<HTMLElement>('[style*="width"]');
+      expect(fill).not.toBeNull();
+      expect(fill).toHaveStyle({ width: expectedWidth });
+    },
+  );
+
+  it('после завершения через API-006 один раз загружает API-008 и выходит из disabled game state', async () => {
     const api = makeApi();
     vi.mocked(api.submitRoute).mockResolvedValue(makeCompletedSubmission());
     vi.mocked(api.getLevelResults).mockResolvedValue(normalRewardlessResults);
@@ -467,7 +558,7 @@ describe('P4 Results state machine', () => {
     expect(screen.queryByLabelText('Игровое поле')).not.toBeInTheDocument();
   });
 
-  it('показывает skeleton level-results после 250 мс, abort по timeout, игнорирует late response и retry не повторяет submit-route', async () => {
+  it('показывает skeleton API-008 после 250 мс, abort по timeout, игнорирует late response и retry не повторяет API-006', async () => {
     vi.useFakeTimers();
     const api = makeApi(makePendingState());
     let resolveFirst: (results: LevelResultsResponse) => void = () => undefined;
@@ -497,7 +588,7 @@ describe('P4 Results state machine', () => {
     expect(screen.getByRole('heading', { name: 'Уровень пройден!' })).toBeVisible();
   });
 
-  it('acknowledge-results показывает pending status, блокирует Results actions, timeout даёт alert, а retry сохраняет intent', async () => {
+  it('API-017 показывает pending status, блокирует Results actions, timeout даёт alert, а retry сохраняет intent', async () => {
     const api = makeApi(makePendingState());
     let resolveLate: (results: AcknowledgeLevelResultsResponse) => void = () => undefined;
     vi.mocked(api.getLevelResults).mockResolvedValue(normalRewardlessResults);
@@ -530,7 +621,7 @@ describe('P4 Results state machine', () => {
       await Promise.resolve();
     });
     expect(screen.getByRole('alert')).toBeVisible();
-    expect(screen.getByLabelText('Результаты уровня 1')).toBeVisible();
+    expect(screen.getByLabelText('Результаты текущего уровня')).toBeVisible();
 
     fireEvent.click(screen.getByRole('button', { name: 'Повторить' }));
     expect(api.acknowledgeLevelResults).toHaveBeenCalledTimes(2);
@@ -543,14 +634,14 @@ describe('P4 Results state machine', () => {
     expect(api.submitRoute).not.toHaveBeenCalled();
   });
 
-  it('рендерит обычные Results только по snapshot level-results и primary ведёт на границу start-level', async () => {
+  it('рендерит обычные Results только по snapshot API-008 и primary ведёт на границу start-level', async () => {
     const api = makeApi(makePendingState());
     vi.mocked(api.getLevelResults).mockResolvedValue(normalRewardlessResults);
     const user = userEvent.setup();
 
     await renderPendingResults(api);
 
-    const results = screen.getByLabelText('Результаты уровня 1');
+    const results = screen.getByLabelText('Результаты текущего уровня');
     expect(within(results).queryByRole('heading', { name: 'Результаты' })).not.toBeInTheDocument();
     expect(within(results).getByRole('heading', { name: /^Уровень пройден!$/ })).toBeVisible();
     const envelope = within(results).getByRole('img', { name: /^конверт$/i });
@@ -581,7 +672,40 @@ describe('P4 Results state machine', () => {
     expect(api.claimReward).not.toHaveBeenCalled();
   });
 
-  it('показывает mini-course для server foundTarget АКЦИЯ только по ручному тапу и возвращает в Results', async () => {
+  it('после API-017 перечитывает API-002 и открывает авторитетный следующий уровень', async () => {
+    const authoritativeState = makeState(NextAction.StartLevel);
+    authoritativeState.clientState.chapters[0] = {
+      ...authoritativeState.clientState.chapters[0],
+      completedLevels: 1,
+    };
+    authoritativeState.clientState.levels = authoritativeState.clientState.levels.map((level, index) => ({
+      ...level,
+      status: index === 0
+        ? LevelProgressSummaryStatusEnum.Completed
+        : index === 1
+          ? LevelProgressSummaryStatusEnum.Available
+          : LevelProgressSummaryStatusEnum.Locked,
+    }));
+    const api = makeApi(makePendingState()) as P1ApiContract & {
+      resyncState: ReturnType<typeof vi.fn>;
+    };
+    api.resyncState = vi.fn().mockResolvedValue(authoritativeState);
+    vi.mocked(api.getLevelResults).mockResolvedValue(normalRewardlessResults);
+    vi.mocked(api.enterLevel).mockImplementation(async (state) => {
+      if (state !== authoritativeState) throw new Error('stale client state');
+      return makeLevelPlay(authoritativeState.clientState.levels[1].levelId, 2);
+    });
+    const user = userEvent.setup();
+
+    await renderPendingResults(api);
+    await user.click(screen.getByRole('button', { name: 'Следующий уровень' }));
+
+    await waitFor(() => expect(api.resyncState).toHaveBeenCalledTimes(1));
+    expect(api.enterLevel).toHaveBeenCalledWith(authoritativeState, undefined);
+    expect(await screen.findByLabelText('Игровой экран уровня 2')).toBeVisible();
+  });
+
+  it('показывает Course Error для server foundTarget АКЦИЯ и возвращает из Results к полю', async () => {
     const api = makeApi(makePendingState());
     vi.mocked(api.getLevelResults).mockResolvedValue(normalRewardlessResults);
     const user = userEvent.setup();
@@ -598,11 +722,14 @@ describe('P4 Results state machine', () => {
     const dialog = screen.getByRole('dialog', { name: 'АКЦИЯ' });
     expect(dialog).toHaveTextContent(stockTarget.definition);
     expect(within(dialog).getByText('Мини-курс')).toBeVisible();
-    await user.click(within(dialog).getByRole('button', { name: /Вернуться|закрыть/i }));
-    expect(screen.getByRole('heading', { name: 'Уровень пройден!' })).toBeVisible();
+    expect(within(dialog).getByRole('button', { name: 'Повторить' })).toBeDisabled();
+    await user.click(within(dialog).getByRole('button', { name: 'Вернуться к полю' }));
+    expect(screen.getByLabelText('Просмотр поля текущего уровня')).toBeVisible();
+    expect(api.submitRoute).not.toHaveBeenCalled();
+    expect(api.acknowledgeLevelResults).not.toHaveBeenCalled();
   });
 
-  it('открывает read-only Field Review со snapshot level-results без hint/route submit и сохраняет Results после скрытия поля', async () => {
+  it('открывает read-only Field Review со snapshot API-008 без hint/route submit и сохраняет Results после скрытия поля', async () => {
     const api = makeApi(makePendingState());
     vi.mocked(api.getLevelResults).mockResolvedValue(customTotalRewardlessResults);
     const user = userEvent.setup();
@@ -610,7 +737,7 @@ describe('P4 Results state machine', () => {
     await renderPendingResults(api);
     await user.click(screen.getByRole('button', { name: 'Показать поле' }));
 
-    expect(screen.getByLabelText('Просмотр поля уровня 1')).toBeVisible();
+    expect(screen.getByLabelText('Просмотр поля текущего уровня')).toBeVisible();
     expect(screen.getByLabelText('Игровое поле')).toBeVisible();
     expect(screen.queryByRole('button', { name: /Использовать подсказку/ })).not.toBeInTheDocument();
     expect(api.submitRoute).not.toHaveBeenCalled();
@@ -623,7 +750,9 @@ describe('P4 Results state machine', () => {
     const dialog = screen.getByRole('dialog', { name: 'АКЦИЯ' });
     expect(dialog).toHaveTextContent(stockTarget.definition);
     expect(within(dialog).getByText('Мини-курс')).toBeVisible();
-    await user.click(within(dialog).getByRole('button', { name: /Вернуться|закрыть/i }));
+    expect(within(dialog).getByRole('button', { name: 'Повторить' })).toBeDisabled();
+    await user.click(within(dialog).getByRole('button', { name: 'Вернуться к полю' }));
+    expect(screen.getByLabelText('Просмотр поля текущего уровня')).toBeVisible();
 
     await user.click(screen.getByRole('button', { name: 'Скрыть поле' }));
     expect(screen.getByRole('heading', { name: 'Уровень пройден!' })).toBeVisible();
@@ -632,7 +761,7 @@ describe('P4 Results state machine', () => {
     expect(api.acknowledgeLevelResults).not.toHaveBeenCalled();
   });
 
-  it('при bootstrap и refresh с pendingResults сначала загружает level-results и не дублирует reward UI', async () => {
+  it('при bootstrap и refresh с pendingResults сначала загружает API-008 и не дублирует reward UI', async () => {
     const api = makeApi(makePendingState());
     vi.mocked(api.getLevelResults).mockResolvedValue(normalRewardlessResults);
 
@@ -677,19 +806,13 @@ describe('P4 Results state machine', () => {
     expect(within(dialog).queryByRole('radio', { name: '1 подсказка' })).not.toBeInTheDocument();
   });
 
-  it('bootstrap pending Golden reward оставляет Home affordance и не открывает regular modal автоматически', async () => {
+  it('bootstrap pending Golden reward auto-opens the exact Golden choice', async () => {
     const api = makeApi(makePendingGoldenState());
     const user = userEvent.setup();
 
     render(<P1App api={api} minimumLoadingMs={0} />);
 
-    const home = await screen.findByLabelText('Главный экран');
-    const claimButton = within(home).getByRole('button', { name: 'Забрать награду' });
-    expect(claimButton).toBeVisible();
-    expect(screen.queryByLabelText('Результаты уровня')).not.toBeInTheDocument();
-    expect(screen.queryByRole('dialog', { name: 'Выберите награду' })).not.toBeInTheDocument();
-
-    await user.click(claimButton);
+    expect(screen.queryByLabelText('Результаты текущего уровня')).not.toBeInTheDocument();
 
     const dialog = await screen.findByRole('dialog', { name: 'Выберите награду' });
     expect(dialog).toHaveAttribute('aria-modal', 'true');
@@ -704,7 +827,7 @@ describe('P4 Results state machine', () => {
       rewardType: 'decoration',
       selectedOptionId: DECORATION_ID,
     });
-    await waitFor(() => expect(screen.getByLabelText('Главный экран')).toBeVisible());
+    await waitFor(() => expect(screen.getByRole('heading', { name: 'Оставить отзыв' })).toBeVisible());
     expect(screen.queryByLabelText(/^Результаты/)).not.toBeInTheDocument();
     expect(screen.queryByRole('heading', { name: 'Результаты' })).not.toBeInTheDocument();
   });
@@ -715,7 +838,7 @@ describe('P4 Results state machine', () => {
       selectedOptionType: SelectedOptionSelectedOptionTypeEnum.Decoration,
       selectedOptionId: DECORATION_ID,
     }],
-  ] as const)('для chapter Results отправляет server option payload %s, блокирует double claim и применяет ответ claim-reward', async (_, option) => {
+  ] as const)('для chapter Results отправляет server option payload %s, блокирует double claim и применяет ответ API-009', async (_, option) => {
     const api = makeApi(makePendingState('chapter'));
     vi.mocked(api.getLevelResults).mockResolvedValue(chapterResults);
     let resolveClaim: (response: ClaimRewardResponse) => void = () => undefined;
@@ -730,7 +853,7 @@ describe('P4 Results state machine', () => {
     expect(screen.queryByText('Завершена', { exact: true })).not.toBeInTheDocument();
     expect(screen.getByText('Золотой конверт готов')).toBeVisible();
     expect(screen.queryByRole('dialog', { name: 'Выберите награду' })).not.toBeInTheDocument();
-    const results = screen.getByLabelText('Результаты уровня');
+    const results = screen.getByLabelText('Результаты текущего уровня');
     const primary = within(results).getByRole('button', { name: 'Забрать награду' });
     await user.click(primary);
     expect(api.acknowledgeLevelResults).toHaveBeenCalledTimes(1);
@@ -767,7 +890,7 @@ describe('P4 Results state machine', () => {
 
     render(<P1App api={api} minimumLoadingMs={0} />);
     await screen.findByRole('heading', { name: 'Глава завершена!' });
-    await user.click(within(screen.getByLabelText('Результаты уровня')).getByRole('button', { name: 'Забрать награду' }));
+    await user.click(within(screen.getByLabelText('Результаты текущего уровня')).getByRole('button', { name: 'Забрать награду' }));
     await screen.findByRole('dialog', { name: 'Выберите награду' });
     await user.click(screen.getByRole('radio', { name: '3 подсказки' }));
     await user.click(screen.getByRole('button', { name: 'Забрать награду' }));
@@ -787,7 +910,7 @@ describe('P4 Results state machine', () => {
 
     render(<P1App api={api} minimumLoadingMs={0} />);
     await screen.findByRole('heading', { name: 'Глава завершена!' });
-    const results = screen.getByLabelText('Результаты уровня');
+    const results = screen.getByLabelText('Результаты текущего уровня');
     expect(within(results).queryByRole('heading', { name: 'Результаты' })).not.toBeInTheDocument();
     expect(within(results).getByRole('heading', { name: /^Глава завершена!$/ })).toBeVisible();
     const envelope = within(results).getByRole('img', { name: /^Золотой конверт$/i });
@@ -804,7 +927,7 @@ describe('P4 Results state machine', () => {
     expect(within(results).queryByText('В процессе', { exact: true })).not.toBeInTheDocument();
     expect(within(results).queryByText('Завершена', { exact: true })).not.toBeInTheDocument();
     expect(within(results).getByText('0', { exact: true })).toBeVisible();
-    expect(within(results).queryByRole('button', { name: /Мини-курс|Рекомендуем|Учебный материал/ }))
+    expect(within(results).queryByRole('button', { name: /Мини-курс|Рекомендуем|Продукт БКС/ }))
       .not.toBeInTheDocument();
     expect(within(results).getByRole('progressbar', { name: 'Прогресс золотого конверта' }))
       .toHaveAttribute('aria-valuenow', '9');
@@ -829,7 +952,7 @@ describe('P4 Results state machine', () => {
 
     await waitFor(() => expect(api.acknowledgeLevelResults).toHaveBeenCalledTimes(1));
     expect(api.enterLevel).not.toHaveBeenCalled();
-    expect(screen.getByLabelText('Результаты уровня 1')).toBeVisible();
+    expect(screen.getByLabelText('Результаты текущего уровня')).toBeVisible();
     expect(screen.getByRole('alert')).toHaveTextContent(/.+/);
     expect(screen.getByText('+7 знаний')).toBeVisible();
     expect(screen.getByText('Целевые слова')).toBeVisible();
@@ -854,7 +977,7 @@ describe('P4 Results state machine', () => {
     await user.click(screen.getByRole('button', { name: 'На главный экран' }));
 
     expect(api.acknowledgeLevelResults).toHaveBeenCalledTimes(1);
-    expect(screen.getByLabelText('Результаты уровня 1')).toBeVisible();
+    expect(screen.getByLabelText('Результаты текущего уровня')).toBeVisible();
     expect(screen.queryByLabelText('Главный экран')).not.toBeInTheDocument();
 
     await user.click(screen.getByRole('button', { name: 'Повторить' }));
@@ -875,15 +998,15 @@ describe('P4 Results state machine', () => {
 
     await renderPendingResults(api);
     await user.click(screen.getByRole('button', { name: 'Показать поле' }));
-    expect(screen.getByLabelText('Просмотр поля уровня 1')).toBeVisible();
+    expect(screen.getByLabelText('Просмотр поля текущего уровня')).toBeVisible();
     expect(api.acknowledgeLevelResults).not.toHaveBeenCalled();
 
     await user.click(screen.getByRole('button', { name: 'Скрыть поле' }));
-    expect(screen.getByLabelText('Результаты уровня 1')).toBeVisible();
+    expect(screen.getByLabelText('Результаты текущего уровня')).toBeVisible();
     expect(api.acknowledgeLevelResults).not.toHaveBeenCalled();
 
     await user.click(screen.getByRole('button', { name: 'Показать поле' }));
-    const fieldReview = screen.getByLabelText('Просмотр поля уровня 1');
+    const fieldReview = screen.getByLabelText('Просмотр поля текущего уровня');
     await user.click(within(fieldReview).getByRole('button', { name: 'Следующий уровень' }));
     expect(api.acknowledgeLevelResults).toHaveBeenCalledTimes(1);
     expect(api.enterLevel).not.toHaveBeenCalled();
@@ -899,23 +1022,49 @@ describe('P4 Results state machine', () => {
     const user = userEvent.setup();
 
     render(<P1App api={api} minimumLoadingMs={0} />);
-    const results = await screen.findByLabelText('Результаты уровня 2');
+    const results = await screen.findByLabelText('Результаты текущего уровня');
     expect(api.getLevelResults).toHaveBeenCalledWith(SECOND_LEVEL_ID, expect.any(AbortSignal));
-    expect(screen.queryByLabelText('Результаты уровня 1')).not.toBeInTheDocument();
-    expect(within(results).getByRole('button', { name: /Учебный материал.*ИИС|ИИС.*Учебный материал/ })).toBeVisible();
+    expect(screen.getAllByLabelText('Результаты текущего уровня')).toHaveLength(1);
+    expect(within(results).getByRole('button', { name: /Продукт БКС.*ИИС|ИИС.*Продукт БКС/ })).toBeVisible();
 
     await user.click(within(results).getByRole('button', { name: 'Показать поле' }));
-    const fieldReview = await screen.findByLabelText('Просмотр поля уровня 2');
+    const fieldReview = await screen.findByLabelText('Просмотр поля текущего уровня');
     expect(fieldReview.querySelector('[data-found-marker]')).not.toBeInTheDocument();
     const nonFirstTargetCell = within(fieldReview).getByRole('button', {
       name: 'Р, строка 2, столбец 3. Найденное слово ИИС. Открыть информацию',
     });
     expect(nonFirstTargetCell).toHaveAttribute('data-cell-id', '2:3');
     await user.click(nonFirstTargetCell);
-    expect(screen.getByRole('dialog', { name: 'ИИС' })).toHaveTextContent('Учебный материал');
+    expect(screen.getByRole('dialog', { name: 'ИИС' })).toHaveTextContent('Продукт БКС');
   });
 
-  it('Golden primary сначала подтверждает Results, затем открывает выбор; claim-reward недоступен до acknowledge-results', async () => {
+  it('после завершения без local destination безопасно блокирует retry в Results и Field Review', async () => {
+    const api = makeApi();
+    vi.mocked(api.submitRoute).mockResolvedValue(makeCompletedSubmission());
+    vi.mocked(api.getLevelResults).mockResolvedValue(normalRewardlessResults);
+    const user = userEvent.setup();
+
+    await renderStartedGame(api);
+    releaseRoute();
+    await screen.findByRole('heading', { name: 'Уровень пройден!' });
+
+    const results = screen.getByLabelText('Результаты уровня 1');
+    await user.click(within(results).getByRole('button', { name: /Мини-курс.*Основы личных финансов/ }));
+    let dialog = screen.getByRole('dialog', { name: 'АКЦИЯ' });
+    expect(within(dialog).getByRole('button', { name: 'Повторить' })).toBeDisabled();
+    expect(openDeepLink).not.toHaveBeenCalled();
+
+    await user.click(within(dialog).getByRole('button', { name: 'Вернуться к полю' }));
+    const fieldReview = screen.getByLabelText('Просмотр поля уровня 1');
+    await user.click(within(fieldReview).getAllByRole('button', {
+      name: /Найденное слово АКЦИЯ\. Открыть информацию/,
+    })[0]);
+    dialog = screen.getByRole('dialog', { name: 'АКЦИЯ' });
+    expect(within(dialog).getByRole('button', { name: 'Повторить' })).toBeDisabled();
+    expect(openDeepLink).not.toHaveBeenCalled();
+  });
+
+  it('Golden primary сначала подтверждает Results, затем открывает выбор; API-009 недоступен до API-017', async () => {
     const api = makeApi(makePendingState('chapter'));
     vi.mocked(api.getLevelResults).mockResolvedValue(chapterResults);
     let resolveAcknowledge: (response: AcknowledgeLevelResultsResponse) => void = () => undefined;
@@ -925,8 +1074,7 @@ describe('P4 Results state machine', () => {
     const user = userEvent.setup();
 
     render(<P1App api={api} minimumLoadingMs={0} />);
-    const results = await screen.findByLabelText('Результаты уровня');
-    expect(screen.queryByLabelText('Результаты уровня 1')).not.toBeInTheDocument();
+    const results = await screen.findByLabelText('Результаты текущего уровня');
     expect(screen.queryByRole('dialog', { name: 'Выберите награду' })).not.toBeInTheDocument();
     await user.click(within(results).getByRole('button', { name: 'Забрать награду' }));
     expect(api.acknowledgeLevelResults).toHaveBeenCalledTimes(1);
@@ -948,14 +1096,14 @@ describe('P4 Results state machine', () => {
     expect(api.claimReward).not.toHaveBeenCalled();
   });
 
-  it('Golden Header Back подтверждает Results и возвращает Home без claim-reward', async () => {
+  it('Golden Header Back подтверждает Results и возвращает Home без API-009', async () => {
     const api = makeApi(makePendingState('chapter'));
     vi.mocked(api.getLevelResults).mockResolvedValue(chapterResults);
     vi.mocked(api.acknowledgeLevelResults).mockResolvedValue(makeAcknowledgeResponse());
     const user = userEvent.setup();
 
     render(<P1App api={api} minimumLoadingMs={0} />);
-    const results = await screen.findByLabelText('Результаты уровня');
+    const results = await screen.findByLabelText('Результаты текущего уровня');
     await user.click(within(results).getByRole('button', { name: 'На главный экран' }));
     await waitFor(() => expect(screen.getByLabelText('Главный экран')).toBeVisible());
     expect(api.acknowledgeLevelResults).toHaveBeenCalledTimes(1);
@@ -969,7 +1117,7 @@ describe('P4 Results state machine', () => {
     const user = userEvent.setup();
 
     render(<P1App api={api} minimumLoadingMs={0} />);
-    const results = await screen.findByLabelText('Результаты уровня');
+    const results = await screen.findByLabelText('Результаты текущего уровня');
     const primary = within(results).getByRole('button', { name: 'Забрать награду' });
     await user.click(primary);
     const dialog = await screen.findByRole('dialog', { name: 'Выберите награду' });
@@ -980,14 +1128,36 @@ describe('P4 Results state machine', () => {
       await user.tab();
       expect(dialog).toContainElement(document.activeElement as HTMLElement);
     }
-    expect(screen.queryByLabelText('Просмотр поля уровня 1')).not.toBeInTheDocument();
+    expect(screen.queryByLabelText('Просмотр поля текущего уровня')).not.toBeInTheDocument();
     await user.keyboard('{Enter}');
-    expect(screen.queryByLabelText('Просмотр поля уровня 1')).not.toBeInTheDocument();
+    expect(screen.queryByLabelText('Просмотр поля текущего уровня')).not.toBeInTheDocument();
 
     await user.keyboard('{Escape}');
     await waitFor(() => expect(screen.queryByRole('dialog', { name: 'Выберите награду' })).not.toBeInTheDocument());
-    const currentResults = screen.getByLabelText('Результаты уровня');
+    const currentResults = screen.getByLabelText('Результаты текущего уровня');
     const currentPrimary = within(currentResults).getByRole('button', { name: 'Забрать награду' });
     expect(document.activeElement).toBe(currentPrimary);
+  });
+
+  it('routes RESULTS_ACKNOWLEDGEMENT_REQUIRED back through authoritative Results and API-017', async () => {
+    const initial = makePendingGoldenState();
+    const authoritative = makePendingState('chapter');
+    const api = makeApi(initial);
+    vi.mocked(api.loadState)
+      .mockResolvedValueOnce(initial)
+      .mockResolvedValueOnce(authoritative);
+    vi.mocked(api.claimReward).mockRejectedValue({ type: 'RESULTS_ACKNOWLEDGEMENT_REQUIRED' });
+    vi.mocked(api.getLevelResults).mockResolvedValue(chapterResults);
+    const user = userEvent.setup();
+
+    render(<P1App api={api} minimumLoadingMs={0} />);
+    const dialog = await screen.findByRole('dialog', { name: 'Выберите награду' });
+    await user.click(within(dialog).getByRole('radio', { name: '3 подсказки' }));
+    await user.click(within(dialog).getByRole('button', { name: 'Забрать награду' }));
+
+    expect(await screen.findByLabelText('Результаты текущего уровня')).toBeVisible();
+    expect(api.loadState).toHaveBeenCalledTimes(2);
+    expect(api.getLevelResults).toHaveBeenCalledWith(LEVEL_ID, expect.any(AbortSignal));
+    expect(api.acknowledgeLevelResults).not.toHaveBeenCalled();
   });
 });

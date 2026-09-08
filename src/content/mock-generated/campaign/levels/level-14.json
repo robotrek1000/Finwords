@@ -1,0 +1,225 @@
+{
+  "schemaVersion": "1",
+  "id": "level-14",
+  "number": 14,
+  "chapterId": "chapter-02",
+  "chapterTitle": "Финансовая подушка",
+  "microtheme": "Обязательные расходы",
+  "rows": 5,
+  "cols": 5,
+  "desiredTurns": {
+    "min": 1,
+    "max": 2
+  },
+  "difficulty": "Базовая",
+  "sourceWords": [
+    "АРЕНДА",
+    "ОПЛАТА",
+    "РАСХОД",
+    "СВЕТ",
+    "ЖКХ"
+  ],
+  "gridStatus": "TBD_AFTER_DATA_MODEL",
+  "contentStatus": "Draft",
+  "validation": "VALID",
+  "grid": [
+    [
+      "А",
+      "Т",
+      "А",
+      "А",
+      "Р"
+    ],
+    [
+      "Л",
+      "П",
+      "О",
+      "Д",
+      "Е"
+    ],
+    [
+      "В",
+      "Е",
+      "Т",
+      "О",
+      "Н"
+    ],
+    [
+      "С",
+      "Ж",
+      "Р",
+      "Х",
+      "Д"
+    ],
+    [
+      "Х",
+      "К",
+      "А",
+      "С",
+      "А"
+    ]
+  ],
+  "targets": [
+    {
+      "targetId": "target-14-01",
+      "order": 1,
+      "word": "АРЕНДА",
+      "normalized": "АРЕНДА",
+      "definition": "Временное пользование имуществом за установленную плату.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 0,
+          "col": 3
+        },
+        {
+          "row": 0,
+          "col": 4
+        },
+        {
+          "row": 1,
+          "col": 4
+        },
+        {
+          "row": 2,
+          "col": 4
+        },
+        {
+          "row": 3,
+          "col": 4
+        },
+        {
+          "row": 4,
+          "col": 4
+        }
+      ]
+    },
+    {
+      "targetId": "target-14-02",
+      "order": 2,
+      "word": "ОПЛАТА",
+      "normalized": "ОПЛАТА",
+      "definition": "Передача денег в исполнение обязательства за товар, услугу или счёт.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 1,
+          "col": 2
+        },
+        {
+          "row": 1,
+          "col": 1
+        },
+        {
+          "row": 1,
+          "col": 0
+        },
+        {
+          "row": 0,
+          "col": 0
+        },
+        {
+          "row": 0,
+          "col": 1
+        },
+        {
+          "row": 0,
+          "col": 2
+        }
+      ]
+    },
+    {
+      "targetId": "target-14-03",
+      "order": 3,
+      "word": "РАСХОД",
+      "normalized": "РАСХОД",
+      "definition": "Деньги или ресурсы, использованные за определённый период.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "offerId": "offer-14",
+      "canonicalPath": [
+        {
+          "row": 3,
+          "col": 2
+        },
+        {
+          "row": 4,
+          "col": 2
+        },
+        {
+          "row": 4,
+          "col": 3
+        },
+        {
+          "row": 3,
+          "col": 3
+        },
+        {
+          "row": 2,
+          "col": 3
+        },
+        {
+          "row": 1,
+          "col": 3
+        }
+      ]
+    },
+    {
+      "targetId": "target-14-04",
+      "order": 4,
+      "word": "СВЕТ",
+      "normalized": "СВЕТ",
+      "definition": "Электроэнергия и освещение, расходы на которые входят в коммунальные платежи.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 3,
+          "col": 0
+        },
+        {
+          "row": 2,
+          "col": 0
+        },
+        {
+          "row": 2,
+          "col": 1
+        },
+        {
+          "row": 2,
+          "col": 2
+        }
+      ]
+    },
+    {
+      "targetId": "target-14-05",
+      "order": 5,
+      "word": "ЖКХ",
+      "normalized": "ЖКХ",
+      "definition": "Жилищно-коммунальные услуги, необходимые для содержания дома и квартиры.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 3,
+          "col": 1
+        },
+        {
+          "row": 4,
+          "col": 1
+        },
+        {
+          "row": 4,
+          "col": 0
+        }
+      ]
+    }
+  ]
+}

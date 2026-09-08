@@ -1,0 +1,224 @@
+{
+  "schemaVersion": "1",
+  "id": "level-15",
+  "number": 15,
+  "chapterId": "chapter-02",
+  "chapterTitle": "Финансовая подушка",
+  "microtheme": "Запас на паузу",
+  "rows": 5,
+  "cols": 5,
+  "desiredTurns": {
+    "min": 1,
+    "max": 2
+  },
+  "difficulty": "Базовая",
+  "sourceWords": [
+    "РАБОТА",
+    "РЕЗЕРВ",
+    "ПАУЗА",
+    "НУЖДА",
+    "КЭШ"
+  ],
+  "gridStatus": "TBD_AFTER_DATA_MODEL",
+  "contentStatus": "Draft",
+  "validation": "VALID",
+  "grid": [
+    [
+      "Р",
+      "А",
+      "Б",
+      "О",
+      "Т"
+    ],
+    [
+      "Е",
+      "З",
+      "Е",
+      "Р",
+      "А"
+    ],
+    [
+      "Р",
+      "В",
+      "П",
+      "А",
+      "У"
+    ],
+    [
+      "Ж",
+      "У",
+      "Н",
+      "А",
+      "З"
+    ],
+    [
+      "Д",
+      "А",
+      "К",
+      "Э",
+      "Ш"
+    ]
+  ],
+  "targets": [
+    {
+      "targetId": "target-15-01",
+      "order": 1,
+      "word": "РАБОТА",
+      "normalized": "РАБОТА",
+      "definition": "Деятельность, выполняемая для создания результата и получения вознаграждения.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 0,
+          "col": 0
+        },
+        {
+          "row": 0,
+          "col": 1
+        },
+        {
+          "row": 0,
+          "col": 2
+        },
+        {
+          "row": 0,
+          "col": 3
+        },
+        {
+          "row": 0,
+          "col": 4
+        },
+        {
+          "row": 1,
+          "col": 4
+        }
+      ]
+    },
+    {
+      "targetId": "target-15-02",
+      "order": 2,
+      "word": "РЕЗЕРВ",
+      "normalized": "РЕЗЕРВ",
+      "definition": "Заранее отложенный ресурс для покрытия будущих потребностей или рисков.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 1,
+          "col": 3
+        },
+        {
+          "row": 1,
+          "col": 2
+        },
+        {
+          "row": 1,
+          "col": 1
+        },
+        {
+          "row": 1,
+          "col": 0
+        },
+        {
+          "row": 2,
+          "col": 0
+        },
+        {
+          "row": 2,
+          "col": 1
+        }
+      ]
+    },
+    {
+      "targetId": "target-15-03",
+      "order": 3,
+      "word": "ПАУЗА",
+      "normalized": "ПАУЗА",
+      "definition": "Временное прекращение действия или процесса.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 2,
+          "col": 2
+        },
+        {
+          "row": 2,
+          "col": 3
+        },
+        {
+          "row": 2,
+          "col": 4
+        },
+        {
+          "row": 3,
+          "col": 4
+        },
+        {
+          "row": 3,
+          "col": 3
+        }
+      ]
+    },
+    {
+      "targetId": "target-15-04",
+      "order": 4,
+      "word": "НУЖДА",
+      "normalized": "НУЖДА",
+      "definition": "Необходимая потребность, для удовлетворения которой требуются ресурсы.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 3,
+          "col": 2
+        },
+        {
+          "row": 3,
+          "col": 1
+        },
+        {
+          "row": 3,
+          "col": 0
+        },
+        {
+          "row": 4,
+          "col": 0
+        },
+        {
+          "row": 4,
+          "col": 1
+        }
+      ]
+    },
+    {
+      "targetId": "target-15-05",
+      "order": 5,
+      "word": "КЭШ",
+      "normalized": "КЭШ",
+      "definition": "Разговорное обозначение наличных денег или быстро доступных денежных средств.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 4,
+          "col": 2
+        },
+        {
+          "row": 4,
+          "col": 3
+        },
+        {
+          "row": 4,
+          "col": 4
+        }
+      ]
+    }
+  ]
+}

@@ -5,15 +5,11 @@ import {
 } from './targetPresentation';
 
 describe('resolveTargetPresentation', () => {
-  it('maps all seven Level1 words to their canonical folded-corner orientation', () => {
+  it('maps all governed Level 1 words to their canonical folded-corner orientation', () => {
     const expected: Record<string, string> = {
-      ФОНД: 'bottom-right',
-      КАПИТАЛ: 'top-left',
-      АКЦИЯ: 'bottom-right',
-      РИСК: 'bottom-right',
-      РЫНОК: 'top-left',
-      ИНДЕКС: 'top-left',
-      ДОХОД: 'bottom-right',
+      ЧЕК: 'bottom-right',
+      ЛОТ: 'top-left',
+      АКТ: 'bottom-right',
     };
     for (const [word, corner] of Object.entries(expected)) {
       expect(resolveTargetPresentation(1, word).corner).toBe(corner);
@@ -22,13 +18,9 @@ describe('resolveTargetPresentation', () => {
 
   it('maps each word to its Level1 target color', () => {
     const expected: Record<string, string> = {
-      ФОНД: '#52C7B8',
-      КАПИТАЛ: '#F6C945',
-      АКЦИЯ: '#8B7CF6',
-      РИСК: '#FF8A72',
-      РЫНОК: '#55A6F7',
-      ИНДЕКС: '#EF83BA',
-      ДОХОД: '#75C96B',
+      ЧЕК: '#86d3f4',
+      ЛОТ: '#b8e8a2',
+      АКТ: '#f8d775',
     };
     for (const [word, color] of Object.entries(expected)) {
       expect(resolveTargetPresentation(1, word).color).toBe(color);
@@ -36,28 +28,28 @@ describe('resolveTargetPresentation', () => {
   });
 
   it('is level-aware: resolves a word only within the supplied level', () => {
-    const level1 = resolveTargetPresentation(1, 'ФОНД');
-    expect(level1.corner).toBe('bottom-right');
-    expect(level1.color).toBe('#52C7B8');
+    const level4 = resolveTargetPresentation(4, 'ФОНД');
+    expect(level4.corner).toBeDefined();
+    expect(level4.color).toBe('#b8e8a2');
 
-    // ФОНД не существует на уровне 2 — деградируем, а не бросаем.
-    const level2 = resolveTargetPresentation(2, 'ФОНД');
-    expect(level2.linked).toBe(false);
-    expect(level2.offer).toBeUndefined();
+    // ФОНД не существует на уровне 1 — деградируем, а не бросаем.
+    const level1 = resolveTargetPresentation(1, 'ФОНД');
+    expect(level1.linked).toBe(false);
+    expect(level1.offer).toBeUndefined();
   });
 
   it('exposes the canonical first CellRef/CellId for the marker anchor', () => {
-    const presentation = resolveTargetPresentation(1, 'ФОНД');
-    expect(presentation.firstCell).toEqual({ row: 1, col: 4 });
-    expect(presentation.firstCellId).toBe('2:5');
+    const presentation = resolveTargetPresentation(1, 'ЧЕК');
+    expect(presentation.firstCell).toEqual({ row: 2, col: 2 });
+    expect(presentation.firstCellId).toBe('3:3');
   });
 
-  it('flags only АКЦИЯ as course-linked with the mini-course offer', () => {
-    const linked = ['ФОНД', 'КАПИТАЛ', 'АКЦИЯ', 'РИСК', 'РЫНОК', 'ИНДЕКС', 'ДОХОД']
-      .map((word) => resolveTargetPresentation(1, word))
+  it('flags only the governed КУРС target as course-linked', () => {
+    const linked = ['РОСТ', 'СПАД', 'КУРС', 'ЦЕНА']
+      .map((word) => resolveTargetPresentation(6, word))
       .filter((presentation) => presentation.linked);
     expect(linked).toHaveLength(1);
-    expect(linked[0].word).toBe('АКЦИЯ');
+    expect(linked[0].word).toBe('КУРС');
     expect(linked[0].offer?.type).toBe('course');
     expect(linked[0].offer?.badgeLabel).toBe('Мини-курс');
   });
@@ -69,7 +61,7 @@ describe('resolveTargetPresentation', () => {
   });
 
   it('exposes manual autoShow=false so the course never auto-opens', () => {
-    expect(resolveTargetPresentation(1, 'АКЦИЯ').offer?.autoShow).toBe(false);
+    expect(resolveTargetPresentation(6, 'КУРС').offer?.autoShow).toBe(false);
   });
 });
 

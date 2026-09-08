@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useReducer, useRef, useState } from 'r
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
 import type { CellId, LevelId, Overlay, TargetWord } from './types';
 import type { SelectionResult } from '../features/game/gameEngine';
-import { getLevel } from '../content/levels';
+import { getLevel } from '../content/campaign';
 import {
   createInitialSession,
   envelopeThreshold,
@@ -28,6 +28,11 @@ declare global {
   interface Window {
     render_game_to_text?: () => string;
     advanceTime?: (ms: number) => void;
+    __FINWORDS_E2E__?: {
+      seed?: 'first-run-completed' | 'chapter1-level9' | 'appearance-regular-owned' | 'campaign-boundary';
+      campaignBoundaryLevel?: 9 | 17 | 24 | 31 | 38 | 44 | 50;
+      failAppearanceSelectionOnce?: boolean;
+    };
   }
 }
 
@@ -256,6 +261,7 @@ export function LegacyApp({
   }, []);
 
   useEffect(() => {
+    if (!import.meta.env.DEV) return undefined;
     window.advanceTime = (ms: number) => {
       window.dispatchEvent(new CustomEvent('finwords:advance-time', { detail: ms }));
     };
@@ -776,6 +782,7 @@ export function LegacyApp({
 }
 
 export function App() {
+  if (!import.meta.env.DEV) return <StandaloneApp />;
   const params = new URLSearchParams(window.location.search);
   const legacyPreview = params.has('screen') || params.has('overlay');
 
@@ -783,7 +790,7 @@ export function App() {
     return <LegacyApp />;
   }
 
-  return <StandaloneApp />;
+  return <P1App />;
 }
 
 function StandaloneApp() {

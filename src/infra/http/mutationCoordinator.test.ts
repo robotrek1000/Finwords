@@ -104,11 +104,11 @@ describe('mutationCoordinator', () => {
   it('resumes an unresolved semantic intent across a later user retry', () => {
     const coordinator = createMutationCoordinator();
     const first = coordinator.beginOrRetry({
-      apiId: 'use-hint',
+      apiId: 'API-007',
       params: { levelId: 'level-1' },
     });
     const retry = coordinator.beginOrRetry({
-      apiId: 'use-hint',
+      apiId: 'API-007',
       params: { levelId: 'level-1' },
     });
 
@@ -117,7 +117,7 @@ describe('mutationCoordinator', () => {
     expect(retry.requestGeneration).toBe(first.requestGeneration + 1);
 
     const differentOperation = coordinator.beginOrRetry({
-      apiId: 'start-level',
+      apiId: 'API-004',
       params: { levelId: 'level-1' },
     });
     expect(differentOperation.key).not.toBe(first.key);

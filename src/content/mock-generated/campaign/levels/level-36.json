@@ -1,0 +1,295 @@
+{
+  "schemaVersion": "1",
+  "id": "level-36",
+  "number": 36,
+  "chapterId": "chapter-05",
+  "chapterTitle": "Мир бизнеса",
+  "microtheme": "Экономика бизнеса",
+  "rows": 6,
+  "cols": 6,
+  "desiredTurns": {
+    "min": 1,
+    "max": 3
+  },
+  "difficulty": "Средняя",
+  "sourceWords": [
+    "МАРЖА",
+    "ПРИБЫЛЬ",
+    "ИЗДЕРЖКИ",
+    "НАЛОГ",
+    "РЕНТА",
+    "ПАССИВ"
+  ],
+  "gridStatus": "TBD_AFTER_DATA_MODEL",
+  "contentStatus": "Draft",
+  "validation": "VALID",
+  "grid": [
+    [
+      "Л",
+      "А",
+      "Н",
+      "А",
+      "Т",
+      "Н"
+    ],
+    [
+      "О",
+      "С",
+      "С",
+      "А",
+      "Р",
+      "Е"
+    ],
+    [
+      "Г",
+      "И",
+      "В",
+      "П",
+      "Б",
+      "И"
+    ],
+    [
+      "И",
+      "Р",
+      "Ж",
+      "А",
+      "Ы",
+      "Р"
+    ],
+    [
+      "З",
+      "А",
+      "М",
+      "Ь",
+      "Л",
+      "П"
+    ],
+    [
+      "Д",
+      "Е",
+      "Р",
+      "Ж",
+      "К",
+      "И"
+    ]
+  ],
+  "targets": [
+    {
+      "targetId": "target-36-01",
+      "order": 1,
+      "word": "МАРЖА",
+      "normalized": "МАРЖА",
+      "definition": "Разница между выручкой и связанными с продажей затратами.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 4,
+          "col": 2
+        },
+        {
+          "row": 4,
+          "col": 1
+        },
+        {
+          "row": 3,
+          "col": 1
+        },
+        {
+          "row": 3,
+          "col": 2
+        },
+        {
+          "row": 3,
+          "col": 3
+        }
+      ]
+    },
+    {
+      "targetId": "target-36-02",
+      "order": 2,
+      "word": "ПРИБЫЛЬ",
+      "normalized": "ПРИБЫЛЬ",
+      "definition": "Положительный финансовый результат после вычета расходов из доходов.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "offerId": "offer-36",
+      "canonicalPath": [
+        {
+          "row": 4,
+          "col": 5
+        },
+        {
+          "row": 3,
+          "col": 5
+        },
+        {
+          "row": 2,
+          "col": 5
+        },
+        {
+          "row": 2,
+          "col": 4
+        },
+        {
+          "row": 3,
+          "col": 4
+        },
+        {
+          "row": 4,
+          "col": 4
+        },
+        {
+          "row": 4,
+          "col": 3
+        }
+      ]
+    },
+    {
+      "targetId": "target-36-03",
+      "order": 3,
+      "word": "ИЗДЕРЖКИ",
+      "normalized": "ИЗДЕРЖКИ",
+      "definition": "Затраты компании на производство, продажи и ведение деятельности.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 3,
+          "col": 0
+        },
+        {
+          "row": 4,
+          "col": 0
+        },
+        {
+          "row": 5,
+          "col": 0
+        },
+        {
+          "row": 5,
+          "col": 1
+        },
+        {
+          "row": 5,
+          "col": 2
+        },
+        {
+          "row": 5,
+          "col": 3
+        },
+        {
+          "row": 5,
+          "col": 4
+        },
+        {
+          "row": 5,
+          "col": 5
+        }
+      ]
+    },
+    {
+      "targetId": "target-36-04",
+      "order": 4,
+      "word": "НАЛОГ",
+      "normalized": "НАЛОГ",
+      "definition": "Обязательный платёж государству, установленный законом.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 0,
+          "col": 2
+        },
+        {
+          "row": 0,
+          "col": 1
+        },
+        {
+          "row": 0,
+          "col": 0
+        },
+        {
+          "row": 1,
+          "col": 0
+        },
+        {
+          "row": 2,
+          "col": 0
+        }
+      ]
+    },
+    {
+      "targetId": "target-36-05",
+      "order": 5,
+      "word": "РЕНТА",
+      "normalized": "РЕНТА",
+      "definition": "Регулярный доход от предоставления имущества или ограниченного ресурса.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 1,
+          "col": 4
+        },
+        {
+          "row": 1,
+          "col": 5
+        },
+        {
+          "row": 0,
+          "col": 5
+        },
+        {
+          "row": 0,
+          "col": 4
+        },
+        {
+          "row": 0,
+          "col": 3
+        }
+      ]
+    },
+    {
+      "targetId": "target-36-06",
+      "order": 6,
+      "word": "ПАССИВ",
+      "normalized": "ПАССИВ",
+      "definition": "Источник финансирования организации или обязательство в бухгалтерском балансе.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 2,
+          "col": 3
+        },
+        {
+          "row": 1,
+          "col": 3
+        },
+        {
+          "row": 1,
+          "col": 2
+        },
+        {
+          "row": 1,
+          "col": 1
+        },
+        {
+          "row": 2,
+          "col": 1
+        },
+        {
+          "row": 2,
+          "col": 2
+        }
+      ]
+    }
+  ]
+}

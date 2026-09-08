@@ -1,0 +1,295 @@
+{
+  "schemaVersion": "1",
+  "id": "level-26",
+  "number": 26,
+  "chapterId": "chapter-04",
+  "chapterTitle": "История капитала",
+  "microtheme": "Торговые пути",
+  "rows": 6,
+  "cols": 6,
+  "desiredTurns": {
+    "min": 1,
+    "max": 3
+  },
+  "difficulty": "Средняя",
+  "sourceWords": [
+    "КАРАВАН",
+    "КУПЕЦ",
+    "ЯРМАРКА",
+    "ТОРГИ",
+    "ПОШЛИНА",
+    "ДУКАТ"
+  ],
+  "gridStatus": "TBD_AFTER_DATA_MODEL",
+  "contentStatus": "Draft",
+  "validation": "VALID",
+  "grid": [
+    [
+      "В",
+      "А",
+      "Г",
+      "И",
+      "А",
+      "К"
+    ],
+    [
+      "А",
+      "Н",
+      "Р",
+      "О",
+      "Т",
+      "Р"
+    ],
+    [
+      "Р",
+      "К",
+      "Я",
+      "Р",
+      "М",
+      "А"
+    ],
+    [
+      "А",
+      "У",
+      "Ц",
+      "А",
+      "Н",
+      "П"
+    ],
+    [
+      "К",
+      "П",
+      "Е",
+      "Д",
+      "И",
+      "О"
+    ],
+    [
+      "Т",
+      "А",
+      "К",
+      "У",
+      "Л",
+      "Ш"
+    ]
+  ],
+  "targets": [
+    {
+      "targetId": "target-26-01",
+      "order": 1,
+      "word": "КАРАВАН",
+      "normalized": "КАРАВАН",
+      "definition": "Группа путешественников или транспортных средств, движущихся вместе по торговому пути.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 4,
+          "col": 0
+        },
+        {
+          "row": 3,
+          "col": 0
+        },
+        {
+          "row": 2,
+          "col": 0
+        },
+        {
+          "row": 1,
+          "col": 0
+        },
+        {
+          "row": 0,
+          "col": 0
+        },
+        {
+          "row": 0,
+          "col": 1
+        },
+        {
+          "row": 1,
+          "col": 1
+        }
+      ]
+    },
+    {
+      "targetId": "target-26-02",
+      "order": 2,
+      "word": "КУПЕЦ",
+      "normalized": "КУПЕЦ",
+      "definition": "Историческое название человека, профессионально занимавшегося торговлей.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 2,
+          "col": 1
+        },
+        {
+          "row": 3,
+          "col": 1
+        },
+        {
+          "row": 4,
+          "col": 1
+        },
+        {
+          "row": 4,
+          "col": 2
+        },
+        {
+          "row": 3,
+          "col": 2
+        }
+      ]
+    },
+    {
+      "targetId": "target-26-03",
+      "order": 3,
+      "word": "ЯРМАРКА",
+      "normalized": "ЯРМАРКА",
+      "definition": "Периодическое торговое мероприятие с большим числом продавцов и покупателей.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 2,
+          "col": 2
+        },
+        {
+          "row": 2,
+          "col": 3
+        },
+        {
+          "row": 2,
+          "col": 4
+        },
+        {
+          "row": 2,
+          "col": 5
+        },
+        {
+          "row": 1,
+          "col": 5
+        },
+        {
+          "row": 0,
+          "col": 5
+        },
+        {
+          "row": 0,
+          "col": 4
+        }
+      ]
+    },
+    {
+      "targetId": "target-26-04",
+      "order": 4,
+      "word": "ТОРГИ",
+      "normalized": "ТОРГИ",
+      "definition": "Организованный процесс выбора предложения и заключения сделки.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 1,
+          "col": 4
+        },
+        {
+          "row": 1,
+          "col": 3
+        },
+        {
+          "row": 1,
+          "col": 2
+        },
+        {
+          "row": 0,
+          "col": 2
+        },
+        {
+          "row": 0,
+          "col": 3
+        }
+      ]
+    },
+    {
+      "targetId": "target-26-05",
+      "order": 5,
+      "word": "ПОШЛИНА",
+      "normalized": "ПОШЛИНА",
+      "definition": "Обязательный платёж государству за определённое действие или перемещение товара.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "offerId": "offer-26",
+      "canonicalPath": [
+        {
+          "row": 3,
+          "col": 5
+        },
+        {
+          "row": 4,
+          "col": 5
+        },
+        {
+          "row": 5,
+          "col": 5
+        },
+        {
+          "row": 5,
+          "col": 4
+        },
+        {
+          "row": 4,
+          "col": 4
+        },
+        {
+          "row": 3,
+          "col": 4
+        },
+        {
+          "row": 3,
+          "col": 3
+        }
+      ]
+    },
+    {
+      "targetId": "target-26-06",
+      "order": 6,
+      "word": "ДУКАТ",
+      "normalized": "ДУКАТ",
+      "definition": "Историческая золотая или серебряная монета ряда европейских государств.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 4,
+          "col": 3
+        },
+        {
+          "row": 5,
+          "col": 3
+        },
+        {
+          "row": 5,
+          "col": 2
+        },
+        {
+          "row": 5,
+          "col": 1
+        },
+        {
+          "row": 5,
+          "col": 0
+        }
+      ]
+    }
+  ]
+}

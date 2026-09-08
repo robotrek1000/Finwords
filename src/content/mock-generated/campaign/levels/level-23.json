@@ -1,0 +1,294 @@
+{
+  "schemaVersion": "1",
+  "id": "level-23",
+  "number": 23,
+  "chapterId": "chapter-03",
+  "chapterTitle": "Морская торговля",
+  "microtheme": "Море и погода",
+  "rows": 6,
+  "cols": 6,
+  "desiredTurns": {
+    "min": 1,
+    "max": 2
+  },
+  "difficulty": "Базовая",
+  "sourceWords": [
+    "ЦИКЛОН",
+    "МУССОН",
+    "ПАССАТ",
+    "УРАГАН",
+    "ПРИЛИВ",
+    "ОСАДКИ"
+  ],
+  "gridStatus": "TBD_AFTER_DATA_MODEL",
+  "contentStatus": "Draft",
+  "validation": "VALID",
+  "grid": [
+    [
+      "С",
+      "А",
+      "П",
+      "Н",
+      "И",
+      "В"
+    ],
+    [
+      "С",
+      "К",
+      "И",
+      "О",
+      "Л",
+      "О"
+    ],
+    [
+      "А",
+      "Л",
+      "Ц",
+      "С",
+      "И",
+      "С"
+    ],
+    [
+      "Т",
+      "О",
+      "У",
+      "С",
+      "Р",
+      "А"
+    ],
+    [
+      "У",
+      "Н",
+      "М",
+      "Н",
+      "П",
+      "Д"
+    ],
+    [
+      "Р",
+      "А",
+      "Г",
+      "А",
+      "И",
+      "К"
+    ]
+  ],
+  "targets": [
+    {
+      "targetId": "target-23-01",
+      "order": 1,
+      "word": "ЦИКЛОН",
+      "normalized": "ЦИКЛОН",
+      "definition": "Область пониженного атмосферного давления с облачностью и сильным ветром.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 2,
+          "col": 2
+        },
+        {
+          "row": 1,
+          "col": 2
+        },
+        {
+          "row": 1,
+          "col": 1
+        },
+        {
+          "row": 2,
+          "col": 1
+        },
+        {
+          "row": 3,
+          "col": 1
+        },
+        {
+          "row": 4,
+          "col": 1
+        }
+      ]
+    },
+    {
+      "targetId": "target-23-02",
+      "order": 2,
+      "word": "МУССОН",
+      "normalized": "МУССОН",
+      "definition": "Сезонный ветер, меняющий направление между летом и зимой.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 4,
+          "col": 2
+        },
+        {
+          "row": 3,
+          "col": 2
+        },
+        {
+          "row": 3,
+          "col": 3
+        },
+        {
+          "row": 2,
+          "col": 3
+        },
+        {
+          "row": 1,
+          "col": 3
+        },
+        {
+          "row": 0,
+          "col": 3
+        }
+      ]
+    },
+    {
+      "targetId": "target-23-03",
+      "order": 3,
+      "word": "ПАССАТ",
+      "normalized": "ПАССАТ",
+      "definition": "Постоянный тропический ветер, дующий в устойчивом направлении.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 0,
+          "col": 2
+        },
+        {
+          "row": 0,
+          "col": 1
+        },
+        {
+          "row": 0,
+          "col": 0
+        },
+        {
+          "row": 1,
+          "col": 0
+        },
+        {
+          "row": 2,
+          "col": 0
+        },
+        {
+          "row": 3,
+          "col": 0
+        }
+      ]
+    },
+    {
+      "targetId": "target-23-04",
+      "order": 4,
+      "word": "УРАГАН",
+      "normalized": "УРАГАН",
+      "definition": "Очень сильный ветер, способный причинить значительный ущерб.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 4,
+          "col": 0
+        },
+        {
+          "row": 5,
+          "col": 0
+        },
+        {
+          "row": 5,
+          "col": 1
+        },
+        {
+          "row": 5,
+          "col": 2
+        },
+        {
+          "row": 5,
+          "col": 3
+        },
+        {
+          "row": 4,
+          "col": 3
+        }
+      ]
+    },
+    {
+      "targetId": "target-23-05",
+      "order": 5,
+      "word": "ПРИЛИВ",
+      "normalized": "ПРИЛИВ",
+      "definition": "Периодическое повышение уровня моря под влиянием притяжения Луны и Солнца.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 4,
+          "col": 4
+        },
+        {
+          "row": 3,
+          "col": 4
+        },
+        {
+          "row": 2,
+          "col": 4
+        },
+        {
+          "row": 1,
+          "col": 4
+        },
+        {
+          "row": 0,
+          "col": 4
+        },
+        {
+          "row": 0,
+          "col": 5
+        }
+      ]
+    },
+    {
+      "targetId": "target-23-06",
+      "order": 6,
+      "word": "ОСАДКИ",
+      "normalized": "ОСАДКИ",
+      "definition": "Вода, выпадающая из атмосферы в виде дождя, снега или града.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 1,
+          "col": 5
+        },
+        {
+          "row": 2,
+          "col": 5
+        },
+        {
+          "row": 3,
+          "col": 5
+        },
+        {
+          "row": 4,
+          "col": 5
+        },
+        {
+          "row": 5,
+          "col": 5
+        },
+        {
+          "row": 5,
+          "col": 4
+        }
+      ]
+    }
+  ]
+}

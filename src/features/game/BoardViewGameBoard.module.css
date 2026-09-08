@@ -58,8 +58,7 @@
   cursor: pointer;
   transition:
     color 140ms ease,
-    opacity 140ms ease,
-    transform 140ms ease;
+    opacity 140ms ease;
 }
 
 .board[data-size='5'] .cell,
@@ -87,10 +86,6 @@
   }
 }
 
-.cell:active:not(:disabled) {
-  transform: scale(0.96);
-}
-
 .cell:focus-visible {
   outline: 3px solid #315dcc;
   outline-offset: -3px;
@@ -113,7 +108,6 @@
 .selected {
   border-color: transparent;
   background: transparent;
-  transform: scale(1.02);
 }
 
 .found {

@@ -1,0 +1,295 @@
+{
+  "schemaVersion": "1",
+  "id": "level-30",
+  "number": 30,
+  "chapterId": "chapter-04",
+  "chapterTitle": "История капитала",
+  "microtheme": "Рыночные кризисы",
+  "rows": 6,
+  "cols": 6,
+  "desiredTurns": {
+    "min": 1,
+    "max": 3
+  },
+  "difficulty": "Средняя",
+  "sourceWords": [
+    "КРИЗИС",
+    "ПАНИКА",
+    "ДЕФОЛТ",
+    "УБЫТОК",
+    "ПУЗЫРЬ",
+    "ЗАСТОЙ"
+  ],
+  "gridStatus": "TBD_AFTER_DATA_MODEL",
+  "contentStatus": "Draft",
+  "validation": "VALID",
+  "grid": [
+    [
+      "Р",
+      "И",
+      "Б",
+      "Ы",
+      "Т",
+      "О"
+    ],
+    [
+      "К",
+      "З",
+      "У",
+      "Й",
+      "П",
+      "К"
+    ],
+    [
+      "А",
+      "И",
+      "Т",
+      "О",
+      "У",
+      "Д"
+    ],
+    [
+      "К",
+      "С",
+      "С",
+      "Ь",
+      "З",
+      "Е"
+    ],
+    [
+      "И",
+      "З",
+      "А",
+      "Р",
+      "Ы",
+      "Ф"
+    ],
+    [
+      "Н",
+      "А",
+      "П",
+      "Т",
+      "Л",
+      "О"
+    ]
+  ],
+  "targets": [
+    {
+      "targetId": "target-30-01",
+      "order": 1,
+      "word": "КРИЗИС",
+      "normalized": "КРИЗИС",
+      "definition": "Период резкого ухудшения состояния экономики, рынка или организации.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 1,
+          "col": 0
+        },
+        {
+          "row": 0,
+          "col": 0
+        },
+        {
+          "row": 0,
+          "col": 1
+        },
+        {
+          "row": 1,
+          "col": 1
+        },
+        {
+          "row": 2,
+          "col": 1
+        },
+        {
+          "row": 3,
+          "col": 1
+        }
+      ]
+    },
+    {
+      "targetId": "target-30-02",
+      "order": 2,
+      "word": "ПАНИКА",
+      "normalized": "ПАНИКА",
+      "definition": "Массовая эмоциональная реакция, способная вызвать резкие и несогласованные решения.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 5,
+          "col": 2
+        },
+        {
+          "row": 5,
+          "col": 1
+        },
+        {
+          "row": 5,
+          "col": 0
+        },
+        {
+          "row": 4,
+          "col": 0
+        },
+        {
+          "row": 3,
+          "col": 0
+        },
+        {
+          "row": 2,
+          "col": 0
+        }
+      ]
+    },
+    {
+      "targetId": "target-30-03",
+      "order": 3,
+      "word": "ДЕФОЛТ",
+      "normalized": "ДЕФОЛТ",
+      "definition": "Невыполнение заёмщиком обязательств по долгу в установленный срок.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 2,
+          "col": 5
+        },
+        {
+          "row": 3,
+          "col": 5
+        },
+        {
+          "row": 4,
+          "col": 5
+        },
+        {
+          "row": 5,
+          "col": 5
+        },
+        {
+          "row": 5,
+          "col": 4
+        },
+        {
+          "row": 5,
+          "col": 3
+        }
+      ]
+    },
+    {
+      "targetId": "target-30-04",
+      "order": 4,
+      "word": "УБЫТОК",
+      "normalized": "УБЫТОК",
+      "definition": "Отрицательный финансовый результат, когда расходы превышают доходы.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 1,
+          "col": 2
+        },
+        {
+          "row": 0,
+          "col": 2
+        },
+        {
+          "row": 0,
+          "col": 3
+        },
+        {
+          "row": 0,
+          "col": 4
+        },
+        {
+          "row": 0,
+          "col": 5
+        },
+        {
+          "row": 1,
+          "col": 5
+        }
+      ]
+    },
+    {
+      "targetId": "target-30-05",
+      "order": 5,
+      "word": "ПУЗЫРЬ",
+      "normalized": "ПУЗЫРЬ",
+      "definition": "Ситуация, когда цена актива долго превышает обоснованную стоимость из-за ожиданий участников.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "offerId": "offer-30",
+      "canonicalPath": [
+        {
+          "row": 1,
+          "col": 4
+        },
+        {
+          "row": 2,
+          "col": 4
+        },
+        {
+          "row": 3,
+          "col": 4
+        },
+        {
+          "row": 4,
+          "col": 4
+        },
+        {
+          "row": 4,
+          "col": 3
+        },
+        {
+          "row": 3,
+          "col": 3
+        }
+      ]
+    },
+    {
+      "targetId": "target-30-06",
+      "order": 6,
+      "word": "ЗАСТОЙ",
+      "normalized": "ЗАСТОЙ",
+      "definition": "Длительный период слабого роста и низкой деловой активности.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 4,
+          "col": 1
+        },
+        {
+          "row": 4,
+          "col": 2
+        },
+        {
+          "row": 3,
+          "col": 2
+        },
+        {
+          "row": 2,
+          "col": 2
+        },
+        {
+          "row": 2,
+          "col": 3
+        },
+        {
+          "row": 1,
+          "col": 3
+        }
+      ]
+    }
+  ]
+}

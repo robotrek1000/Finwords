@@ -1,0 +1,294 @@
+{
+  "schemaVersion": "1",
+  "id": "level-29",
+  "number": 29,
+  "chapterId": "chapter-04",
+  "chapterTitle": "История капитала",
+  "microtheme": "Эпоха заводов",
+  "rows": 6,
+  "cols": 6,
+  "desiredTurns": {
+    "min": 1,
+    "max": 3
+  },
+  "difficulty": "Средняя",
+  "sourceWords": [
+    "ЗАВОД",
+    "ФАБРИКА",
+    "СТАНОК",
+    "ПАРОВОЗ",
+    "СЫРЬЁ",
+    "ПАТЕНТ"
+  ],
+  "gridStatus": "TBD_AFTER_DATA_MODEL",
+  "contentStatus": "Draft",
+  "validation": "VALID",
+  "grid": [
+    [
+      "Б",
+      "Р",
+      "А",
+      "В",
+      "О",
+      "Д"
+    ],
+    [
+      "А",
+      "И",
+      "З",
+      "Н",
+      "Т",
+      "П"
+    ],
+    [
+      "Ф",
+      "К",
+      "А",
+      "Е",
+      "Т",
+      "А"
+    ],
+    [
+      "К",
+      "С",
+      "З",
+      "А",
+      "П",
+      "Е"
+    ],
+    [
+      "О",
+      "Т",
+      "О",
+      "Р",
+      "С",
+      "Ь"
+    ],
+    [
+      "Н",
+      "А",
+      "В",
+      "О",
+      "Ы",
+      "Р"
+    ]
+  ],
+  "targets": [
+    {
+      "targetId": "target-29-01",
+      "order": 1,
+      "word": "ЗАВОД",
+      "normalized": "ЗАВОД",
+      "definition": "Промышленное предприятие, производящее продукцию с помощью оборудования.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 1,
+          "col": 2
+        },
+        {
+          "row": 0,
+          "col": 2
+        },
+        {
+          "row": 0,
+          "col": 3
+        },
+        {
+          "row": 0,
+          "col": 4
+        },
+        {
+          "row": 0,
+          "col": 5
+        }
+      ]
+    },
+    {
+      "targetId": "target-29-02",
+      "order": 2,
+      "word": "ФАБРИКА",
+      "normalized": "ФАБРИКА",
+      "definition": "Предприятие, серийно выпускающее продукцию промышленным способом.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 2,
+          "col": 0
+        },
+        {
+          "row": 1,
+          "col": 0
+        },
+        {
+          "row": 0,
+          "col": 0
+        },
+        {
+          "row": 0,
+          "col": 1
+        },
+        {
+          "row": 1,
+          "col": 1
+        },
+        {
+          "row": 2,
+          "col": 1
+        },
+        {
+          "row": 2,
+          "col": 2
+        }
+      ]
+    },
+    {
+      "targetId": "target-29-03",
+      "order": 3,
+      "word": "СТАНОК",
+      "normalized": "СТАНОК",
+      "definition": "Машина для обработки материалов и изготовления деталей.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 3,
+          "col": 1
+        },
+        {
+          "row": 4,
+          "col": 1
+        },
+        {
+          "row": 5,
+          "col": 1
+        },
+        {
+          "row": 5,
+          "col": 0
+        },
+        {
+          "row": 4,
+          "col": 0
+        },
+        {
+          "row": 3,
+          "col": 0
+        }
+      ]
+    },
+    {
+      "targetId": "target-29-04",
+      "order": 4,
+      "word": "ПАРОВОЗ",
+      "normalized": "ПАРОВОЗ",
+      "definition": "Локомотив, который приводится в движение паровой машиной.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 3,
+          "col": 4
+        },
+        {
+          "row": 3,
+          "col": 3
+        },
+        {
+          "row": 4,
+          "col": 3
+        },
+        {
+          "row": 5,
+          "col": 3
+        },
+        {
+          "row": 5,
+          "col": 2
+        },
+        {
+          "row": 4,
+          "col": 2
+        },
+        {
+          "row": 3,
+          "col": 2
+        }
+      ]
+    },
+    {
+      "targetId": "target-29-05",
+      "order": 5,
+      "word": "СЫРЬЁ",
+      "normalized": "СЫРЬЕ",
+      "definition": "Исходный материал, используемый для производства продукции.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 4,
+          "col": 4
+        },
+        {
+          "row": 5,
+          "col": 4
+        },
+        {
+          "row": 5,
+          "col": 5
+        },
+        {
+          "row": 4,
+          "col": 5
+        },
+        {
+          "row": 3,
+          "col": 5
+        }
+      ]
+    },
+    {
+      "targetId": "target-29-06",
+      "order": 6,
+      "word": "ПАТЕНТ",
+      "normalized": "ПАТЕНТ",
+      "definition": "Документ, подтверждающий исключительное право на техническое решение.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 1,
+          "col": 5
+        },
+        {
+          "row": 2,
+          "col": 5
+        },
+        {
+          "row": 2,
+          "col": 4
+        },
+        {
+          "row": 2,
+          "col": 3
+        },
+        {
+          "row": 1,
+          "col": 3
+        },
+        {
+          "row": 1,
+          "col": 4
+        }
+      ]
+    }
+  ]
+}

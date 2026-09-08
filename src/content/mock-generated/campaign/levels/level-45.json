@@ -1,0 +1,281 @@
+{
+  "schemaVersion": "1",
+  "id": "level-45",
+  "number": 45,
+  "chapterId": "chapter-07",
+  "chapterTitle": "Финансовая свобода",
+  "microtheme": "Личная цель",
+  "rows": 6,
+  "cols": 6,
+  "desiredTurns": {
+    "min": 2,
+    "max": 4
+  },
+  "difficulty": "Продвинутая",
+  "sourceWords": [
+    "ПРИОРИТЕТ",
+    "РЕЗУЛЬТАТ",
+    "ЭТАП",
+    "МАРШРУТ",
+    "ЖЕЛАНИЕ"
+  ],
+  "gridStatus": "TBD_AFTER_DATA_MODEL",
+  "contentStatus": "Draft",
+  "validation": "VALID",
+  "grid": [
+    [
+      "Т",
+      "А",
+      "Т",
+      "М",
+      "А",
+      "Р"
+    ],
+    [
+      "Ь",
+      "И",
+      "Р",
+      "П",
+      "А",
+      "Ш"
+    ],
+    [
+      "Л",
+      "Т",
+      "О",
+      "Э",
+      "Т",
+      "Р"
+    ],
+    [
+      "У",
+      "Е",
+      "И",
+      "Ж",
+      "Т",
+      "У"
+    ],
+    [
+      "З",
+      "Т",
+      "Р",
+      "Е",
+      "Л",
+      "А"
+    ],
+    [
+      "Е",
+      "Р",
+      "П",
+      "Е",
+      "И",
+      "Н"
+    ]
+  ],
+  "targets": [
+    {
+      "targetId": "target-45-01",
+      "order": 1,
+      "word": "ПРИОРИТЕТ",
+      "normalized": "ПРИОРИТЕТ",
+      "definition": "Задача или цель, которой отдаётся преимущество перед другими.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 5,
+          "col": 2
+        },
+        {
+          "row": 4,
+          "col": 2
+        },
+        {
+          "row": 3,
+          "col": 2
+        },
+        {
+          "row": 2,
+          "col": 2
+        },
+        {
+          "row": 1,
+          "col": 2
+        },
+        {
+          "row": 1,
+          "col": 1
+        },
+        {
+          "row": 2,
+          "col": 1
+        },
+        {
+          "row": 3,
+          "col": 1
+        },
+        {
+          "row": 4,
+          "col": 1
+        }
+      ]
+    },
+    {
+      "targetId": "target-45-02",
+      "order": 2,
+      "word": "РЕЗУЛЬТАТ",
+      "normalized": "РЕЗУЛЬТАТ",
+      "definition": "Полученный итог действия, процесса или периода.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 5,
+          "col": 1
+        },
+        {
+          "row": 5,
+          "col": 0
+        },
+        {
+          "row": 4,
+          "col": 0
+        },
+        {
+          "row": 3,
+          "col": 0
+        },
+        {
+          "row": 2,
+          "col": 0
+        },
+        {
+          "row": 1,
+          "col": 0
+        },
+        {
+          "row": 0,
+          "col": 0
+        },
+        {
+          "row": 0,
+          "col": 1
+        },
+        {
+          "row": 0,
+          "col": 2
+        }
+      ]
+    },
+    {
+      "targetId": "target-45-03",
+      "order": 3,
+      "word": "ЭТАП",
+      "normalized": "ЭТАП",
+      "definition": "Отдельная завершённая часть последовательного процесса.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 2,
+          "col": 3
+        },
+        {
+          "row": 2,
+          "col": 4
+        },
+        {
+          "row": 1,
+          "col": 4
+        },
+        {
+          "row": 1,
+          "col": 3
+        }
+      ]
+    },
+    {
+      "targetId": "target-45-04",
+      "order": 4,
+      "word": "МАРШРУТ",
+      "normalized": "МАРШРУТ",
+      "definition": "Заранее определённый путь между начальной и конечной точками.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 0,
+          "col": 3
+        },
+        {
+          "row": 0,
+          "col": 4
+        },
+        {
+          "row": 0,
+          "col": 5
+        },
+        {
+          "row": 1,
+          "col": 5
+        },
+        {
+          "row": 2,
+          "col": 5
+        },
+        {
+          "row": 3,
+          "col": 5
+        },
+        {
+          "row": 3,
+          "col": 4
+        }
+      ]
+    },
+    {
+      "targetId": "target-45-05",
+      "order": 5,
+      "word": "ЖЕЛАНИЕ",
+      "normalized": "ЖЕЛАНИЕ",
+      "definition": "Осознанное стремление получить результат или изменить ситуацию.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 3,
+          "col": 3
+        },
+        {
+          "row": 4,
+          "col": 3
+        },
+        {
+          "row": 4,
+          "col": 4
+        },
+        {
+          "row": 4,
+          "col": 5
+        },
+        {
+          "row": 5,
+          "col": 5
+        },
+        {
+          "row": 5,
+          "col": 4
+        },
+        {
+          "row": 5,
+          "col": 3
+        }
+      ]
+    }
+  ]
+}

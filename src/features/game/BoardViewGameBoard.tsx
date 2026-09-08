@@ -14,7 +14,7 @@ import type {
   BoardView,
   CellRef,
   FoundTarget,
-} from '../../shared/demoTypes';
+} from '../../infra/api/generated/data-contracts';
 import { cellToCoordinates, extendSelection } from './gameEngine';
 import {
   boardCellMap,
@@ -132,6 +132,7 @@ export function BoardViewGameBoard({
   const pointerIdRef = useRef<number | undefined>(undefined);
   const selectionRef = useRef<CellId[]>([]);
   const selectingRef = useRef(false);
+  const submittedSelectionRef = useRef<CellId[] | null>(null);
   const clearFrameRef = useRef<number | undefined>(undefined);
   const [selection, setSelection] = useState<CellId[]>([]);
   const cells = useMemo(() => boardCellMap(board), [board]);
@@ -246,7 +247,7 @@ export function BoardViewGameBoard({
 
   useEffect(() => {
     retainSelectionRef.current = retainSelection;
-    if (!retainSelection && selectionRef.current.length > 0) {
+    if (!retainSelection && selectionRef.current === submittedSelectionRef.current) {
       clearActiveSelection();
     }
   }, [retainSelection]);
@@ -258,16 +259,17 @@ export function BoardViewGameBoard({
   }
 
   function clearSelectionSoon() {
+    const submitted = selectionRef.current;
     window.cancelAnimationFrame(clearFrameRef.current ?? 0);
     clearFrameRef.current = window.requestAnimationFrame(() => {
-      if (retainSelectionRef.current) return;
+      if (retainSelectionRef.current || selectionRef.current !== submitted) return;
       setActiveSelection([]);
     });
   }
 
   function startSelection(cellId: CellId) {
     window.cancelAnimationFrame(clearFrameRef.current ?? 0);
-    clearFrameRef.current = undefined;
+    submittedSelectionRef.current = null;
     if (selectionRef.current.length === 0) {
       setRouteColor(TARGET_PALETTE[foundTargets.length % TARGET_PALETTE.length]);
     }
@@ -277,6 +279,7 @@ export function BoardViewGameBoard({
   function handlePointerDown(event: PointerEvent<HTMLButtonElement>, cellId: CellId) {
     event.preventDefault();
     if (inputDisabled || lockedCellIds.has(cellId)) return;
+    window.cancelAnimationFrame(clearFrameRef.current ?? 0);
     pointerIdRef.current = event.pointerId;
     selectingRef.current = true;
     startSelection(cellId);
@@ -310,6 +313,7 @@ export function BoardViewGameBoard({
     event.preventDefault();
     releasePointer();
     selectingRef.current = false;
+    submittedSelectionRef.current = selectionRef.current;
     onSelectionEnd([...selectionRef.current]);
     clearSelectionSoon();
   }
@@ -383,11 +387,12 @@ export function BoardViewGameBoard({
 
     event.preventDefault();
     const current = selectionRef.current;
-    if (current.length === 0) {
+    if (current.length === 0 || current === submittedSelectionRef.current) {
       startSelection(cellId);
       return;
     }
     if (current.length >= 2) {
+      submittedSelectionRef.current = current;
       onSelectionEnd([...current]);
       clearSelectionSoon();
     }

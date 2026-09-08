@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
-import { getLevel } from '../content/levels';
+import { getLevel } from '../content/campaign';
 import { GameBoard } from '../features/game/GameBoard';
 import type { SelectionResult } from '../features/game/gameEngine';
 import type {

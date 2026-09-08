@@ -18,6 +18,7 @@
     "jsx": "react-jsx",
     "types": [
       "vitest/globals",
+      "node",
       "@testing-library/jest-dom"
     ]
   },

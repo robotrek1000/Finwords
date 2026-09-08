@@ -1,0 +1,224 @@
+{
+  "schemaVersion": "1",
+  "id": "level-17",
+  "number": 17,
+  "chapterId": "chapter-02",
+  "chapterTitle": "Финансовая подушка",
+  "microtheme": "Страховая защита",
+  "rows": 5,
+  "cols": 5,
+  "desiredTurns": {
+    "min": 1,
+    "max": 2
+  },
+  "difficulty": "Базовая",
+  "sourceWords": [
+    "ЗАЩИТА",
+    "ПОМОЩЬ",
+    "ЛИМИТ",
+    "ПОЛИС",
+    "ГОД"
+  ],
+  "gridStatus": "TBD_AFTER_DATA_MODEL",
+  "contentStatus": "Draft",
+  "validation": "VALID",
+  "grid": [
+    [
+      "Л",
+      "И",
+      "Л",
+      "И",
+      "М"
+    ],
+    [
+      "О",
+      "С",
+      "З",
+      "Ь",
+      "И"
+    ],
+    [
+      "П",
+      "Д",
+      "А",
+      "Щ",
+      "Т"
+    ],
+    [
+      "Г",
+      "О",
+      "Щ",
+      "О",
+      "П"
+    ],
+    [
+      "А",
+      "Т",
+      "И",
+      "М",
+      "О"
+    ]
+  ],
+  "targets": [
+    {
+      "targetId": "target-17-01",
+      "order": 1,
+      "word": "ЗАЩИТА",
+      "normalized": "ЗАЩИТА",
+      "definition": "Меры, которые уменьшают вероятность или последствия неблагоприятного события.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 1,
+          "col": 2
+        },
+        {
+          "row": 2,
+          "col": 2
+        },
+        {
+          "row": 3,
+          "col": 2
+        },
+        {
+          "row": 4,
+          "col": 2
+        },
+        {
+          "row": 4,
+          "col": 1
+        },
+        {
+          "row": 4,
+          "col": 0
+        }
+      ]
+    },
+    {
+      "targetId": "target-17-02",
+      "order": 2,
+      "word": "ПОМОЩЬ",
+      "normalized": "ПОМОЩЬ",
+      "definition": "Поддержка ресурсами, действиями или информацией в сложной ситуации.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 3,
+          "col": 4
+        },
+        {
+          "row": 4,
+          "col": 4
+        },
+        {
+          "row": 4,
+          "col": 3
+        },
+        {
+          "row": 3,
+          "col": 3
+        },
+        {
+          "row": 2,
+          "col": 3
+        },
+        {
+          "row": 1,
+          "col": 3
+        }
+      ]
+    },
+    {
+      "targetId": "target-17-03",
+      "order": 3,
+      "word": "ЛИМИТ",
+      "normalized": "ЛИМИТ",
+      "definition": "Максимально допустимое значение суммы, объёма или операции.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 0,
+          "col": 2
+        },
+        {
+          "row": 0,
+          "col": 3
+        },
+        {
+          "row": 0,
+          "col": 4
+        },
+        {
+          "row": 1,
+          "col": 4
+        },
+        {
+          "row": 2,
+          "col": 4
+        }
+      ]
+    },
+    {
+      "targetId": "target-17-04",
+      "order": 4,
+      "word": "ПОЛИС",
+      "normalized": "ПОЛИС",
+      "definition": "Документ, подтверждающий заключение договора страхования и его условия.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 2,
+          "col": 0
+        },
+        {
+          "row": 1,
+          "col": 0
+        },
+        {
+          "row": 0,
+          "col": 0
+        },
+        {
+          "row": 0,
+          "col": 1
+        },
+        {
+          "row": 1,
+          "col": 1
+        }
+      ]
+    },
+    {
+      "targetId": "target-17-05",
+      "order": 5,
+      "word": "ГОД",
+      "normalized": "ГОД",
+      "definition": "Период времени, равный двенадцати календарным месяцам.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 3,
+          "col": 0
+        },
+        {
+          "row": 3,
+          "col": 1
+        },
+        {
+          "row": 2,
+          "col": 1
+        }
+      ]
+    }
+  ]
+}

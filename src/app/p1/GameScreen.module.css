@@ -216,19 +216,11 @@
 .boardSlot {
   position: absolute;
   z-index: 2;
-  top: 128px;
+  top: 148px;
   left: 50%;
   width: min(328px, calc(100vw - 16px));
   height: min(328px, calc(100vw - 16px));
   transform: translateX(-50%);
-}
-
-.screen[data-status-kind='mentor'] .boardSlot {
-  top: 148px;
-}
-
-.screen[data-status-kind='banner'] .boardSlot {
-  top: 152px;
 }
 
 .gameHud {
@@ -286,6 +278,9 @@
 
 .hintButton:disabled {
   cursor: default;
+}
+
+.hintButton[data-hint-pending='true'] {
   opacity: 0.6;
 }
 
@@ -440,6 +435,58 @@
 
   .targetStatus {
     right: 8px;
+  }
+}
+
+@media (max-height: 639px) {
+  .header {
+    top: 0;
+  }
+
+  .statusSlot,
+  .selectionLabel {
+    top: 64px;
+  }
+
+  .boardSlot {
+    top: 132px;
+  }
+
+  .hintButton,
+  .bonusButton,
+  .targetStatus {
+    top: min(480px, calc(100% - var(--p1-safe-gutter-bottom, 16px) - 72px));
+    bottom: auto;
+  }
+
+  .bonusButton {
+    width: 72px;
+    height: 72px;
+    gap: 2px;
+    padding-top: 0;
+  }
+
+  .bonusRing {
+    width: 56px;
+    height: 56px;
+    flex-basis: 56px;
+  }
+
+  .bonusRing::after {
+    inset: 5.4px;
+  }
+
+  .bonusRing img {
+    top: 50%;
+    left: 50%;
+    width: 36px;
+    height: 30px;
+    transform: translate(-50%, -50%);
+  }
+
+  .bonusButton > strong {
+    font-size: 14px;
+    line-height: 14px;
   }
 }
 

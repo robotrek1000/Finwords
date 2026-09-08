@@ -1,0 +1,225 @@
+{
+  "schemaVersion": "1",
+  "id": "level-18",
+  "number": 18,
+  "chapterId": "chapter-03",
+  "chapterTitle": "Морская торговля",
+  "microtheme": "Порт и гавань",
+  "rows": 5,
+  "cols": 5,
+  "desiredTurns": {
+    "min": 1,
+    "max": 2
+  },
+  "difficulty": "Базовая",
+  "sourceWords": [
+    "ГАВАНЬ",
+    "СУДНО",
+    "МАЯК",
+    "ЯКОРЬ",
+    "БУХТА"
+  ],
+  "gridStatus": "TBD_AFTER_DATA_MODEL",
+  "contentStatus": "Draft",
+  "validation": "VALID",
+  "grid": [
+    [
+      "Б",
+      "Ь",
+      "Н",
+      "А",
+      "В"
+    ],
+    [
+      "У",
+      "Х",
+      "Т",
+      "Г",
+      "А"
+    ],
+    [
+      "Д",
+      "Н",
+      "А",
+      "Я",
+      "К"
+    ],
+    [
+      "У",
+      "О",
+      "А",
+      "М",
+      "О"
+    ],
+    [
+      "С",
+      "К",
+      "Я",
+      "Ь",
+      "Р"
+    ]
+  ],
+  "targets": [
+    {
+      "targetId": "target-18-01",
+      "order": 1,
+      "word": "ГАВАНЬ",
+      "normalized": "ГАВАНЬ",
+      "definition": "Защищённая часть водного пространства, где суда могут безопасно стоять.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 1,
+          "col": 3
+        },
+        {
+          "row": 1,
+          "col": 4
+        },
+        {
+          "row": 0,
+          "col": 4
+        },
+        {
+          "row": 0,
+          "col": 3
+        },
+        {
+          "row": 0,
+          "col": 2
+        },
+        {
+          "row": 0,
+          "col": 1
+        }
+      ]
+    },
+    {
+      "targetId": "target-18-02",
+      "order": 2,
+      "word": "СУДНО",
+      "normalized": "СУДНО",
+      "definition": "Плавучее сооружение, предназначенное для перевозки людей, грузов или выполнения работ.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 4,
+          "col": 0
+        },
+        {
+          "row": 3,
+          "col": 0
+        },
+        {
+          "row": 2,
+          "col": 0
+        },
+        {
+          "row": 2,
+          "col": 1
+        },
+        {
+          "row": 3,
+          "col": 1
+        }
+      ]
+    },
+    {
+      "targetId": "target-18-03",
+      "order": 3,
+      "word": "МАЯК",
+      "normalized": "МАЯК",
+      "definition": "Сооружение с сигнальным огнём, помогающее судам ориентироваться у берега.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 3,
+          "col": 3
+        },
+        {
+          "row": 3,
+          "col": 2
+        },
+        {
+          "row": 4,
+          "col": 2
+        },
+        {
+          "row": 4,
+          "col": 1
+        }
+      ]
+    },
+    {
+      "targetId": "target-18-04",
+      "order": 4,
+      "word": "ЯКОРЬ",
+      "normalized": "ЯКОРЬ",
+      "definition": "Устройство, удерживающее судно на месте за счёт сцепления с грунтом.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "offerId": "offer-18",
+      "canonicalPath": [
+        {
+          "row": 2,
+          "col": 3
+        },
+        {
+          "row": 2,
+          "col": 4
+        },
+        {
+          "row": 3,
+          "col": 4
+        },
+        {
+          "row": 4,
+          "col": 4
+        },
+        {
+          "row": 4,
+          "col": 3
+        }
+      ]
+    },
+    {
+      "targetId": "target-18-05",
+      "order": 5,
+      "word": "БУХТА",
+      "normalized": "БУХТА",
+      "definition": "Небольшая часть моря или озера, глубоко вдающаяся в сушу.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 0,
+          "col": 0
+        },
+        {
+          "row": 1,
+          "col": 0
+        },
+        {
+          "row": 1,
+          "col": 1
+        },
+        {
+          "row": 1,
+          "col": 2
+        },
+        {
+          "row": 2,
+          "col": 2
+        }
+      ]
+    }
+  ]
+}

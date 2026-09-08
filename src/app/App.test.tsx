@@ -40,18 +40,18 @@ describe('Results Field Review history', () => {
     window.history.replaceState(
       {},
       '',
-      '/?screen=results-field&level=1&overlay=course',
+      '/?screen=results-field&level=2&overlay=product',
     );
     render(<App />);
 
-    expect(screen.getByRole('heading', { name: 'АКЦИЯ' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /ИИС/ })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Вернуться к полю' })).toBeInTheDocument();
 
     act(() => window.dispatchEvent(new PopStateEvent('popstate')));
     await waitFor(() =>
-      expect(screen.queryByRole('heading', { name: 'АКЦИЯ' })).not.toBeInTheDocument(),
+      expect(screen.queryByRole('heading', { name: /ИИС/ })).not.toBeInTheDocument(),
     );
-    expect(screen.getByLabelText('Просмотр поля уровня 1')).toBeInTheDocument();
+    expect(screen.getByLabelText('Просмотр поля уровня 2')).toBeInTheDocument();
 
     act(() => window.dispatchEvent(new PopStateEvent('popstate')));
     await waitFor(() =>
@@ -62,11 +62,11 @@ describe('Results Field Review history', () => {
       window.__FINWORDS_ANALYTICS__?.find(
         (event) => event.name === 'word_offer_closed',
       )?.payload,
-    ).toMatchObject({ closeMethod: 'return_to_field', levelId: 1 });
+    ).toMatchObject({ closeMethod: 'return_to_field', levelId: 2 });
     expect(
       window.__FINWORDS_ANALYTICS__?.find(
         (event) => event.name === 'results_field_closed',
       )?.payload,
-    ).toMatchObject({ closeMethod: 'system_back', levelId: 1 });
+    ).toMatchObject({ closeMethod: 'system_back', levelId: 2 });
   });
 });

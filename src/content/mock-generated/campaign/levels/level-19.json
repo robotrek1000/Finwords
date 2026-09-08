@@ -1,0 +1,237 @@
+{
+  "schemaVersion": "1",
+  "id": "level-19",
+  "number": 19,
+  "chapterId": "chapter-03",
+  "chapterTitle": "Морская торговля",
+  "microtheme": "Грузовой рейс",
+  "rows": 5,
+  "cols": 5,
+  "desiredTurns": {
+    "min": 1,
+    "max": 2
+  },
+  "difficulty": "Базовая",
+  "sourceWords": [
+    "ТОВАР",
+    "ФРАХТ",
+    "ГРУЗ",
+    "ТАРА",
+    "РЕЙС",
+    "ТЮК"
+  ],
+  "gridStatus": "TBD_AFTER_DATA_MODEL",
+  "contentStatus": "Draft",
+  "validation": "VALID",
+  "grid": [
+    [
+      "С",
+      "Т",
+      "Т",
+      "О",
+      "В"
+    ],
+    [
+      "Й",
+      "Ю",
+      "К",
+      "Р",
+      "А"
+    ],
+    [
+      "Е",
+      "Р",
+      "А",
+      "Р",
+      "А"
+    ],
+    [
+      "Х",
+      "Т",
+      "Г",
+      "Р",
+      "Т"
+    ],
+    [
+      "А",
+      "Р",
+      "Ф",
+      "У",
+      "З"
+    ]
+  ],
+  "targets": [
+    {
+      "targetId": "target-19-01",
+      "order": 1,
+      "word": "ТОВАР",
+      "normalized": "ТОВАР",
+      "definition": "Продукт, предназначенный для обмена или продажи.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 0,
+          "col": 2
+        },
+        {
+          "row": 0,
+          "col": 3
+        },
+        {
+          "row": 0,
+          "col": 4
+        },
+        {
+          "row": 1,
+          "col": 4
+        },
+        {
+          "row": 1,
+          "col": 3
+        }
+      ]
+    },
+    {
+      "targetId": "target-19-02",
+      "order": 2,
+      "word": "ФРАХТ",
+      "normalized": "ФРАХТ",
+      "definition": "Плата за перевозку груза или предоставление транспортного средства.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 4,
+          "col": 2
+        },
+        {
+          "row": 4,
+          "col": 1
+        },
+        {
+          "row": 4,
+          "col": 0
+        },
+        {
+          "row": 3,
+          "col": 0
+        },
+        {
+          "row": 3,
+          "col": 1
+        }
+      ]
+    },
+    {
+      "targetId": "target-19-03",
+      "order": 3,
+      "word": "ГРУЗ",
+      "normalized": "ГРУЗ",
+      "definition": "Имущество или товар, перевозимый транспортом.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 3,
+          "col": 2
+        },
+        {
+          "row": 3,
+          "col": 3
+        },
+        {
+          "row": 4,
+          "col": 3
+        },
+        {
+          "row": 4,
+          "col": 4
+        }
+      ]
+    },
+    {
+      "targetId": "target-19-04",
+      "order": 4,
+      "word": "ТАРА",
+      "normalized": "ТАРА",
+      "definition": "Упаковка или ёмкость, предназначенная для хранения и перевозки товара.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 3,
+          "col": 4
+        },
+        {
+          "row": 2,
+          "col": 4
+        },
+        {
+          "row": 2,
+          "col": 3
+        },
+        {
+          "row": 2,
+          "col": 2
+        }
+      ]
+    },
+    {
+      "targetId": "target-19-05",
+      "order": 5,
+      "word": "РЕЙС",
+      "normalized": "РЕЙС",
+      "definition": "Поездка транспортного средства по установленному маршруту.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 2,
+          "col": 1
+        },
+        {
+          "row": 2,
+          "col": 0
+        },
+        {
+          "row": 1,
+          "col": 0
+        },
+        {
+          "row": 0,
+          "col": 0
+        }
+      ]
+    },
+    {
+      "targetId": "target-19-06",
+      "order": 6,
+      "word": "ТЮК",
+      "normalized": "ТЮК",
+      "definition": "Плотно упакованный и перевязанный груз.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 0,
+          "col": 1
+        },
+        {
+          "row": 1,
+          "col": 1
+        },
+        {
+          "row": 1,
+          "col": 2
+        }
+      ]
+    }
+  ]
+}

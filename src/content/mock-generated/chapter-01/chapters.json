@@ -1,0 +1,12 @@
+[
+  {
+    "chapterId": "chapter-01",
+    "number": 1,
+    "title": "Азбука денег",
+    "levelStart": 1,
+    "levelEnd": 9,
+    "narrative": "Начните с простых финансовых понятий и постепенно соберите свою базу знаний.",
+    "illustrationConcept": "Объёмные буквы, монета и сертификат знаний.",
+    "status": "Draft"
+  }
+]

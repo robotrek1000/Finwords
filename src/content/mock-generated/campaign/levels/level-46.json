@@ -1,0 +1,282 @@
+{
+  "schemaVersion": "1",
+  "id": "level-46",
+  "number": 46,
+  "chapterId": "chapter-07",
+  "chapterTitle": "Финансовая свобода",
+  "microtheme": "Диверсификация",
+  "rows": 6,
+  "cols": 6,
+  "desiredTurns": {
+    "min": 2,
+    "max": 4
+  },
+  "difficulty": "Продвинутая",
+  "sourceWords": [
+    "ДИВЕРСИФИКАЦИЯ",
+    "ПОРТФЕЛЬ",
+    "НАБОР",
+    "ВЕС",
+    "СОСТАВ"
+  ],
+  "gridStatus": "TBD_AFTER_DATA_MODEL",
+  "contentStatus": "Draft",
+  "validation": "VALID",
+  "grid": [
+    [
+      "С",
+      "Р",
+      "Е",
+      "В",
+      "Ь",
+      "Л"
+    ],
+    [
+      "И",
+      "В",
+      "Е",
+      "И",
+      "Д",
+      "Е"
+    ],
+    [
+      "Ф",
+      "Р",
+      "С",
+      "С",
+      "В",
+      "Ф"
+    ],
+    [
+      "И",
+      "О",
+      "Н",
+      "О",
+      "А",
+      "Т"
+    ],
+    [
+      "К",
+      "Б",
+      "А",
+      "С",
+      "Т",
+      "Р"
+    ],
+    [
+      "А",
+      "Ц",
+      "И",
+      "Я",
+      "П",
+      "О"
+    ]
+  ],
+  "targets": [
+    {
+      "targetId": "target-46-01",
+      "order": 1,
+      "word": "ДИВЕРСИФИКАЦИЯ",
+      "normalized": "ДИВЕРСИФИКАЦИЯ",
+      "definition": "Распределение вложений между разными активами для снижения зависимости от одного источника риска.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "offerId": "offer-46",
+      "canonicalPath": [
+        {
+          "row": 1,
+          "col": 4
+        },
+        {
+          "row": 1,
+          "col": 3
+        },
+        {
+          "row": 0,
+          "col": 3
+        },
+        {
+          "row": 0,
+          "col": 2
+        },
+        {
+          "row": 0,
+          "col": 1
+        },
+        {
+          "row": 0,
+          "col": 0
+        },
+        {
+          "row": 1,
+          "col": 0
+        },
+        {
+          "row": 2,
+          "col": 0
+        },
+        {
+          "row": 3,
+          "col": 0
+        },
+        {
+          "row": 4,
+          "col": 0
+        },
+        {
+          "row": 5,
+          "col": 0
+        },
+        {
+          "row": 5,
+          "col": 1
+        },
+        {
+          "row": 5,
+          "col": 2
+        },
+        {
+          "row": 5,
+          "col": 3
+        }
+      ]
+    },
+    {
+      "targetId": "target-46-02",
+      "order": 2,
+      "word": "ПОРТФЕЛЬ",
+      "normalized": "ПОРТФЕЛЬ",
+      "definition": "Совокупность активов, которыми владеет один инвестор.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 5,
+          "col": 4
+        },
+        {
+          "row": 5,
+          "col": 5
+        },
+        {
+          "row": 4,
+          "col": 5
+        },
+        {
+          "row": 3,
+          "col": 5
+        },
+        {
+          "row": 2,
+          "col": 5
+        },
+        {
+          "row": 1,
+          "col": 5
+        },
+        {
+          "row": 0,
+          "col": 5
+        },
+        {
+          "row": 0,
+          "col": 4
+        }
+      ]
+    },
+    {
+      "targetId": "target-46-03",
+      "order": 3,
+      "word": "НАБОР",
+      "normalized": "НАБОР",
+      "definition": "Совокупность объектов, выбранных по определённому признаку.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 3,
+          "col": 2
+        },
+        {
+          "row": 4,
+          "col": 2
+        },
+        {
+          "row": 4,
+          "col": 1
+        },
+        {
+          "row": 3,
+          "col": 1
+        },
+        {
+          "row": 2,
+          "col": 1
+        }
+      ]
+    },
+    {
+      "targetId": "target-46-04",
+      "order": 4,
+      "word": "ВЕС",
+      "normalized": "ВЕС",
+      "definition": "Доля отдельного актива или показателя в общей структуре.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 1,
+          "col": 1
+        },
+        {
+          "row": 1,
+          "col": 2
+        },
+        {
+          "row": 2,
+          "col": 2
+        }
+      ]
+    },
+    {
+      "targetId": "target-46-05",
+      "order": 5,
+      "word": "СОСТАВ",
+      "normalized": "СОСТАВ",
+      "definition": "Совокупность частей, образующих единое целое.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 2,
+          "col": 3
+        },
+        {
+          "row": 3,
+          "col": 3
+        },
+        {
+          "row": 4,
+          "col": 3
+        },
+        {
+          "row": 4,
+          "col": 4
+        },
+        {
+          "row": 3,
+          "col": 4
+        },
+        {
+          "row": 2,
+          "col": 4
+        }
+      ]
+    }
+  ]
+}

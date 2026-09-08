@@ -1,0 +1,165 @@
+{
+  "schemaVersion": "1",
+  "id": "level-06",
+  "number": 6,
+  "chapterId": "chapter-01",
+  "chapterTitle": "Азбука денег",
+  "microtheme": "Движение рынка",
+  "rows": 4,
+  "cols": 4,
+  "desiredTurns": {
+    "min": 0,
+    "max": 1
+  },
+  "difficulty": "Начальная",
+  "sourceWords": [
+    "РОСТ",
+    "СПАД",
+    "КУРС",
+    "ЦЕНА"
+  ],
+  "gridStatus": "TBD_AFTER_DATA_MODEL",
+  "contentStatus": "Draft",
+  "validation": "VALID",
+  "grid": [
+    [
+      "Р",
+      "О",
+      "С",
+      "Т"
+    ],
+    [
+      "А",
+      "Н",
+      "Е",
+      "Ц"
+    ],
+    [
+      "К",
+      "У",
+      "Р",
+      "С"
+    ],
+    [
+      "Д",
+      "А",
+      "П",
+      "С"
+    ]
+  ],
+  "targets": [
+    {
+      "targetId": "target-06-01",
+      "order": 1,
+      "word": "РОСТ",
+      "normalized": "РОСТ",
+      "definition": "Увеличение значения показателя, цены, объёма или результата.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 0,
+          "col": 0
+        },
+        {
+          "row": 0,
+          "col": 1
+        },
+        {
+          "row": 0,
+          "col": 2
+        },
+        {
+          "row": 0,
+          "col": 3
+        }
+      ]
+    },
+    {
+      "targetId": "target-06-02",
+      "order": 2,
+      "word": "СПАД",
+      "normalized": "СПАД",
+      "definition": "Устойчивое снижение показателя, активности или стоимости.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 3,
+          "col": 3
+        },
+        {
+          "row": 3,
+          "col": 2
+        },
+        {
+          "row": 3,
+          "col": 1
+        },
+        {
+          "row": 3,
+          "col": 0
+        }
+      ]
+    },
+    {
+      "targetId": "target-06-03",
+      "order": 3,
+      "word": "КУРС",
+      "normalized": "КУРС",
+      "definition": "Цена одной валюты или финансового актива, выраженная в другой единице.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "offerId": "offer-06",
+      "canonicalPath": [
+        {
+          "row": 2,
+          "col": 0
+        },
+        {
+          "row": 2,
+          "col": 1
+        },
+        {
+          "row": 2,
+          "col": 2
+        },
+        {
+          "row": 2,
+          "col": 3
+        }
+      ]
+    },
+    {
+      "targetId": "target-06-04",
+      "order": 4,
+      "word": "ЦЕНА",
+      "normalized": "ЦЕНА",
+      "definition": "Количество денег, за которое можно купить или продать товар либо актив.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 1,
+          "col": 3
+        },
+        {
+          "row": 1,
+          "col": 2
+        },
+        {
+          "row": 1,
+          "col": 1
+        },
+        {
+          "row": 1,
+          "col": 0
+        }
+      ]
+    }
+  ]
+}

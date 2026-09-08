@@ -1,0 +1,295 @@
+{
+  "schemaVersion": "1",
+  "id": "level-50",
+  "number": 50,
+  "chapterId": "chapter-07",
+  "chapterTitle": "Финансовая свобода",
+  "microtheme": "Финансовая свобода",
+  "rows": 6,
+  "cols": 6,
+  "desiredTurns": {
+    "min": 2,
+    "max": 4
+  },
+  "difficulty": "Продвинутая",
+  "sourceWords": [
+    "СВОБОДА",
+    "ДОСТАТОК",
+    "БУДУЩЕЕ",
+    "ОПОРА",
+    "ВЫХОД",
+    "ПУТЬ"
+  ],
+  "gridStatus": "TBD_AFTER_DATA_MODEL",
+  "contentStatus": "Draft",
+  "validation": "VALID",
+  "grid": [
+    [
+      "Е",
+      "Щ",
+      "О",
+      "Х",
+      "А",
+      "Р"
+    ],
+    [
+      "Е",
+      "У",
+      "Д",
+      "Ы",
+      "В",
+      "О"
+    ],
+    [
+      "У",
+      "Д",
+      "П",
+      "У",
+      "О",
+      "П"
+    ],
+    [
+      "Б",
+      "К",
+      "О",
+      "Т",
+      "Ь",
+      "С"
+    ],
+    [
+      "Т",
+      "А",
+      "Т",
+      "Д",
+      "О",
+      "В"
+    ],
+    [
+      "С",
+      "О",
+      "Д",
+      "А",
+      "Б",
+      "О"
+    ]
+  ],
+  "targets": [
+    {
+      "targetId": "target-50-01",
+      "order": 1,
+      "word": "СВОБОДА",
+      "normalized": "СВОБОДА",
+      "definition": "Возможность самостоятельно принимать решения и распоряжаться ресурсами.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 3,
+          "col": 5
+        },
+        {
+          "row": 4,
+          "col": 5
+        },
+        {
+          "row": 5,
+          "col": 5
+        },
+        {
+          "row": 5,
+          "col": 4
+        },
+        {
+          "row": 4,
+          "col": 4
+        },
+        {
+          "row": 4,
+          "col": 3
+        },
+        {
+          "row": 5,
+          "col": 3
+        }
+      ]
+    },
+    {
+      "targetId": "target-50-02",
+      "order": 2,
+      "word": "ДОСТАТОК",
+      "normalized": "ДОСТАТОК",
+      "definition": "Состояние, при котором доступных ресурсов хватает для основных потребностей и целей.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 5,
+          "col": 2
+        },
+        {
+          "row": 5,
+          "col": 1
+        },
+        {
+          "row": 5,
+          "col": 0
+        },
+        {
+          "row": 4,
+          "col": 0
+        },
+        {
+          "row": 4,
+          "col": 1
+        },
+        {
+          "row": 4,
+          "col": 2
+        },
+        {
+          "row": 3,
+          "col": 2
+        },
+        {
+          "row": 3,
+          "col": 1
+        }
+      ]
+    },
+    {
+      "targetId": "target-50-03",
+      "order": 3,
+      "word": "БУДУЩЕЕ",
+      "normalized": "БУДУЩЕЕ",
+      "definition": "Период после настоящего, к которому относятся долгосрочные планы и ожидания.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "offerId": "offer-50",
+      "canonicalPath": [
+        {
+          "row": 3,
+          "col": 0
+        },
+        {
+          "row": 2,
+          "col": 0
+        },
+        {
+          "row": 2,
+          "col": 1
+        },
+        {
+          "row": 1,
+          "col": 1
+        },
+        {
+          "row": 0,
+          "col": 1
+        },
+        {
+          "row": 0,
+          "col": 0
+        },
+        {
+          "row": 1,
+          "col": 0
+        }
+      ]
+    },
+    {
+      "targetId": "target-50-04",
+      "order": 4,
+      "word": "ОПОРА",
+      "normalized": "ОПОРА",
+      "definition": "Надёжная основа, которая поддерживает решение или устойчивость системы.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 2,
+          "col": 4
+        },
+        {
+          "row": 2,
+          "col": 5
+        },
+        {
+          "row": 1,
+          "col": 5
+        },
+        {
+          "row": 0,
+          "col": 5
+        },
+        {
+          "row": 0,
+          "col": 4
+        }
+      ]
+    },
+    {
+      "targetId": "target-50-05",
+      "order": 5,
+      "word": "ВЫХОД",
+      "normalized": "ВЫХОД",
+      "definition": "Завершение процесса или выбранный способ прекратить участие.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 1,
+          "col": 4
+        },
+        {
+          "row": 1,
+          "col": 3
+        },
+        {
+          "row": 0,
+          "col": 3
+        },
+        {
+          "row": 0,
+          "col": 2
+        },
+        {
+          "row": 1,
+          "col": 2
+        }
+      ]
+    },
+    {
+      "targetId": "target-50-06",
+      "order": 6,
+      "word": "ПУТЬ",
+      "normalized": "ПУТЬ",
+      "definition": "Последовательность действий и этапов, ведущих к цели.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 2,
+          "col": 2
+        },
+        {
+          "row": 2,
+          "col": 3
+        },
+        {
+          "row": 3,
+          "col": 3
+        },
+        {
+          "row": 3,
+          "col": 4
+        }
+      ]
+    }
+  ]
+}

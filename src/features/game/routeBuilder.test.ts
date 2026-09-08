@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { CellId } from '../../app/types';
-import type { CellRef } from '../../shared/demoTypes';
+import type { CellRef } from '../../infra/api/generated/data-contracts';
 import { cellIdsToRoute } from './routeBuilder';
 
 describe('cellIdsToRoute', () => {

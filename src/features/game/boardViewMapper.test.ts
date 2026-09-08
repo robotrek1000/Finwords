@@ -2,8 +2,8 @@ import { describe, expect, it } from 'vitest';
 import type {
   BoardView,
   FoundTarget,
-} from '../../shared/demoTypes';
-import { CellViewStateEnum } from '../../shared/demoTypes';
+} from '../../infra/api/generated/data-contracts';
+import { CellViewStateEnum } from '../../infra/api/generated/data-contracts';
 import {
   boardCellMap,
   cellRefToCellId,

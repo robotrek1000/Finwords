@@ -1,0 +1,295 @@
+{
+  "schemaVersion": "1",
+  "id": "level-24",
+  "number": 24,
+  "chapterId": "chapter-03",
+  "chapterTitle": "Морская торговля",
+  "microtheme": "Морская торговля",
+  "rows": 6,
+  "cols": 6,
+  "desiredTurns": {
+    "min": 1,
+    "max": 2
+  },
+  "difficulty": "Базовая",
+  "sourceWords": [
+    "ИМПОРТ",
+    "СДЕЛКА",
+    "БАРТЕР",
+    "ОБОРОТ",
+    "БАЛАНС",
+    "ВАЛЮТА"
+  ],
+  "gridStatus": "TBD_AFTER_DATA_MODEL",
+  "contentStatus": "Draft",
+  "validation": "VALID",
+  "grid": [
+    [
+      "Л",
+      "А",
+      "Р",
+      "О",
+      "П",
+      "М"
+    ],
+    [
+      "А",
+      "Б",
+      "Т",
+      "В",
+      "А",
+      "И"
+    ],
+    [
+      "Н",
+      "А",
+      "Т",
+      "Ю",
+      "Л",
+      "А"
+    ],
+    [
+      "С",
+      "О",
+      "Б",
+      "О",
+      "Р",
+      "К"
+    ],
+    [
+      "Р",
+      "А",
+      "Б",
+      "Т",
+      "О",
+      "Л"
+    ],
+    [
+      "Т",
+      "Е",
+      "Р",
+      "С",
+      "Д",
+      "Е"
+    ]
+  ],
+  "targets": [
+    {
+      "targetId": "target-24-01",
+      "order": 1,
+      "word": "ИМПОРТ",
+      "normalized": "ИМПОРТ",
+      "definition": "Ввоз товаров, услуг или капитала из другой страны.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 1,
+          "col": 5
+        },
+        {
+          "row": 0,
+          "col": 5
+        },
+        {
+          "row": 0,
+          "col": 4
+        },
+        {
+          "row": 0,
+          "col": 3
+        },
+        {
+          "row": 0,
+          "col": 2
+        },
+        {
+          "row": 1,
+          "col": 2
+        }
+      ]
+    },
+    {
+      "targetId": "target-24-02",
+      "order": 2,
+      "word": "СДЕЛКА",
+      "normalized": "СДЕЛКА",
+      "definition": "Согласованное действие сторон, создающее, изменяющее или прекращающее права и обязанности.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 5,
+          "col": 3
+        },
+        {
+          "row": 5,
+          "col": 4
+        },
+        {
+          "row": 5,
+          "col": 5
+        },
+        {
+          "row": 4,
+          "col": 5
+        },
+        {
+          "row": 3,
+          "col": 5
+        },
+        {
+          "row": 2,
+          "col": 5
+        }
+      ]
+    },
+    {
+      "targetId": "target-24-03",
+      "order": 3,
+      "word": "БАРТЕР",
+      "normalized": "БАРТЕР",
+      "definition": "Обмен товарами или услугами без использования денег.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 4,
+          "col": 2
+        },
+        {
+          "row": 4,
+          "col": 1
+        },
+        {
+          "row": 4,
+          "col": 0
+        },
+        {
+          "row": 5,
+          "col": 0
+        },
+        {
+          "row": 5,
+          "col": 1
+        },
+        {
+          "row": 5,
+          "col": 2
+        }
+      ]
+    },
+    {
+      "targetId": "target-24-04",
+      "order": 4,
+      "word": "ОБОРОТ",
+      "normalized": "ОБОРОТ",
+      "definition": "Общий объём операций, продаж или движения средств за период.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 3,
+          "col": 1
+        },
+        {
+          "row": 3,
+          "col": 2
+        },
+        {
+          "row": 3,
+          "col": 3
+        },
+        {
+          "row": 3,
+          "col": 4
+        },
+        {
+          "row": 4,
+          "col": 4
+        },
+        {
+          "row": 4,
+          "col": 3
+        }
+      ]
+    },
+    {
+      "targetId": "target-24-05",
+      "order": 5,
+      "word": "БАЛАНС",
+      "normalized": "БАЛАНС",
+      "definition": "Соотношение взаимосвязанных величин или свод активов и обязательств.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 1,
+          "col": 1
+        },
+        {
+          "row": 0,
+          "col": 1
+        },
+        {
+          "row": 0,
+          "col": 0
+        },
+        {
+          "row": 1,
+          "col": 0
+        },
+        {
+          "row": 2,
+          "col": 0
+        },
+        {
+          "row": 3,
+          "col": 0
+        }
+      ]
+    },
+    {
+      "targetId": "target-24-06",
+      "order": 6,
+      "word": "ВАЛЮТА",
+      "normalized": "ВАЛЮТА",
+      "definition": "Денежная единица государства или средство международных расчётов.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "offerId": "offer-24",
+      "canonicalPath": [
+        {
+          "row": 1,
+          "col": 3
+        },
+        {
+          "row": 1,
+          "col": 4
+        },
+        {
+          "row": 2,
+          "col": 4
+        },
+        {
+          "row": 2,
+          "col": 3
+        },
+        {
+          "row": 2,
+          "col": 2
+        },
+        {
+          "row": 2,
+          "col": 1
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,281 @@
+{
+  "schemaVersion": "1",
+  "id": "level-47",
+  "number": 47,
+  "chapterId": "chapter-07",
+  "chapterTitle": "Финансовая свобода",
+  "microtheme": "Классы активов",
+  "rows": 6,
+  "cols": 6,
+  "desiredTurns": {
+    "min": 2,
+    "max": 4
+  },
+  "difficulty": "Продвинутая",
+  "sourceWords": [
+    "ОБЛИГАЦИЯ",
+    "НЕДВИЖИМОСТЬ",
+    "ДЕНЬГИ",
+    "ЗЕМЛЯ",
+    "МЕДЬ"
+  ],
+  "gridStatus": "TBD_AFTER_DATA_MODEL",
+  "contentStatus": "Draft",
+  "validation": "VALID",
+  "grid": [
+    [
+      "А",
+      "Ц",
+      "И",
+      "Я",
+      "И",
+      "М"
+    ],
+    [
+      "Г",
+      "И",
+      "Л",
+      "Н",
+      "Ж",
+      "О"
+    ],
+    [
+      "Е",
+      "М",
+      "Б",
+      "Е",
+      "И",
+      "С"
+    ],
+    [
+      "Д",
+      "Ь",
+      "О",
+      "Д",
+      "В",
+      "Т"
+    ],
+    [
+      "Я",
+      "Е",
+      "З",
+      "Ь",
+      "Н",
+      "Ь"
+    ],
+    [
+      "Л",
+      "М",
+      "И",
+      "Г",
+      "Е",
+      "Д"
+    ]
+  ],
+  "targets": [
+    {
+      "targetId": "target-47-01",
+      "order": 1,
+      "word": "ОБЛИГАЦИЯ",
+      "normalized": "ОБЛИГАЦИЯ",
+      "definition": "Долговая ценная бумага, по которой эмитент возвращает деньги и выплачивает доход по условиям выпуска.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 3,
+          "col": 2
+        },
+        {
+          "row": 2,
+          "col": 2
+        },
+        {
+          "row": 1,
+          "col": 2
+        },
+        {
+          "row": 1,
+          "col": 1
+        },
+        {
+          "row": 1,
+          "col": 0
+        },
+        {
+          "row": 0,
+          "col": 0
+        },
+        {
+          "row": 0,
+          "col": 1
+        },
+        {
+          "row": 0,
+          "col": 2
+        },
+        {
+          "row": 0,
+          "col": 3
+        }
+      ]
+    },
+    {
+      "targetId": "target-47-02",
+      "order": 2,
+      "word": "НЕДВИЖИМОСТЬ",
+      "normalized": "НЕДВИЖИМОСТЬ",
+      "definition": "Земля и прочно связанные с ней объекты, права на которые подлежат регистрации.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 1,
+          "col": 3
+        },
+        {
+          "row": 2,
+          "col": 3
+        },
+        {
+          "row": 3,
+          "col": 3
+        },
+        {
+          "row": 3,
+          "col": 4
+        },
+        {
+          "row": 2,
+          "col": 4
+        },
+        {
+          "row": 1,
+          "col": 4
+        },
+        {
+          "row": 0,
+          "col": 4
+        },
+        {
+          "row": 0,
+          "col": 5
+        },
+        {
+          "row": 1,
+          "col": 5
+        },
+        {
+          "row": 2,
+          "col": 5
+        },
+        {
+          "row": 3,
+          "col": 5
+        },
+        {
+          "row": 4,
+          "col": 5
+        }
+      ]
+    },
+    {
+      "targetId": "target-47-03",
+      "order": 3,
+      "word": "ДЕНЬГИ",
+      "normalized": "ДЕНЬГИ",
+      "definition": "Общепринятое средство обмена, измерения стоимости и накопления.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 5,
+          "col": 5
+        },
+        {
+          "row": 5,
+          "col": 4
+        },
+        {
+          "row": 4,
+          "col": 4
+        },
+        {
+          "row": 4,
+          "col": 3
+        },
+        {
+          "row": 5,
+          "col": 3
+        },
+        {
+          "row": 5,
+          "col": 2
+        }
+      ]
+    },
+    {
+      "targetId": "target-47-04",
+      "order": 4,
+      "word": "ЗЕМЛЯ",
+      "normalized": "ЗЕМЛЯ",
+      "definition": "Природный ресурс и объект собственности, который может иметь экономическую стоимость.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 4,
+          "col": 2
+        },
+        {
+          "row": 4,
+          "col": 1
+        },
+        {
+          "row": 5,
+          "col": 1
+        },
+        {
+          "row": 5,
+          "col": 0
+        },
+        {
+          "row": 4,
+          "col": 0
+        }
+      ]
+    },
+    {
+      "targetId": "target-47-05",
+      "order": 5,
+      "word": "МЕДЬ",
+      "normalized": "МЕДЬ",
+      "definition": "Промышленный цветной металл, спрос на который связан с производством и инфраструктурой.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 2,
+          "col": 1
+        },
+        {
+          "row": 2,
+          "col": 0
+        },
+        {
+          "row": 3,
+          "col": 0
+        },
+        {
+          "row": 3,
+          "col": 1
+        }
+      ]
+    }
+  ]
+}

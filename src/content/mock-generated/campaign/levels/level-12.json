@@ -1,0 +1,225 @@
+{
+  "schemaVersion": "1",
+  "id": "level-12",
+  "number": 12,
+  "chapterId": "chapter-02",
+  "chapterTitle": "Финансовая подушка",
+  "microtheme": "Накопления",
+  "rows": 5,
+  "cols": 5,
+  "desiredTurns": {
+    "min": 1,
+    "max": 2
+  },
+  "difficulty": "Базовая",
+  "sourceWords": [
+    "ЗАПАС",
+    "ВКЛАД",
+    "РУБЛЬ",
+    "МЕЧТА",
+    "БУФЕР"
+  ],
+  "gridStatus": "TBD_AFTER_DATA_MODEL",
+  "contentStatus": "Draft",
+  "validation": "VALID",
+  "grid": [
+    [
+      "В",
+      "С",
+      "А",
+      "З",
+      "Р"
+    ],
+    [
+      "К",
+      "А",
+      "П",
+      "Ф",
+      "Е"
+    ],
+    [
+      "Л",
+      "А",
+      "Д",
+      "У",
+      "Б"
+    ],
+    [
+      "Б",
+      "У",
+      "Р",
+      "А",
+      "Т"
+    ],
+    [
+      "Л",
+      "Ь",
+      "М",
+      "Е",
+      "Ч"
+    ]
+  ],
+  "targets": [
+    {
+      "targetId": "target-12-01",
+      "order": 1,
+      "word": "ЗАПАС",
+      "normalized": "ЗАПАС",
+      "definition": "Ресурс, отложенный для будущего использования или непредвиденной ситуации.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 0,
+          "col": 3
+        },
+        {
+          "row": 0,
+          "col": 2
+        },
+        {
+          "row": 1,
+          "col": 2
+        },
+        {
+          "row": 1,
+          "col": 1
+        },
+        {
+          "row": 0,
+          "col": 1
+        }
+      ]
+    },
+    {
+      "targetId": "target-12-02",
+      "order": 2,
+      "word": "ВКЛАД",
+      "normalized": "ВКЛАД",
+      "definition": "Деньги, размещённые в банке на условиях возврата и выплаты процентов.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "offerId": "offer-12",
+      "canonicalPath": [
+        {
+          "row": 0,
+          "col": 0
+        },
+        {
+          "row": 1,
+          "col": 0
+        },
+        {
+          "row": 2,
+          "col": 0
+        },
+        {
+          "row": 2,
+          "col": 1
+        },
+        {
+          "row": 2,
+          "col": 2
+        }
+      ]
+    },
+    {
+      "targetId": "target-12-03",
+      "order": 3,
+      "word": "РУБЛЬ",
+      "normalized": "РУБЛЬ",
+      "definition": "Официальная денежная единица Российской Федерации.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 3,
+          "col": 2
+        },
+        {
+          "row": 3,
+          "col": 1
+        },
+        {
+          "row": 3,
+          "col": 0
+        },
+        {
+          "row": 4,
+          "col": 0
+        },
+        {
+          "row": 4,
+          "col": 1
+        }
+      ]
+    },
+    {
+      "targetId": "target-12-04",
+      "order": 4,
+      "word": "МЕЧТА",
+      "normalized": "МЕЧТА",
+      "definition": "Желаемый образ будущего, который можно превратить в финансовую цель.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 4,
+          "col": 2
+        },
+        {
+          "row": 4,
+          "col": 3
+        },
+        {
+          "row": 4,
+          "col": 4
+        },
+        {
+          "row": 3,
+          "col": 4
+        },
+        {
+          "row": 3,
+          "col": 3
+        }
+      ]
+    },
+    {
+      "targetId": "target-12-05",
+      "order": 5,
+      "word": "БУФЕР",
+      "normalized": "БУФЕР",
+      "definition": "Дополнительный запас денег или времени, снижающий последствия неожиданного события.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 2,
+          "col": 4
+        },
+        {
+          "row": 2,
+          "col": 3
+        },
+        {
+          "row": 1,
+          "col": 3
+        },
+        {
+          "row": 1,
+          "col": 4
+        },
+        {
+          "row": 0,
+          "col": 4
+        }
+      ]
+    }
+  ]
+}

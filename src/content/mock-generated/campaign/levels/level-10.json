@@ -1,0 +1,251 @@
+{
+  "schemaVersion": "1",
+  "id": "level-10",
+  "number": 10,
+  "chapterId": "chapter-02",
+  "chapterTitle": "Финансовая подушка",
+  "microtheme": "Непредвиденный случай",
+  "rows": 5,
+  "cols": 5,
+  "desiredTurns": {
+    "min": 1,
+    "max": 2
+  },
+  "difficulty": "Базовая",
+  "sourceWords": [
+    "БЫТ",
+    "ДОМ",
+    "ТЫЛ",
+    "ВРАЧ",
+    "УРОН",
+    "СБОЙ",
+    "ТРУД"
+  ],
+  "gridStatus": "TBD_AFTER_DATA_MODEL",
+  "contentStatus": "Draft",
+  "validation": "VALID",
+  "grid": [
+    [
+      "Т",
+      "Д",
+      "О",
+      "Ы",
+      "Л"
+    ],
+    [
+      "Ы",
+      "Б",
+      "М",
+      "Т",
+      "В"
+    ],
+    [
+      "Р",
+      "У",
+      "Ч",
+      "А",
+      "Р"
+    ],
+    [
+      "О",
+      "Б",
+      "О",
+      "Д",
+      "У"
+    ],
+    [
+      "Н",
+      "С",
+      "Й",
+      "Т",
+      "Р"
+    ]
+  ],
+  "targets": [
+    {
+      "targetId": "target-10-01",
+      "order": 1,
+      "word": "БЫТ",
+      "normalized": "БЫТ",
+      "definition": "Повседневные условия жизни и связанные с ними регулярные расходы.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 1,
+          "col": 1
+        },
+        {
+          "row": 1,
+          "col": 0
+        },
+        {
+          "row": 0,
+          "col": 0
+        }
+      ]
+    },
+    {
+      "targetId": "target-10-02",
+      "order": 2,
+      "word": "ДОМ",
+      "normalized": "ДОМ",
+      "definition": "Жилое пространство, содержание которого требует планирования расходов.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 0,
+          "col": 1
+        },
+        {
+          "row": 0,
+          "col": 2
+        },
+        {
+          "row": 1,
+          "col": 2
+        }
+      ]
+    },
+    {
+      "targetId": "target-10-03",
+      "order": 3,
+      "word": "ТЫЛ",
+      "normalized": "ТЫЛ",
+      "definition": "Надёжная опора или запас, помогающий справляться с трудной ситуацией.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 1,
+          "col": 3
+        },
+        {
+          "row": 0,
+          "col": 3
+        },
+        {
+          "row": 0,
+          "col": 4
+        }
+      ]
+    },
+    {
+      "targetId": "target-10-04",
+      "order": 4,
+      "word": "ВРАЧ",
+      "normalized": "ВРАЧ",
+      "definition": "Специалист, который диагностирует заболевания и оказывает медицинскую помощь.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 1,
+          "col": 4
+        },
+        {
+          "row": 2,
+          "col": 4
+        },
+        {
+          "row": 2,
+          "col": 3
+        },
+        {
+          "row": 2,
+          "col": 2
+        }
+      ]
+    },
+    {
+      "targetId": "target-10-05",
+      "order": 5,
+      "word": "УРОН",
+      "normalized": "УРОН",
+      "definition": "Вред или потеря, которые можно оценить в физических или денежных величинах.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "offerId": "offer-10",
+      "canonicalPath": [
+        {
+          "row": 2,
+          "col": 1
+        },
+        {
+          "row": 2,
+          "col": 0
+        },
+        {
+          "row": 3,
+          "col": 0
+        },
+        {
+          "row": 4,
+          "col": 0
+        }
+      ]
+    },
+    {
+      "targetId": "target-10-06",
+      "order": 6,
+      "word": "СБОЙ",
+      "normalized": "СБОЙ",
+      "definition": "Нарушение нормальной работы системы, процесса или оборудования.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 4,
+          "col": 1
+        },
+        {
+          "row": 3,
+          "col": 1
+        },
+        {
+          "row": 3,
+          "col": 2
+        },
+        {
+          "row": 4,
+          "col": 2
+        }
+      ]
+    },
+    {
+      "targetId": "target-10-07",
+      "order": 7,
+      "word": "ТРУД",
+      "normalized": "ТРУД",
+      "definition": "Целенаправленная деятельность, создающая товары, услуги или иной полезный результат.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 4,
+          "col": 3
+        },
+        {
+          "row": 4,
+          "col": 4
+        },
+        {
+          "row": 3,
+          "col": 4
+        },
+        {
+          "row": 3,
+          "col": 3
+        }
+      ]
+    }
+  ]
+}

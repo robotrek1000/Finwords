@@ -4,7 +4,7 @@ import type {
   CellRef,
   CellView,
   FoundTarget,
-} from '../../shared/demoTypes';
+} from '../../infra/api/generated/data-contracts';
 
 export function cellRefToCellId(cell: CellRef): CellId {
   return `${cell.row + 1}:${cell.col + 1}` as CellId;

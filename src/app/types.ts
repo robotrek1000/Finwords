@@ -1,4 +1,4 @@
-export type LevelId = 1 | 2;
+export type LevelId = number;
 export type CellId = `${number}:${number}`;
 
 export type WordOfferType = 'course' | 'product';

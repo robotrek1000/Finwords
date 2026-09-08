@@ -1,0 +1,165 @@
+{
+  "schemaVersion": "1",
+  "id": "level-08",
+  "number": 8,
+  "chapterId": "chapter-01",
+  "chapterTitle": "Азбука денег",
+  "microtheme": "Биржевые операции",
+  "rows": 4,
+  "cols": 4,
+  "desiredTurns": {
+    "min": 0,
+    "max": 1
+  },
+  "difficulty": "Начальная",
+  "sourceWords": [
+    "ЛОНГ",
+    "ШОРТ",
+    "РЕПО",
+    "ТОРГ"
+  ],
+  "gridStatus": "TBD_AFTER_DATA_MODEL",
+  "contentStatus": "Draft",
+  "validation": "VALID",
+  "grid": [
+    [
+      "Г",
+      "Л",
+      "О",
+      "Н"
+    ],
+    [
+      "Р",
+      "О",
+      "Р",
+      "Г"
+    ],
+    [
+      "О",
+      "Ш",
+      "Т",
+      "Р"
+    ],
+    [
+      "Т",
+      "О",
+      "П",
+      "Е"
+    ]
+  ],
+  "targets": [
+    {
+      "targetId": "target-08-01",
+      "order": 1,
+      "word": "ЛОНГ",
+      "normalized": "ЛОНГ",
+      "definition": "Позиция, открытая в расчёте на рост цены актива.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "offerId": "offer-08",
+      "canonicalPath": [
+        {
+          "row": 0,
+          "col": 1
+        },
+        {
+          "row": 0,
+          "col": 2
+        },
+        {
+          "row": 0,
+          "col": 3
+        },
+        {
+          "row": 1,
+          "col": 3
+        }
+      ]
+    },
+    {
+      "targetId": "target-08-02",
+      "order": 2,
+      "word": "ШОРТ",
+      "normalized": "ШОРТ",
+      "definition": "Позиция, открытая в расчёте на снижение цены актива.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 2,
+          "col": 1
+        },
+        {
+          "row": 1,
+          "col": 1
+        },
+        {
+          "row": 1,
+          "col": 2
+        },
+        {
+          "row": 2,
+          "col": 2
+        }
+      ]
+    },
+    {
+      "targetId": "target-08-03",
+      "order": 3,
+      "word": "РЕПО",
+      "normalized": "РЕПО",
+      "definition": "Сделка продажи ценной бумаги с обязательством её обратного выкупа на согласованных условиях.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 2,
+          "col": 3
+        },
+        {
+          "row": 3,
+          "col": 3
+        },
+        {
+          "row": 3,
+          "col": 2
+        },
+        {
+          "row": 3,
+          "col": 1
+        }
+      ]
+    },
+    {
+      "targetId": "target-08-04",
+      "order": 4,
+      "word": "ТОРГ",
+      "normalized": "ТОРГ",
+      "definition": "Процесс согласования цены и условий покупки или продажи.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 3,
+          "col": 0
+        },
+        {
+          "row": 2,
+          "col": 0
+        },
+        {
+          "row": 1,
+          "col": 0
+        },
+        {
+          "row": 0,
+          "col": 0
+        }
+      ]
+    }
+  ]
+}

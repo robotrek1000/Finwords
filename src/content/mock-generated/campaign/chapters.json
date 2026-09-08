@@ -1,0 +1,72 @@
+[
+  {
+    "chapterId": "chapter-01",
+    "number": 1,
+    "title": "Азбука денег",
+    "levelStart": 1,
+    "levelEnd": 9,
+    "narrative": "Начните с простых финансовых понятий и постепенно соберите свою базу знаний.",
+    "illustrationConcept": "Объёмные буквы, монета и сертификат знаний.",
+    "status": "Draft"
+  },
+  {
+    "chapterId": "chapter-02",
+    "number": 2,
+    "title": "Финансовая подушка",
+    "levelStart": 10,
+    "levelEnd": 17,
+    "narrative": "Разберитесь, из чего складывается финансовый резерв и как он помогает в неожиданных ситуациях.",
+    "illustrationConcept": "Финансовая подушка и монеты.",
+    "status": "Draft"
+  },
+  {
+    "chapterId": "chapter-03",
+    "number": 3,
+    "title": "Морская торговля",
+    "levelStart": 18,
+    "levelEnd": 24,
+    "narrative": "Пройдите путь от гавани и грузов до торговли и валюты.",
+    "illustrationConcept": "Торговый корабль, груз и компас.",
+    "status": "Draft"
+  },
+  {
+    "chapterId": "chapter-04",
+    "number": 4,
+    "title": "История капитала",
+    "levelStart": 25,
+    "levelEnd": 31,
+    "narrative": "Проследите, как монеты, банки и биржи сформировали современный рынок.",
+    "illustrationConcept": "Старинная монета, банковская книга и фасад биржи.",
+    "status": "Draft"
+  },
+  {
+    "chapterId": "chapter-05",
+    "number": 5,
+    "title": "Мир бизнеса",
+    "levelStart": 32,
+    "levelEnd": 38,
+    "narrative": "Посмотрите, как идея превращается в компанию, продажи и рост.",
+    "illustrationConcept": "Офис, витрина продукта и график роста.",
+    "status": "Draft"
+  },
+  {
+    "chapterId": "chapter-06",
+    "number": 6,
+    "title": "Акции и компании",
+    "levelStart": 39,
+    "levelEnd": 44,
+    "narrative": "Узнайте, как устроено владение компанией, дивиденды и анализ эмитентов.",
+    "illustrationConcept": "Сертификат акции, компании и рыночный график.",
+    "status": "Draft"
+  },
+  {
+    "chapterId": "chapter-07",
+    "number": 7,
+    "title": "Финансовая свобода",
+    "levelStart": 45,
+    "levelEnd": 50,
+    "narrative": "Соберите знания о портфеле, доходе и долгосрочной дисциплине.",
+    "illustrationConcept": "Горизонт, устойчивый портфель и символ достигнутой цели.",
+    "status": "Draft"
+  }
+]

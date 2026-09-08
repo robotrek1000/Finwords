@@ -6,6 +6,7 @@ import {
   isLevelComplete,
   sessionReducer,
 } from './session';
+import { LEVELS } from '../content/chapter1';
 
 describe('session state', () => {
   it('starts a fresh session with five hints and no progress', () => {
@@ -26,7 +27,7 @@ describe('session state', () => {
       view: 'game',
       currentLevelId: 2,
       overlay: 'product',
-      selectedWordId: 'iis',
+      selectedWordId: 'target-02-01',
       hints: 8,
       knowledge: 13,
       bonusEnvelopeProgress: 3,
@@ -119,7 +120,7 @@ describe('session state', () => {
 
   it('completes a level, unlocks results, and can defer the golden reward', () => {
     let state = createInitialSession();
-    for (const targetId of ['fund', 'capital', 'stock', 'risk', 'market', 'index', 'income']) {
+    for (const targetId of LEVELS[1].targets.map((target) => target.id)) {
       state = sessionReducer(state, { type: 'FIND_TARGET', targetId });
     }
     expect(isLevelComplete(state, 1)).toBe(true);

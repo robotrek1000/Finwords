@@ -1,0 +1,281 @@
+{
+  "schemaVersion": "1",
+  "id": "level-41",
+  "number": 41,
+  "chapterId": "chapter-06",
+  "chapterTitle": "Акции и компании",
+  "microtheme": "Дивиденды",
+  "rows": 6,
+  "cols": 6,
+  "desiredTurns": {
+    "min": 2,
+    "max": 4
+  },
+  "difficulty": "Продвинутая",
+  "sourceWords": [
+    "ДИВИДЕНД",
+    "ОТСЕЧКА",
+    "ВЫПЛАТА",
+    "СОБРАНИЕ",
+    "ПЕРИОД"
+  ],
+  "gridStatus": "TBD_AFTER_DATA_MODEL",
+  "contentStatus": "Draft",
+  "validation": "VALID",
+  "grid": [
+    [
+      "И",
+      "Н",
+      "А",
+      "Р",
+      "Б",
+      "О"
+    ],
+    [
+      "Е",
+      "Л",
+      "А",
+      "Т",
+      "А",
+      "С"
+    ],
+    [
+      "Ы",
+      "П",
+      "О",
+      "Д",
+      "П",
+      "Е"
+    ],
+    [
+      "В",
+      "С",
+      "Т",
+      "Н",
+      "И",
+      "Р"
+    ],
+    [
+      "А",
+      "Е",
+      "Д",
+      "Е",
+      "О",
+      "Д"
+    ],
+    [
+      "К",
+      "Ч",
+      "И",
+      "В",
+      "И",
+      "Д"
+    ]
+  ],
+  "targets": [
+    {
+      "targetId": "target-41-01",
+      "order": 1,
+      "word": "ДИВИДЕНД",
+      "normalized": "ДИВИДЕНД",
+      "definition": "Часть прибыли компании, которую она может выплатить владельцам акций.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 5,
+          "col": 5
+        },
+        {
+          "row": 5,
+          "col": 4
+        },
+        {
+          "row": 5,
+          "col": 3
+        },
+        {
+          "row": 5,
+          "col": 2
+        },
+        {
+          "row": 4,
+          "col": 2
+        },
+        {
+          "row": 4,
+          "col": 3
+        },
+        {
+          "row": 3,
+          "col": 3
+        },
+        {
+          "row": 2,
+          "col": 3
+        }
+      ]
+    },
+    {
+      "targetId": "target-41-02",
+      "order": 2,
+      "word": "ОТСЕЧКА",
+      "normalized": "ОТСЕЧКА",
+      "definition": "Дата, по состоянию на которую определяют владельцев, имеющих право на выплату.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 2,
+          "col": 2
+        },
+        {
+          "row": 3,
+          "col": 2
+        },
+        {
+          "row": 3,
+          "col": 1
+        },
+        {
+          "row": 4,
+          "col": 1
+        },
+        {
+          "row": 5,
+          "col": 1
+        },
+        {
+          "row": 5,
+          "col": 0
+        },
+        {
+          "row": 4,
+          "col": 0
+        }
+      ]
+    },
+    {
+      "targetId": "target-41-03",
+      "order": 3,
+      "word": "ВЫПЛАТА",
+      "normalized": "ВЫПЛАТА",
+      "definition": "Передача получателю причитающейся денежной суммы.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 3,
+          "col": 0
+        },
+        {
+          "row": 2,
+          "col": 0
+        },
+        {
+          "row": 2,
+          "col": 1
+        },
+        {
+          "row": 1,
+          "col": 1
+        },
+        {
+          "row": 1,
+          "col": 2
+        },
+        {
+          "row": 1,
+          "col": 3
+        },
+        {
+          "row": 1,
+          "col": 4
+        }
+      ]
+    },
+    {
+      "targetId": "target-41-04",
+      "order": 4,
+      "word": "СОБРАНИЕ",
+      "normalized": "СОБРАНИЕ",
+      "definition": "Официальная встреча участников для обсуждения и принятия решений.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 1,
+          "col": 5
+        },
+        {
+          "row": 0,
+          "col": 5
+        },
+        {
+          "row": 0,
+          "col": 4
+        },
+        {
+          "row": 0,
+          "col": 3
+        },
+        {
+          "row": 0,
+          "col": 2
+        },
+        {
+          "row": 0,
+          "col": 1
+        },
+        {
+          "row": 0,
+          "col": 0
+        },
+        {
+          "row": 1,
+          "col": 0
+        }
+      ]
+    },
+    {
+      "targetId": "target-41-05",
+      "order": 5,
+      "word": "ПЕРИОД",
+      "normalized": "ПЕРИОД",
+      "definition": "Промежуток времени, используемый для учёта, сравнения или выполнения условия.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 2,
+          "col": 4
+        },
+        {
+          "row": 2,
+          "col": 5
+        },
+        {
+          "row": 3,
+          "col": 5
+        },
+        {
+          "row": 3,
+          "col": 4
+        },
+        {
+          "row": 4,
+          "col": 4
+        },
+        {
+          "row": 4,
+          "col": 5
+        }
+      ]
+    }
+  ]
+}

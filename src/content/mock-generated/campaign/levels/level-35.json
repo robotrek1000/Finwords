@@ -1,0 +1,294 @@
+{
+  "schemaVersion": "1",
+  "id": "level-35",
+  "number": 35,
+  "chapterId": "chapter-05",
+  "chapterTitle": "Мир бизнеса",
+  "microtheme": "Продажи",
+  "rows": 6,
+  "cols": 6,
+  "desiredTurns": {
+    "min": 1,
+    "max": 3
+  },
+  "difficulty": "Средняя",
+  "sourceWords": [
+    "ПРОДАЖА",
+    "СКИДКА",
+    "ВЫРУЧКА",
+    "ЗАКАЗ",
+    "ВИТРИНА",
+    "КЛИК"
+  ],
+  "gridStatus": "TBD_AFTER_DATA_MODEL",
+  "contentStatus": "Draft",
+  "validation": "VALID",
+  "grid": [
+    [
+      "А",
+      "К",
+      "В",
+      "Ы",
+      "Д",
+      "К"
+    ],
+    [
+      "З",
+      "А",
+      "З",
+      "Р",
+      "И",
+      "А"
+    ],
+    [
+      "И",
+      "Р",
+      "Т",
+      "У",
+      "К",
+      "П"
+    ],
+    [
+      "Н",
+      "А",
+      "И",
+      "Ч",
+      "С",
+      "Р"
+    ],
+    [
+      "И",
+      "К",
+      "В",
+      "К",
+      "А",
+      "О"
+    ],
+    [
+      "Л",
+      "К",
+      "А",
+      "Ж",
+      "А",
+      "Д"
+    ]
+  ],
+  "targets": [
+    {
+      "targetId": "target-35-01",
+      "order": 1,
+      "word": "ПРОДАЖА",
+      "normalized": "ПРОДАЖА",
+      "definition": "Передача товара или услуги покупателю за установленную плату.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 2,
+          "col": 5
+        },
+        {
+          "row": 3,
+          "col": 5
+        },
+        {
+          "row": 4,
+          "col": 5
+        },
+        {
+          "row": 5,
+          "col": 5
+        },
+        {
+          "row": 5,
+          "col": 4
+        },
+        {
+          "row": 5,
+          "col": 3
+        },
+        {
+          "row": 5,
+          "col": 2
+        }
+      ]
+    },
+    {
+      "targetId": "target-35-02",
+      "order": 2,
+      "word": "СКИДКА",
+      "normalized": "СКИДКА",
+      "definition": "Снижение обычной цены товара или услуги.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 3,
+          "col": 4
+        },
+        {
+          "row": 2,
+          "col": 4
+        },
+        {
+          "row": 1,
+          "col": 4
+        },
+        {
+          "row": 0,
+          "col": 4
+        },
+        {
+          "row": 0,
+          "col": 5
+        },
+        {
+          "row": 1,
+          "col": 5
+        }
+      ]
+    },
+    {
+      "targetId": "target-35-03",
+      "order": 3,
+      "word": "ВЫРУЧКА",
+      "normalized": "ВЫРУЧКА",
+      "definition": "Все поступления компании от продажи товаров и услуг до вычета расходов.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 0,
+          "col": 2
+        },
+        {
+          "row": 0,
+          "col": 3
+        },
+        {
+          "row": 1,
+          "col": 3
+        },
+        {
+          "row": 2,
+          "col": 3
+        },
+        {
+          "row": 3,
+          "col": 3
+        },
+        {
+          "row": 4,
+          "col": 3
+        },
+        {
+          "row": 4,
+          "col": 4
+        }
+      ]
+    },
+    {
+      "targetId": "target-35-04",
+      "order": 4,
+      "word": "ЗАКАЗ",
+      "normalized": "ЗАКАЗ",
+      "definition": "Запрос клиента на поставку товара или выполнение услуги.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 1,
+          "col": 0
+        },
+        {
+          "row": 0,
+          "col": 0
+        },
+        {
+          "row": 0,
+          "col": 1
+        },
+        {
+          "row": 1,
+          "col": 1
+        },
+        {
+          "row": 1,
+          "col": 2
+        }
+      ]
+    },
+    {
+      "targetId": "target-35-05",
+      "order": 5,
+      "word": "ВИТРИНА",
+      "normalized": "ВИТРИНА",
+      "definition": "Место или интерфейс, где клиенту показывают доступные товары и предложения.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 4,
+          "col": 2
+        },
+        {
+          "row": 3,
+          "col": 2
+        },
+        {
+          "row": 2,
+          "col": 2
+        },
+        {
+          "row": 2,
+          "col": 1
+        },
+        {
+          "row": 2,
+          "col": 0
+        },
+        {
+          "row": 3,
+          "col": 0
+        },
+        {
+          "row": 3,
+          "col": 1
+        }
+      ]
+    },
+    {
+      "targetId": "target-35-06",
+      "order": 6,
+      "word": "КЛИК",
+      "normalized": "КЛИК",
+      "definition": "Нажатие пользователя на элемент цифрового интерфейса.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 5,
+          "col": 1
+        },
+        {
+          "row": 5,
+          "col": 0
+        },
+        {
+          "row": 4,
+          "col": 0
+        },
+        {
+          "row": 4,
+          "col": 1
+        }
+      ]
+    }
+  ]
+}

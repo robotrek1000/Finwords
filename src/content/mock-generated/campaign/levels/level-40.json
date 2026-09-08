@@ -1,0 +1,282 @@
+{
+  "schemaVersion": "1",
+  "id": "level-40",
+  "number": 40,
+  "chapterId": "chapter-06",
+  "chapterTitle": "Акции и компании",
+  "microtheme": "Выход на биржу",
+  "rows": 6,
+  "cols": 6,
+  "desiredTurns": {
+    "min": 2,
+    "max": 4
+  },
+  "difficulty": "Продвинутая",
+  "sourceWords": [
+    "РАЗМЕЩЕНИЕ",
+    "ПОДПИСКА",
+    "ОЦЕНКА",
+    "ВЫПУСК",
+    "ДОПУСК"
+  ],
+  "gridStatus": "TBD_AFTER_DATA_MODEL",
+  "contentStatus": "Draft",
+  "validation": "VALID",
+  "grid": [
+    [
+      "П",
+      "Ы",
+      "Е",
+      "Н",
+      "Д",
+      "П"
+    ],
+    [
+      "У",
+      "В",
+      "Ц",
+      "К",
+      "О",
+      "И"
+    ],
+    [
+      "С",
+      "К",
+      "О",
+      "А",
+      "П",
+      "С"
+    ],
+    [
+      "М",
+      "З",
+      "А",
+      "Р",
+      "А",
+      "К"
+    ],
+    [
+      "Е",
+      "Н",
+      "И",
+      "Е",
+      "Д",
+      "О"
+    ],
+    [
+      "Щ",
+      "Е",
+      "К",
+      "С",
+      "У",
+      "П"
+    ]
+  ],
+  "targets": [
+    {
+      "targetId": "target-40-01",
+      "order": 1,
+      "word": "РАЗМЕЩЕНИЕ",
+      "normalized": "РАЗМЕЩЕНИЕ",
+      "definition": "Предложение выпущенных ценных бумаг инвесторам для их приобретения.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "offerId": "offer-40",
+      "canonicalPath": [
+        {
+          "row": 3,
+          "col": 3
+        },
+        {
+          "row": 3,
+          "col": 2
+        },
+        {
+          "row": 3,
+          "col": 1
+        },
+        {
+          "row": 3,
+          "col": 0
+        },
+        {
+          "row": 4,
+          "col": 0
+        },
+        {
+          "row": 5,
+          "col": 0
+        },
+        {
+          "row": 5,
+          "col": 1
+        },
+        {
+          "row": 4,
+          "col": 1
+        },
+        {
+          "row": 4,
+          "col": 2
+        },
+        {
+          "row": 4,
+          "col": 3
+        }
+      ]
+    },
+    {
+      "targetId": "target-40-02",
+      "order": 2,
+      "word": "ПОДПИСКА",
+      "normalized": "ПОДПИСКА",
+      "definition": "Согласие регулярно получать услугу или купить бумаги в ходе размещения.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 2,
+          "col": 4
+        },
+        {
+          "row": 1,
+          "col": 4
+        },
+        {
+          "row": 0,
+          "col": 4
+        },
+        {
+          "row": 0,
+          "col": 5
+        },
+        {
+          "row": 1,
+          "col": 5
+        },
+        {
+          "row": 2,
+          "col": 5
+        },
+        {
+          "row": 3,
+          "col": 5
+        },
+        {
+          "row": 3,
+          "col": 4
+        }
+      ]
+    },
+    {
+      "targetId": "target-40-03",
+      "order": 3,
+      "word": "ОЦЕНКА",
+      "normalized": "ОЦЕНКА",
+      "definition": "Определение стоимости, качества или вероятного результата по выбранной методике.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 2,
+          "col": 2
+        },
+        {
+          "row": 1,
+          "col": 2
+        },
+        {
+          "row": 0,
+          "col": 2
+        },
+        {
+          "row": 0,
+          "col": 3
+        },
+        {
+          "row": 1,
+          "col": 3
+        },
+        {
+          "row": 2,
+          "col": 3
+        }
+      ]
+    },
+    {
+      "targetId": "target-40-04",
+      "order": 4,
+      "word": "ВЫПУСК",
+      "normalized": "ВЫПУСК",
+      "definition": "Совокупность ценных бумаг одного эмитента с едиными условиями.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 1,
+          "col": 1
+        },
+        {
+          "row": 0,
+          "col": 1
+        },
+        {
+          "row": 0,
+          "col": 0
+        },
+        {
+          "row": 1,
+          "col": 0
+        },
+        {
+          "row": 2,
+          "col": 0
+        },
+        {
+          "row": 2,
+          "col": 1
+        }
+      ]
+    },
+    {
+      "targetId": "target-40-05",
+      "order": 5,
+      "word": "ДОПУСК",
+      "normalized": "ДОПУСК",
+      "definition": "Официальное разрешение участвовать в процессе или использовать инструмент.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 4,
+          "col": 4
+        },
+        {
+          "row": 4,
+          "col": 5
+        },
+        {
+          "row": 5,
+          "col": 5
+        },
+        {
+          "row": 5,
+          "col": 4
+        },
+        {
+          "row": 5,
+          "col": 3
+        },
+        {
+          "row": 5,
+          "col": 2
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,225 @@
+{
+  "schemaVersion": "1",
+  "id": "level-16",
+  "number": 16,
+  "chapterId": "chapter-02",
+  "chapterTitle": "Финансовая подушка",
+  "microtheme": "Кредитная нагрузка",
+  "rows": 5,
+  "cols": 5,
+  "desiredTurns": {
+    "min": 1,
+    "max": 2
+  },
+  "difficulty": "Базовая",
+  "sourceWords": [
+    "КРЕДИТ",
+    "СТАВКА",
+    "ЗАЁМ",
+    "ДЕБЕТ",
+    "ПЕНЯ"
+  ],
+  "gridStatus": "TBD_AFTER_DATA_MODEL",
+  "contentStatus": "Draft",
+  "validation": "VALID",
+  "grid": [
+    [
+      "Р",
+      "Е",
+      "Д",
+      "И",
+      "Т"
+    ],
+    [
+      "К",
+      "Д",
+      "М",
+      "З",
+      "С"
+    ],
+    [
+      "Я",
+      "Е",
+      "Е",
+      "А",
+      "Т"
+    ],
+    [
+      "Н",
+      "Б",
+      "Е",
+      "А",
+      "А"
+    ],
+    [
+      "Е",
+      "П",
+      "Т",
+      "К",
+      "В"
+    ]
+  ],
+  "targets": [
+    {
+      "targetId": "target-16-01",
+      "order": 1,
+      "word": "КРЕДИТ",
+      "normalized": "КРЕДИТ",
+      "definition": "Деньги, предоставленные заёмщику на условиях возврата, срока и обычно выплаты процентов.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "offerId": "offer-16",
+      "canonicalPath": [
+        {
+          "row": 1,
+          "col": 0
+        },
+        {
+          "row": 0,
+          "col": 0
+        },
+        {
+          "row": 0,
+          "col": 1
+        },
+        {
+          "row": 0,
+          "col": 2
+        },
+        {
+          "row": 0,
+          "col": 3
+        },
+        {
+          "row": 0,
+          "col": 4
+        }
+      ]
+    },
+    {
+      "targetId": "target-16-02",
+      "order": 2,
+      "word": "СТАВКА",
+      "normalized": "СТАВКА",
+      "definition": "Процент или тариф, по которому рассчитывается доход, плата или стоимость кредита.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 1,
+          "col": 4
+        },
+        {
+          "row": 2,
+          "col": 4
+        },
+        {
+          "row": 3,
+          "col": 4
+        },
+        {
+          "row": 4,
+          "col": 4
+        },
+        {
+          "row": 4,
+          "col": 3
+        },
+        {
+          "row": 3,
+          "col": 3
+        }
+      ]
+    },
+    {
+      "targetId": "target-16-03",
+      "order": 3,
+      "word": "ЗАЁМ",
+      "normalized": "ЗАЕМ",
+      "definition": "Деньги или имущество, переданные с обязанностью вернуть эквивалент.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 1,
+          "col": 3
+        },
+        {
+          "row": 2,
+          "col": 3
+        },
+        {
+          "row": 2,
+          "col": 2
+        },
+        {
+          "row": 1,
+          "col": 2
+        }
+      ]
+    },
+    {
+      "targetId": "target-16-04",
+      "order": 4,
+      "word": "ДЕБЕТ",
+      "normalized": "ДЕБЕТ",
+      "definition": "Сторона бухгалтерской записи, отражающая движение средств в зависимости от типа счёта.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 1,
+          "col": 1
+        },
+        {
+          "row": 2,
+          "col": 1
+        },
+        {
+          "row": 3,
+          "col": 1
+        },
+        {
+          "row": 3,
+          "col": 2
+        },
+        {
+          "row": 4,
+          "col": 2
+        }
+      ]
+    },
+    {
+      "targetId": "target-16-05",
+      "order": 5,
+      "word": "ПЕНЯ",
+      "normalized": "ПЕНЯ",
+      "definition": "Денежная сумма, начисляемая за каждый период просрочки обязательства.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 4,
+          "col": 1
+        },
+        {
+          "row": 4,
+          "col": 0
+        },
+        {
+          "row": 3,
+          "col": 0
+        },
+        {
+          "row": 2,
+          "col": 0
+        }
+      ]
+    }
+  ]
+}

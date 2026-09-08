@@ -1,0 +1,107 @@
+[
+  {
+    "cueId": "mentor-course",
+    "trigger": "offer_target_found",
+    "message": "По этому слову есть мини-курс. Нажмите, чтобы узнать больше.",
+    "frequency": "once_per_offer",
+    "status": "Draft"
+  },
+  {
+    "cueId": "mentor-definition-reminder",
+    "trigger": "ordinary_target_found",
+    "message": "Нажмите на найденное слово, чтобы узнать его значение.",
+    "frequency": "once_per_level_1_to_5",
+    "status": "Draft"
+  },
+  {
+    "cueId": "mentor-first-hint",
+    "trigger": "hint_used",
+    "message": "Подсказка ведёт по буквам одного слова по порядку.",
+    "frequency": "once_per_campaign",
+    "status": "Draft"
+  },
+  {
+    "cueId": "mentor-first-target",
+    "trigger": "target_found",
+    "message": "Отлично! Найденные клетки теперь недоступны для новых слов.",
+    "frequency": "once_per_campaign",
+    "status": "Draft"
+  },
+  {
+    "cueId": "mentor-level-1-start",
+    "trigger": "level_start",
+    "message": "Начните с коротких слов — так легче увидеть связи.",
+    "frequency": "once_per_level_1",
+    "status": "Draft"
+  },
+  {
+    "cueId": "mentor-one-left",
+    "trigger": "remaining_targets",
+    "message": "Последнее слово рядом. Ищите среди свободных клеток.",
+    "frequency": "once_per_level",
+    "status": "Draft"
+  },
+  {
+    "cueId": "mentor-product",
+    "trigger": "offer_target_found",
+    "message": "Это слово связано с продуктом БКС. Нажмите, чтобы узнать больше.",
+    "frequency": "once_per_offer",
+    "status": "Draft"
+  },
+  {
+    "cueId": "mentor-three-errors",
+    "trigger": "invalid_streak",
+    "message": "Начните с другой буквы. Диагонали не работают.",
+    "frequency": "once_per_level",
+    "status": "Draft"
+  },
+  {
+    "cueId": "mentor-tutorial-bonus",
+    "trigger": "tutorial",
+    "message": "Другие существительные могут стать бонусными словами.",
+    "frequency": "once_per_tutorial",
+    "status": "Draft"
+  },
+  {
+    "cueId": "mentor-tutorial-definition",
+    "trigger": "tutorial",
+    "message": "Нажмите на найденное слово, чтобы прочитать его значение.",
+    "frequency": "once_per_tutorial",
+    "status": "Draft"
+  },
+  {
+    "cueId": "mentor-tutorial-lock",
+    "trigger": "tutorial",
+    "message": "Клетки найденного целевого слова больше нельзя использовать.",
+    "frequency": "once_per_tutorial",
+    "status": "Draft"
+  },
+  {
+    "cueId": "mentor-tutorial-reverse",
+    "trigger": "tutorial",
+    "message": "Целевое слово можно собрать в прямом или точном обратном порядке.",
+    "frequency": "once_per_tutorial",
+    "status": "Draft"
+  },
+  {
+    "cueId": "mentor-tutorial-start",
+    "trigger": "tutorial",
+    "message": "Начните с первой буквы и проведите по соседним клеткам.",
+    "frequency": "once_per_tutorial",
+    "status": "Draft"
+  },
+  {
+    "cueId": "mentor-tutorial-turn",
+    "trigger": "tutorial",
+    "message": "Слово может поворачивать, но диагональные переходы не используются.",
+    "frequency": "once_per_tutorial",
+    "status": "Draft"
+  },
+  {
+    "cueId": "mentor-two-left",
+    "trigger": "remaining_targets",
+    "message": "Осталось два слова. Проверьте пути с поворотами.",
+    "frequency": "once_per_level",
+    "status": "Draft"
+  }
+]

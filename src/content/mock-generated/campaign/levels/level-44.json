@@ -1,0 +1,295 @@
+{
+  "schemaVersion": "1",
+  "id": "level-44",
+  "number": 44,
+  "chapterId": "chapter-06",
+  "chapterTitle": "Акции и компании",
+  "microtheme": "Сырьевые отрасли",
+  "rows": 6,
+  "cols": 6,
+  "desiredTurns": {
+    "min": 2,
+    "max": 4
+  },
+  "difficulty": "Продвинутая",
+  "sourceWords": [
+    "СЕКТОР",
+    "ОТРАСЛЬ",
+    "НЕФТЬ",
+    "МЕТАЛЛ",
+    "РЕСУРС",
+    "ДОБЫЧА"
+  ],
+  "gridStatus": "TBD_AFTER_DATA_MODEL",
+  "contentStatus": "Draft",
+  "validation": "VALID",
+  "grid": [
+    [
+      "С",
+      "У",
+      "Р",
+      "С",
+      "Д",
+      "О"
+    ],
+    [
+      "Е",
+      "Р",
+      "Л",
+      "Л",
+      "А",
+      "Б"
+    ],
+    [
+      "Т",
+      "Ь",
+      "М",
+      "Е",
+      "Т",
+      "Ы"
+    ],
+    [
+      "Ф",
+      "Е",
+      "Н",
+      "Ь",
+      "А",
+      "Ч"
+    ],
+    [
+      "Р",
+      "А",
+      "С",
+      "Л",
+      "К",
+      "Е"
+    ],
+    [
+      "Т",
+      "О",
+      "Р",
+      "О",
+      "Т",
+      "С"
+    ]
+  ],
+  "targets": [
+    {
+      "targetId": "target-44-01",
+      "order": 1,
+      "word": "СЕКТОР",
+      "normalized": "СЕКТОР",
+      "definition": "Крупная группа компаний или видов деятельности внутри экономики.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 5,
+          "col": 5
+        },
+        {
+          "row": 4,
+          "col": 5
+        },
+        {
+          "row": 4,
+          "col": 4
+        },
+        {
+          "row": 5,
+          "col": 4
+        },
+        {
+          "row": 5,
+          "col": 3
+        },
+        {
+          "row": 5,
+          "col": 2
+        }
+      ]
+    },
+    {
+      "targetId": "target-44-02",
+      "order": 2,
+      "word": "ОТРАСЛЬ",
+      "normalized": "ОТРАСЛЬ",
+      "definition": "Совокупность компаний, выпускающих сходную продукцию или оказывающих сходные услуги.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 5,
+          "col": 1
+        },
+        {
+          "row": 5,
+          "col": 0
+        },
+        {
+          "row": 4,
+          "col": 0
+        },
+        {
+          "row": 4,
+          "col": 1
+        },
+        {
+          "row": 4,
+          "col": 2
+        },
+        {
+          "row": 4,
+          "col": 3
+        },
+        {
+          "row": 3,
+          "col": 3
+        }
+      ]
+    },
+    {
+      "targetId": "target-44-03",
+      "order": 3,
+      "word": "НЕФТЬ",
+      "normalized": "НЕФТЬ",
+      "definition": "Природное жидкое сырьё, используемое для производства топлива и материалов.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 3,
+          "col": 2
+        },
+        {
+          "row": 3,
+          "col": 1
+        },
+        {
+          "row": 3,
+          "col": 0
+        },
+        {
+          "row": 2,
+          "col": 0
+        },
+        {
+          "row": 2,
+          "col": 1
+        }
+      ]
+    },
+    {
+      "targetId": "target-44-04",
+      "order": 4,
+      "word": "МЕТАЛЛ",
+      "normalized": "МЕТАЛЛ",
+      "definition": "Материал с характерными физическими свойствами, используемый в промышленности и инвестициях.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "offerId": "offer-44",
+      "canonicalPath": [
+        {
+          "row": 2,
+          "col": 2
+        },
+        {
+          "row": 2,
+          "col": 3
+        },
+        {
+          "row": 2,
+          "col": 4
+        },
+        {
+          "row": 1,
+          "col": 4
+        },
+        {
+          "row": 1,
+          "col": 3
+        },
+        {
+          "row": 1,
+          "col": 2
+        }
+      ]
+    },
+    {
+      "targetId": "target-44-05",
+      "order": 5,
+      "word": "РЕСУРС",
+      "normalized": "РЕСУРС",
+      "definition": "Запас средств, материалов, времени или возможностей для выполнения задачи.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 1,
+          "col": 1
+        },
+        {
+          "row": 1,
+          "col": 0
+        },
+        {
+          "row": 0,
+          "col": 0
+        },
+        {
+          "row": 0,
+          "col": 1
+        },
+        {
+          "row": 0,
+          "col": 2
+        },
+        {
+          "row": 0,
+          "col": 3
+        }
+      ]
+    },
+    {
+      "targetId": "target-44-06",
+      "order": 6,
+      "word": "ДОБЫЧА",
+      "normalized": "ДОБЫЧА",
+      "definition": "Извлечение природного сырья из земли или водной среды.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 0,
+          "col": 4
+        },
+        {
+          "row": 0,
+          "col": 5
+        },
+        {
+          "row": 1,
+          "col": 5
+        },
+        {
+          "row": 2,
+          "col": 5
+        },
+        {
+          "row": 3,
+          "col": 5
+        },
+        {
+          "row": 3,
+          "col": 4
+        }
+      ]
+    }
+  ]
+}

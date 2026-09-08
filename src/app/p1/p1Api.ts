@@ -5,6 +5,9 @@ import type {
   ClaimRewardRequest,
   ClaimRewardResponse,
   ClientStateResponse,
+  ConfirmCampaignCompleteShownResponse,
+  ConfirmNarrativeShownResponse,
+  DismissFeedbackResponse,
   HintUseResponse,
   LevelPlayResponse,
   LevelResultsResponse,
@@ -14,19 +17,27 @@ import type {
   SubmitFeedbackRequest,
   SubmitFeedbackResponse,
   UpdateSettingsRequest,
-} from '../../shared/demoTypes';
+} from '../../infra/api/generated/data-contracts';
+import { NextAction } from '../../infra/api/generated/data-contracts';
 import { createHttpApiAdapter } from '../../infra/api/adapters/httpApiAdapter';
 import type { HttpResponseResult } from '../../infra/api/adapters/httpApiAdapter';
 import { operationRegistry } from '../../infra/api/operationRegistry';
 import { createEtagStore } from '../../infra/http/etagStore';
 import { createMutationCoordinator } from '../../infra/http/mutationCoordinator';
+import { loadRuntimeConfig } from '../../infra/runtime-config/runtimeConfig';
 
 export interface P1Api {
   loadState(signal?: AbortSignal): Promise<ClientStateResponse>;
+  resyncState(signal?: AbortSignal): Promise<ClientStateResponse>;
   enterLevel(
     state: ClientStateResponse,
     signal?: AbortSignal,
   ): Promise<LevelPlayResponse>;
+  confirmNarrativeShown(
+    chapterId: string,
+    state: ClientStateResponse,
+    signal?: AbortSignal,
+  ): Promise<ConfirmNarrativeShownResponse>;
   useHint(levelId: string, signal?: AbortSignal): Promise<HintUseResponse>;
   submitRoute(
     levelId: string,
@@ -37,6 +48,8 @@ export interface P1Api {
   getAppearances(): Promise<AppearanceCatalogResponse>;
   selectAppearance(appearanceId: string): Promise<SelectAppearanceResponse>;
   submitFeedback(body: SubmitFeedbackRequest): Promise<SubmitFeedbackResponse>;
+  dismissFeedback(chapterId: string): Promise<DismissFeedbackResponse>;
+  confirmCampaignCompleteShown(): Promise<ConfirmCampaignCompleteShownResponse>;
   getLevelResults(
     levelId: string,
     signal?: AbortSignal,
@@ -110,10 +123,11 @@ function operationPath(apiId: string, params: PathParams = {}): string {
 }
 
 export function createP1Api(): P1Api {
+  const config = loadRuntimeConfig();
   const etagStore = createEtagStore();
   const mutationCoordinator = createMutationCoordinator();
   const http = createHttpApiAdapter({
-    baseUrl: import.meta.env.MODE === 'test' ? 'http://localhost' : '',
+    baseUrl: config.apiBaseUrl,
   });
   let currentOperationGeneration = 0;
 
@@ -202,7 +216,7 @@ export function createP1Api(): P1Api {
     scope: OperationScope,
     signal?: AbortSignal,
   ): Promise<ClientStateResponse> {
-    const response = await http.get<ClientStateResponse>(operationPath('state'), {
+    const response = await http.get<ClientStateResponse>(operationPath('API-002'), {
       signal,
     });
     return commitResponse(response, scope);
@@ -214,7 +228,7 @@ export function createP1Api(): P1Api {
     signal?: AbortSignal,
   ): Promise<LevelPlayResponse> {
     const response = await http.get<LevelPlayResponse>(
-      operationPath('resume-level', { levelId }),
+      operationPath('API-005', { levelId }),
       { signal },
     );
     return commitResponse(response, scope);
@@ -226,7 +240,7 @@ export function createP1Api(): P1Api {
     signal?: AbortSignal,
   ): Promise<LevelResultsResponse> {
     const response = await http.get<LevelResultsResponse>(
-      operationPath('level-results', { levelId }),
+      operationPath('API-008', { levelId }),
       { signal },
     );
     return commitResponse(response, scope);
@@ -247,12 +261,12 @@ export function createP1Api(): P1Api {
     signal?: AbortSignal,
   ): Promise<LevelPlayResponse> {
     const levelId = onlyAvailableLevel(state);
-    const descriptor = { apiId: 'start-level', params: { levelId } };
+    const descriptor = { apiId: 'API-004', params: { levelId } };
     const intent = mutationCoordinator.beginOrRetry(descriptor);
 
     try {
       const data = await sendMutationAttempt<LevelPlayResponse>(
-        'start-level',
+        'API-004',
         undefined,
         intent,
         scope,
@@ -282,7 +296,7 @@ export function createP1Api(): P1Api {
 
         const retryIntent = mutationCoordinator.beginOrRetry(descriptor);
         const data = await sendMutationAttempt<LevelPlayResponse>(
-          'start-level',
+          'API-004',
           undefined,
           retryIntent,
           scope,
@@ -300,17 +314,86 @@ export function createP1Api(): P1Api {
     }
   }
 
+  async function confirmNarrativeShown(
+    chapterId: string,
+    state: ClientStateResponse,
+    scope: OperationScope,
+    signal?: AbortSignal,
+  ): Promise<ConfirmNarrativeShownResponse> {
+    if (!state.clientState.chapters.some((chapter) => chapter.chapterId === chapterId)) {
+      throw createFlowError('CHAPTER_NOT_FOUND');
+    }
+    const descriptor = { apiId: 'API-003', params: { chapterId } };
+    const intent = mutationCoordinator.beginOrRetry(descriptor);
+
+    try {
+      const data = await sendMutationAttempt<ConfirmNarrativeShownResponse>(
+        'API-003',
+        undefined,
+        intent,
+        scope,
+        { chapterId },
+        signal,
+      );
+      mutationCoordinator.resolve(intent.intentId);
+      return data;
+    } catch (error) {
+      if (errorType(error) !== 'STATE_VERSION_CONFLICT') {
+        if (!shouldRetainIntent(error)) mutationCoordinator.resolve(intent.intentId);
+        throw error;
+      }
+
+      try {
+        const refreshed = await readState(scope, signal);
+        const chapter = refreshed.clientState.chapters.find(
+          (candidate) => candidate.chapterId === chapterId,
+        );
+        if (!chapter) {
+          mutationCoordinator.resolve(intent.intentId);
+          throw createFlowError('CHAPTER_NOT_FOUND');
+        }
+        if (chapter.isNarrativeShown) {
+          mutationCoordinator.resolve(intent.intentId);
+          return {
+            chapterId,
+            isNarrativeShown: true,
+            nextAction: refreshed.clientState.nextAction,
+          };
+        }
+        if (chapter.status === 'locked') {
+          mutationCoordinator.resolve(intent.intentId);
+          throw createFlowError('CHAPTER_LOCKED');
+        }
+
+        const retryIntent = mutationCoordinator.beginOrRetry(descriptor);
+        const data = await sendMutationAttempt<ConfirmNarrativeShownResponse>(
+          'API-003',
+          undefined,
+          retryIntent,
+          scope,
+          { chapterId },
+          signal,
+        );
+        mutationCoordinator.resolve(retryIntent.intentId);
+        return data;
+      } catch (recoveryError) {
+        if (!shouldRetainIntent(recoveryError)) mutationCoordinator.resolve(intent.intentId);
+        throw recoveryError;
+      }
+    }
+  }
+
   async function useHint(
     levelId: string,
     scope: OperationScope,
     signal?: AbortSignal,
   ): Promise<HintUseResponse> {
-    const descriptor = { apiId: 'use-hint', params: { levelId } };
+    const descriptor = { apiId: 'API-007', params: { levelId } };
     const intent = mutationCoordinator.beginOrRetry(descriptor);
 
     try {
       const data = await sendMutationAttempt<HintUseResponse>(
-        'use-hint',
+        'API-007',
         undefined,
         intent,
         scope,
@@ -333,7 +416,7 @@ export function createP1Api(): P1Api {
         }
         const retryIntent = mutationCoordinator.beginOrRetry(descriptor);
         const data = await sendMutationAttempt<HintUseResponse>(
-          'use-hint',
+          'API-007',
           undefined,
           retryIntent,
           scope,
@@ -358,12 +441,12 @@ export function createP1Api(): P1Api {
     signal?: AbortSignal,
   ): Promise<RouteSubmissionResponse> {
     const body = { route };
-    const descriptor = { apiId: 'submit-route', params: { levelId }, body };
+    const descriptor = { apiId: 'API-006', params: { levelId }, body };
     const intent = mutationCoordinator.beginOrRetry(descriptor);
 
     try {
       const data = await sendMutationAttempt<RouteSubmissionResponse>(
-        'submit-route',
+        'API-006',
         body,
         intent,
         scope,
@@ -386,7 +469,7 @@ export function createP1Api(): P1Api {
         }
         const retryIntent = mutationCoordinator.beginOrRetry(descriptor);
         const data = await sendMutationAttempt<RouteSubmissionResponse>(
-          'submit-route',
+          'API-006',
           body,
           retryIntent,
           scope,
@@ -410,12 +493,12 @@ export function createP1Api(): P1Api {
     scope: OperationScope,
     signal?: AbortSignal,
   ): Promise<ClaimRewardResponse> {
-    const descriptor = { apiId: 'claim-reward', params: { rewardId }, body };
+    const descriptor = { apiId: 'API-009', params: { rewardId }, body };
     const intent = mutationCoordinator.beginOrRetry(descriptor);
 
     try {
       const data = await sendMutationAttempt<ClaimRewardResponse>(
-        'claim-reward',
+        'API-009',
         body,
         intent,
         scope,
@@ -443,7 +526,7 @@ export function createP1Api(): P1Api {
         }
         const retryIntent = mutationCoordinator.beginOrRetry(descriptor);
         const data = await sendMutationAttempt<ClaimRewardResponse>(
-          'claim-reward',
+          'API-009',
           body,
           retryIntent,
           scope,
@@ -466,12 +549,12 @@ export function createP1Api(): P1Api {
     scope: OperationScope,
     signal?: AbortSignal,
   ): Promise<AcknowledgeLevelResultsResponse> {
-    const descriptor = { apiId: 'acknowledge-results', params: { levelId } };
+    const descriptor = { apiId: 'API-017', params: { levelId } };
     const intent = mutationCoordinator.beginOrRetry(descriptor);
 
     try {
       const data = await sendMutationAttempt<AcknowledgeLevelResultsResponse>(
-        'acknowledge-results',
+        'API-017',
         undefined,
         intent,
         scope,
@@ -493,7 +576,7 @@ export function createP1Api(): P1Api {
         }
         const retryIntent = mutationCoordinator.beginOrRetry(descriptor);
         const data = await sendMutationAttempt<AcknowledgeLevelResultsResponse>(
-          'acknowledge-results',
+          'API-017',
           undefined,
           retryIntent,
           scope,
@@ -511,11 +594,109 @@ export function createP1Api(): P1Api {
     }
   }
 
+  async function updateSettings(
+    body: UpdateSettingsRequest,
+    scope: OperationScope,
+  ): Promise<SettingsResponse> {
+    const descriptor = { apiId: 'API-010', body };
+    const intent = mutationCoordinator.beginOrRetry(descriptor);
+    try {
+      const data = await sendMutationAttempt<SettingsResponse>(
+        'API-010',
+        body,
+        intent,
+        scope,
+      );
+      mutationCoordinator.resolve(intent.intentId);
+      return data;
+    } catch (error) {
+      if (errorType(error) !== 'STATE_VERSION_CONFLICT') {
+        if (!shouldRetainIntent(error)) mutationCoordinator.resolve(intent.intentId);
+        throw error;
+      }
+
+      try {
+        const refreshed = await readState(scope);
+        const settings = refreshed.clientState.clientView.settings;
+        const alreadyApplied =
+          (body.musicEnabled === undefined || settings.musicEnabled === body.musicEnabled)
+          && (body.soundEnabled === undefined || settings.soundEnabled === body.soundEnabled);
+        if (alreadyApplied) {
+          mutationCoordinator.resolve(intent.intentId);
+          return settings;
+        }
+        const retryIntent = mutationCoordinator.beginOrRetry(descriptor);
+        const data = await sendMutationAttempt<SettingsResponse>(
+          'API-010',
+          body,
+          retryIntent,
+          scope,
+        );
+        mutationCoordinator.resolve(retryIntent.intentId);
+        return data;
+      } catch (recoveryError) {
+        if (!shouldRetainIntent(recoveryError)) mutationCoordinator.resolve(intent.intentId);
+        throw recoveryError;
+      }
+    }
+  }
+
+  async function confirmCampaignCompleteShown(
+    scope: OperationScope,
+  ): Promise<ConfirmCampaignCompleteShownResponse> {
+    const descriptor = { apiId: 'API-015' };
+    const intent = mutationCoordinator.beginOrRetry(descriptor);
+    try {
+      const data = await sendMutationAttempt<ConfirmCampaignCompleteShownResponse>(
+        'API-015',
+        undefined,
+        intent,
+        scope,
+      );
+      mutationCoordinator.resolve(intent.intentId);
+      return data;
+    } catch (error) {
+      if (errorType(error) !== 'STATE_VERSION_CONFLICT') {
+        if (!shouldRetainIntent(error)) mutationCoordinator.resolve(intent.intentId);
+        throw error;
+      }
+
+      try {
+        const refreshed = await readState(scope);
+        const progress = refreshed.clientState.clientView.campaignProgress;
+        if (!progress.isCompleted) {
+          mutationCoordinator.resolve(intent.intentId);
+          throw createFlowError('CAMPAIGN_NOT_COMPLETED');
+        }
+        if (progress.isCompletionShown) {
+          mutationCoordinator.resolve(intent.intentId);
+          return { isCompletionShown: true, nextAction: NextAction.None };
+        }
+        const retryIntent = mutationCoordinator.beginOrRetry(descriptor);
+        const data = await sendMutationAttempt<ConfirmCampaignCompleteShownResponse>(
+          'API-015',
+          undefined,
+          retryIntent,
+          scope,
+        );
+        mutationCoordinator.resolve(retryIntent.intentId);
+        return data;
+      } catch (recoveryError) {
+        if (!shouldRetainIntent(recoveryError)) mutationCoordinator.resolve(intent.intentId);
+        throw recoveryError;
+      }
+    }
+  }
+
   return {
     async loadState(signal) {
       const scope = beginOperation(signal);
-      await mutate<ClientStateResponse>('bootstrap', undefined, scope, {}, signal);
+      await mutate<ClientStateResponse>('API-001', undefined, scope, {}, signal);
       return readState(scope, signal);
+    },
+
+    resyncState(signal) {
+      return readState(beginOperation(signal), signal);
     },
 
     enterLevel(state, signal) {
@@ -524,6 +705,10 @@ export function createP1Api(): P1Api {
       return inProgressLevel
         ? resumeLevel(inProgressLevel.levelId, scope, signal)
         : startLevel(state, scope, signal);
+    },
+
+    confirmNarrativeShown(chapterId, state, signal) {
+      return confirmNarrativeShown(chapterId, state, beginOperation(signal), signal);
     },
 
     useHint(levelId, signal) {
@@ -543,18 +728,18 @@ export function createP1Api(): P1Api {
     },
 
     updateSettings(body) {
-      return mutate<SettingsResponse>('update-settings', body, beginOperation());
+      return updateSettings(body, beginOperation());
     },
 
     async getAppearances() {
       const scope = beginOperation();
-      const response = await http.get<AppearanceCatalogResponse>(operationPath('appearances'));
+      const response = await http.get<AppearanceCatalogResponse>(operationPath('API-011'));
       return commitResponse(response, scope);
     },
 
     selectAppearance(appearanceId) {
       return mutate<SelectAppearanceResponse>(
-        'select-appearance',
+        'API-012',
         undefined,
         beginOperation(),
         { appearanceId },
@@ -567,14 +752,17 @@ export function createP1Api(): P1Api {
       const normalizedBody: SubmitFeedbackRequest = {
         source: body.source,
         rating: body.rating,
+        ...(body.source === 'chapter_completion' && body.chapterId
+          ? { chapterId: body.chapterId }
+          : {}),
         ...(comment ? { comment } : {}),
       };
-      const descriptor = { apiId: 'submit-feedback', body: normalizedBody };
+      const descriptor = { apiId: 'API-013', body: normalizedBody };
       const intent = mutationCoordinator.beginOrRetry(descriptor);
 
       try {
         const data = await sendMutationAttempt<SubmitFeedbackResponse>(
-          'submit-feedback',
+          'API-013',
           normalizedBody,
           intent,
           scope,
@@ -584,9 +772,81 @@ export function createP1Api(): P1Api {
         mutationCoordinator.resolve(intent.intentId);
         return data;
       } catch (error) {
-        if (!shouldRetainIntent(error)) mutationCoordinator.resolve(intent.intentId);
-        throw error;
+        if (errorType(error) !== 'STATE_VERSION_CONFLICT') {
+          if (!shouldRetainIntent(error)) mutationCoordinator.resolve(intent.intentId);
+          throw error;
+        }
+
+        try {
+          const refreshed = await readState(scope);
+          if (
+            normalizedBody.source === 'chapter_completion' &&
+            !refreshed.clientState.chapters.some(
+              (chapter) => chapter.chapterId === normalizedBody.chapterId,
+            )
+          ) {
+            throw error;
+          }
+          const retryIntent = mutationCoordinator.beginOrRetry(descriptor);
+          const data = await sendMutationAttempt<SubmitFeedbackResponse>(
+            'API-013',
+            normalizedBody,
+            retryIntent,
+            scope,
+          );
+          mutationCoordinator.resolve(retryIntent.intentId);
+          return data;
+        } catch (recoveryError) {
+          if (!shouldRetainIntent(recoveryError)) mutationCoordinator.resolve(intent.intentId);
+          throw recoveryError;
+        }
       }
+    },
+
+    async dismissFeedback(chapterId) {
+      const scope = beginOperation();
+      const descriptor = { apiId: 'API-014', params: { chapterId } };
+      const intent = mutationCoordinator.beginOrRetry(descriptor);
+      try {
+        const data = await sendMutationAttempt<DismissFeedbackResponse>(
+          'API-014',
+          undefined,
+          intent,
+          scope,
+          { chapterId },
+        );
+        mutationCoordinator.resolve(intent.intentId);
+        return data;
+      } catch (error) {
+        if (errorType(error) !== 'STATE_VERSION_CONFLICT') {
+          if (!shouldRetainIntent(error)) mutationCoordinator.resolve(intent.intentId);
+          throw error;
+        }
+
+        try {
+          const refreshed = await readState(scope);
+          if (!refreshed.clientState.chapters.some((chapter) => chapter.chapterId === chapterId)) {
+            throw error;
+          }
+          const retryIntent = mutationCoordinator.beginOrRetry(descriptor);
+          const data = await sendMutationAttempt<DismissFeedbackResponse>(
+            'API-014',
+            undefined,
+            retryIntent,
+            scope,
+            { chapterId },
+          );
+          mutationCoordinator.resolve(retryIntent.intentId);
+          return data;
+        } catch (recoveryError) {
+          if (!shouldRetainIntent(recoveryError)) mutationCoordinator.resolve(intent.intentId);
+          throw recoveryError;
+        }
+      }
+    },
+
+    confirmCampaignCompleteShown() {
+      return confirmCampaignCompleteShown(beginOperation());
     },
 
     claimReward(rewardId, body, signal) {

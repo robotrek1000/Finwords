@@ -1,0 +1,114 @@
+{
+  "schemaVersion": "1",
+  "id": "level-01",
+  "number": 1,
+  "chapterId": "chapter-01",
+  "chapterTitle": "Азбука денег",
+  "microtheme": "Покупка и сделка",
+  "rows": 3,
+  "cols": 3,
+  "desiredTurns": {
+    "min": 0,
+    "max": 1
+  },
+  "difficulty": "Начальная",
+  "sourceWords": [
+    "ЧЕК",
+    "ЛОТ",
+    "АКТ"
+  ],
+  "gridStatus": "TBD_AFTER_DATA_MODEL",
+  "contentStatus": "Draft",
+  "validation": "VALID",
+  "grid": [
+    [
+      "Т",
+      "Л",
+      "О"
+    ],
+    [
+      "К",
+      "К",
+      "Т"
+    ],
+    [
+      "А",
+      "Е",
+      "Ч"
+    ]
+  ],
+  "targets": [
+    {
+      "targetId": "target-01-01",
+      "order": 1,
+      "word": "ЧЕК",
+      "normalized": "ЧЕК",
+      "definition": "Документ, который подтверждает оплату товара или услуги.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 2,
+          "col": 2
+        },
+        {
+          "row": 2,
+          "col": 1
+        },
+        {
+          "row": 1,
+          "col": 1
+        }
+      ]
+    },
+    {
+      "targetId": "target-01-02",
+      "order": 2,
+      "word": "ЛОТ",
+      "normalized": "ЛОТ",
+      "definition": "Стандартное количество актива или товара, выставленное на одну сделку.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 0,
+          "col": 1
+        },
+        {
+          "row": 0,
+          "col": 2
+        },
+        {
+          "row": 1,
+          "col": 2
+        }
+      ]
+    },
+    {
+      "targetId": "target-01-03",
+      "order": 3,
+      "word": "АКТ",
+      "normalized": "АКТ",
+      "definition": "Документ, который фиксирует выполненную работу, передачу или установленный факт.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 2,
+          "col": 0
+        },
+        {
+          "row": 1,
+          "col": 0
+        },
+        {
+          "row": 0,
+          "col": 0
+        }
+      ]
+    }
+  ]
+}

@@ -1,40 +1,41 @@
 import { beforeEach, describe, expect, it } from 'vitest';
-import {
-  clearLegacyMockState,
-  createMockPersistence,
-  LEGACY_MOCK_STORAGE_KEY,
-} from './mockPersistence';
+import { createMockPersistence } from './mockPersistence';
 
-describe('standalone mock persistence boundary', () => {
-  beforeEach(() => window.localStorage.clear());
+const STORAGE_KEY = 'finwords:p1-mock-backend:v1';
 
-  it('clears and disables browser persistence', () => {
-    window.localStorage.setItem(LEGACY_MOCK_STORAGE_KEY, JSON.stringify({ progress: true }));
-    const persistence = createMockPersistence({
-      storage: window.localStorage,
-      storageKey: LEGACY_MOCK_STORAGE_KEY,
-      mode: 'browser',
-    });
-
-    expect(persistence.isDisabled).toBe(true);
-    expect(persistence.restore()).toBeNull();
-    persistence.save({ progress: true });
-    expect(window.localStorage.getItem(LEGACY_MOCK_STORAGE_KEY)).toBeNull();
+describe('P5 mock persistence mode', () => {
+  beforeEach(() => {
+    window.localStorage.clear();
   });
 
-  it('keeps persistence only in explicit test mode for migration coverage', () => {
+  it.each([
+    ['DEV mock with mockPersistence=off', true, 'mock', '?mockPersistence=off', true],
+    ['DEV real API with mockPersistence=off', true, 'http', '?mockPersistence=off', false],
+    ['production mock with mockPersistence=off', false, 'mock', '?mockPersistence=off', true],
+    ['production mock resets by default', false, 'mock', '', true],
+    ['normal mock URL', true, 'mock', '', false],
+  ] as const)('%s applies persistence boundary without affecting real API', (
+    _, isDev, apiMode, search, disabled,
+  ) => {
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify({ persisted: true }));
     const persistence = createMockPersistence({
       storage: window.localStorage,
-      storageKey: LEGACY_MOCK_STORAGE_KEY,
-      mode: 'test',
+      storageKey: STORAGE_KEY,
+      isDev,
+      apiMode,
+      search,
     });
-    persistence.save({ schemaVersion: 1 });
-    expect(persistence.restore()).toEqual({ schemaVersion: 1 });
-  });
 
-  it('safely removes the previous browser key at bootstrap', () => {
-    window.localStorage.setItem(LEGACY_MOCK_STORAGE_KEY, 'old progress');
-    clearLegacyMockState(window.localStorage);
-    expect(window.localStorage.getItem(LEGACY_MOCK_STORAGE_KEY)).toBeNull();
+    if (disabled) {
+      expect(persistence.restore()).toBeNull();
+      expect(window.localStorage.getItem(STORAGE_KEY)).toBeNull();
+      persistence.save({ persisted: false });
+      expect(window.localStorage.getItem(STORAGE_KEY)).toBeNull();
+      return;
+    }
+
+    expect(persistence.restore()).toEqual({ persisted: true });
+    persistence.save({ persisted: false });
+    expect(JSON.parse(window.localStorage.getItem(STORAGE_KEY) ?? '{}')).toEqual({ persisted: false });
   });
 });

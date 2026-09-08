@@ -5,8 +5,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type {
   BoardView,
   FoundTarget,
-} from '../../shared/demoTypes';
-import { CellViewStateEnum } from '../../shared/demoTypes';
+} from '../../infra/api/generated/data-contracts';
+import { CellViewStateEnum } from '../../infra/api/generated/data-contracts';
 import { BoardViewGameBoard } from './BoardViewGameBoard';
 
 vi.mock('motion/react', async (importOriginal) => {
@@ -321,7 +321,7 @@ describe('found-target presentation', () => {
   });
 });
 
-describe('course-linked АКЦИЯ pulse lifecycle', () => {
+describe('course-linked КУРС pulse lifecycle', () => {
   beforeEach(() => {
     vi.useFakeTimers();
     vi.mocked(useReducedMotion).mockReturnValue(false);
@@ -333,7 +333,7 @@ describe('course-linked АКЦИЯ pulse lifecycle', () => {
 
   const linkedTarget: FoundTarget = {
     targetId: '8f8fad5b-d9cb-469f-a165-808677289527',
-    word: 'АКЦИЯ',
+    word: 'КУРС',
     definition: 'Ценная бумага, которая подтверждает долю владения компанией.',
     foundAt: '2026-08-21T12:00:00.000Z',
     foundSequence: 1,
@@ -360,10 +360,11 @@ describe('course-linked АКЦИЯ pulse lifecycle', () => {
     ],
   };
 
-  it('does not pulse when АКЦИЯ is already found on initial mount/resume', () => {
+  it('does not pulse when КУРС is already found on initial mount/resume', () => {
     const { container } = render(
       <BoardViewGameBoard
         {...callbacks}
+        levelId={6}
         board={makeBoard(6)}
         foundTargets={[linkedTarget]}
       />,
@@ -379,6 +380,7 @@ describe('course-linked АКЦИЯ pulse lifecycle', () => {
     const { container, rerender } = render(
       <BoardViewGameBoard
         {...callbacks}
+        levelId={6}
         board={makeBoard(6)}
         foundTargets={[]}
       />,
@@ -387,6 +389,7 @@ describe('course-linked АКЦИЯ pulse lifecycle', () => {
     rerender(
       <BoardViewGameBoard
         {...callbacks}
+        levelId={6}
         board={makeBoard(6)}
         foundTargets={[linkedTarget]}
       />,
@@ -399,10 +402,11 @@ describe('course-linked АКЦИЯ pulse lifecycle', () => {
 
   });
 
-  it('pulses only the newly added АКЦИЯ target group when an ordinary target already exists', () => {
+  it('pulses only the newly added КУРС target group when an ordinary target already exists', () => {
     const { container, rerender } = render(
       <BoardViewGameBoard
         {...callbacks}
+        levelId={6}
         board={makeBoard(6)}
         foundTargets={[ordinaryTarget]}
       />,
@@ -411,6 +415,7 @@ describe('course-linked АКЦИЯ pulse lifecycle', () => {
     rerender(
       <BoardViewGameBoard
         {...callbacks}
+        levelId={6}
         board={makeBoard(6)}
         foundTargets={[ordinaryTarget, linkedTarget]}
       />,
@@ -428,6 +433,7 @@ describe('course-linked АКЦИЯ pulse lifecycle', () => {
     const { container, rerender } = render(
       <BoardViewGameBoard
         {...callbacks}
+        levelId={6}
         board={makeBoard(6)}
         foundTargets={[]}
       />,
@@ -436,6 +442,7 @@ describe('course-linked АКЦИЯ pulse lifecycle', () => {
     rerender(
       <BoardViewGameBoard
         {...callbacks}
+        levelId={6}
         board={makeBoard(6)}
         foundTargets={[linkedTarget]}
       />,
@@ -447,6 +454,7 @@ describe('course-linked АКЦИЯ pulse lifecycle', () => {
     rerender(
       <BoardViewGameBoard
         {...callbacks}
+        levelId={6}
         board={makeBoard(6)}
         foundTargets={[linkedTarget, ordinaryTarget]}
       />,
@@ -465,6 +473,7 @@ describe('course-linked АКЦИЯ pulse lifecycle', () => {
     const { container } = render(
       <BoardViewGameBoard
         {...callbacks}
+        levelId={6}
         board={makeBoard(6)}
         foundTargets={[ordinaryTarget]}
       />,
@@ -481,6 +490,7 @@ describe('course-linked АКЦИЯ pulse lifecycle', () => {
     const { container, rerender } = render(
       <BoardViewGameBoard
         {...callbacks}
+        levelId={6}
         board={makeBoard(6)}
         foundTargets={[]}
       />,
@@ -489,6 +499,7 @@ describe('course-linked АКЦИЯ pulse lifecycle', () => {
     rerender(
       <BoardViewGameBoard
         {...callbacks}
+        levelId={6}
         board={makeBoard(6)}
         foundTargets={[linkedTarget]}
       />,
@@ -500,4 +511,19 @@ describe('course-linked АКЦИЯ pulse lifecycle', () => {
     expect(group).not.toHaveAttribute('data-pulse-iterations');
     expect(group).not.toHaveAttribute('data-pulse-duration-ms');
   });
+});
+
+it.each(['pointer', 'keyboard'] as const)('does not clear a new %s gesture when the previous route hold expires', (input) => {
+  const props = { ...callbacks, board: makeBoard(3), foundTargets: [], revealedCells: [] };
+  const view = render(<BoardViewGameBoard {...props} retainSelection={false} />);
+  const cells = () => [document.querySelector('[data-cell-id="1:1"]')!, document.querySelector('[data-cell-id="1:2"]')!];
+  fireEvent.keyDown(cells()[0], { key: ' ' });
+  fireEvent.keyDown(cells()[0], { key: 'ArrowRight' });
+  fireEvent.keyDown(cells()[1], { key: 'Enter' });
+  view.rerender(<BoardViewGameBoard {...props} retainSelection />);
+  if (input === 'pointer') fireEvent.pointerDown(cells()[0], { pointerId: 17 });
+  else fireEvent.keyDown(cells()[0], { key: ' ' });
+  view.rerender(<BoardViewGameBoard {...props} retainSelection={false} />);
+  expect(cells()[0]).toHaveAttribute('aria-pressed', 'true');
+  expect(cells()[1]).toHaveAttribute('aria-pressed', 'false');
 });

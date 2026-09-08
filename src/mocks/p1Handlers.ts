@@ -7,7 +7,10 @@ import type {
   CellRef,
   ClaimRewardResponse,
   ClientStateResponse,
+  ConfirmCampaignCompleteShownResponse,
+  ConfirmNarrativeShownResponse,
   CourseOffer,
+  DismissFeedbackResponse,
   FoundTarget,
   HintUseResponse,
   LevelPlayResponse,
@@ -18,9 +21,8 @@ import type {
   SettingsResponse,
   SubmitFeedbackResponse,
   UpdateSettingsRequest,
-} from '../shared/demoTypes';
+} from '../infra/api/generated/data-contracts';
 import {
-  AppearanceRarityEnum,
   AppearanceTypeEnum,
   CellViewStateEnum,
   ChapterProgressStatusEnum,
@@ -44,30 +46,47 @@ import {
   RouteSubmissionResponseResultEnum3,
   SelectAppearanceResponseTypeEnum,
   SubmitFeedbackResponseStatusEnum,
-} from '../shared/demoTypes';
-import { operationRegistry, toMswPath } from '../infra/api/operationRegistry';
-import { LEVELS } from '../content/levels';
-import { assetUrl } from '../shared/assetUrl';
+} from '../infra/api/generated/data-contracts';
+import { operationRegistry } from '../infra/api/operationRegistry';
+import { CAMPAIGN_CHAPTERS, LEVELS } from '../content/campaign';
+import {
+  type AppearanceAssetId,
+  MOCK_APPEARANCE_IDENTITIES,
+  createMockAppearanceCatalog,
+  nextUnlockAppearance,
+} from './appearanceCatalog';
+import { toMswPath } from './handlerFactory';
 import {
   createMockPersistence,
   type MockPersistence,
   type MockPersistenceRuntimeOptions,
 } from './mockPersistence';
 
-const CHARACTER_IDS = Array.from(
-  { length: 8 },
-  (_, index) => `1f8fad5b-d9cb-469f-a165-8086772895${10 + index}`,
-);
-const BACKGROUND_IDS = Array.from(
-  { length: 6 },
-  (_, index) => `2f8fad5b-d9cb-469f-a165-8086772895${20 + index}`,
-);
+const CHARACTER_IDS = MOCK_APPEARANCE_IDENTITIES
+  .filter((item) => item.type === AppearanceTypeEnum.Character)
+  .map((item) => item.appearanceId);
+const BACKGROUND_IDS = MOCK_APPEARANCE_IDENTITIES
+  .filter((item) => item.type === AppearanceTypeEnum.Background)
+  .map((item) => item.appearanceId);
 const REWARD_ID = '3f8fad5b-d9cb-469f-a165-808677289530';
 const CHAPTER_GOLDEN_REWARD_ID = 'af8fad5b-d9cb-469f-a165-8086772895aa';
-const LEVEL_ID = '4f8fad5b-d9cb-469f-a165-808677289500';
-const LEVEL_VERSION_ID = '5f8fad5b-d9cb-469f-a165-808677289513';
-const LEVEL_GRID = LEVELS[1].grid;
-const LEVEL1_COURSE_OFFER_TARGET_WORD = 'АКЦИЯ';
+const CHAPTER_GOLDEN_REWARD_IDS = [
+  CHAPTER_GOLDEN_REWARD_ID,
+  'af8fad5b-d9cb-469f-a165-8086772895ab',
+  'af8fad5b-d9cb-469f-a165-8086772895ac',
+  'af8fad5b-d9cb-469f-a165-8086772895ad',
+  'af8fad5b-d9cb-469f-a165-8086772895ae',
+  'af8fad5b-d9cb-469f-a165-8086772895af',
+  'af8fad5b-d9cb-469f-a165-8086772895b0',
+];
+const LEVEL_IDS = Array.from(
+  { length: 50 },
+  (_, index) => `4f8fad5b-d9cb-469f-a165-${String(808677289500 + index)}`,
+);
+const LEVEL_VERSION_IDS = Array.from(
+  { length: 50 },
+  (_, index) => `5f8fad5b-d9cb-469f-a165-${String(808677289510 + index)}`,
+);
 const LEVEL1_COURSE_OFFER: CourseOffer = {
   courseId: '6f8fad5b-d9cb-469f-a165-80867728951e',
   locale: 'ru-RU',
@@ -75,10 +94,10 @@ const LEVEL1_COURSE_OFFER: CourseOffer = {
   title: 'АКЦИЯ',
 };
 const PERSISTED_STATE_KEY = 'finwords:p1-mock-backend:v1';
-const PERSISTED_STATE_VERSION = 6;
+const PERSISTED_STATE_VERSION = 8;
 const REGULAR_REWARD_THRESHOLDS = [4, 6, 8, 10] as const;
 
-interface Level1Target {
+interface CampaignTarget {
   slug: string;
   targetId: string;
   word: string;
@@ -86,77 +105,23 @@ interface Level1Target {
   cells: CellRef[];
 }
 
-const LEVEL1_TARGET_API_IDS: Record<string, string> = {
-  fund: '7f8fad5b-d9cb-469f-a165-808677289501',
-  capital: '7f8fad5b-d9cb-469f-a165-808677289502',
-  stock: '7f8fad5b-d9cb-469f-a165-808677289503',
-  risk: '7f8fad5b-d9cb-469f-a165-808677289504',
-  market: '7f8fad5b-d9cb-469f-a165-808677289505',
-  index: '7f8fad5b-d9cb-469f-a165-808677289506',
-  income: '7f8fad5b-d9cb-469f-a165-808677289507',
-};
-
 function cellIdToCellRef(cellId: string): CellRef {
   const [row, col] = cellId.split(':');
   return { row: Number(row) - 1, col: Number(col) - 1 };
 }
 
-const LEVEL1_TARGETS: Level1Target[] = LEVELS[1].targets.map((target) => ({
-  slug: target.id,
-  targetId: LEVEL1_TARGET_API_IDS[target.id]!,
-  word: target.word,
-  definition: target.definition,
-  cells: target.path.map(cellIdToCellRef),
-}));
-
-const LEVEL1_BONUS_WORDS = LEVELS[1].bonusWords;
-
-const chapterTitles = [
-  'Финансовая подушка',
-  'Финансовая подушка',
-  'Морская торговля',
-  'История капитала',
-  'Мир бизнеса',
-  'Акции и компании',
-  'Финансовая свобода',
-];
-const chapterSizes = [9, 8, 7, 7, 7, 6, 6];
-const characterTitles = [
-  'Классический аналитик',
-  'Риск-менеджер',
-  'Штурман',
-  'Исследователь',
-  'Инвестор',
-  'Авантюрист',
-  'Капитан',
-  'Адмирал',
-];
-const characterAssets = [
-  'character-analyst.png',
-  'character-risk-manager.png',
-  'character-navigator.png',
-  'character-researcher.png',
-  'character-investor.png',
-  'character-adventurer.png',
-  'character-captain.png',
-  'character-admiral.png',
-];
-const backgroundTitles = [
-  'По умолчанию',
-  'Каюта',
-  'Порт',
-  'Открытое море',
-  'Деловая гавань',
-  'Мостик',
-];
-const backgroundAssets = [
-  'pattern-default.svg',
-  'pattern-cabin.svg',
-  'pattern-port.svg',
-  'pattern-open-sea.svg',
-  'pattern-business-harbor.svg',
-  'pattern-bridge.svg',
-];
+const CAMPAIGN_TARGETS = Object.fromEntries(
+  Object.values(LEVELS).map((level) => [
+    level.id,
+    level.targets.map((target, index): CampaignTarget => ({
+      slug: target.id,
+      targetId: `7f8fad5b-d9cb-469f-a165-${String(808677280000 + level.id * 100 + index)}`,
+      word: target.word,
+      definition: target.definition,
+      cells: target.path.map(cellIdToCellRef),
+    })),
+  ]),
+) as Record<number, CampaignTarget[]>;
 
 function apiPath(apiId: string): string {
   const operation = operationRegistry.find((candidate) => candidate.apiId === apiId);
@@ -165,39 +130,22 @@ function apiPath(apiId: string): string {
 }
 
 function makeAppearances(): Appearance[] {
-  const characters: Appearance[] = CHARACTER_IDS.map((appearanceId, index) => ({
-    appearanceId,
-    type: AppearanceTypeEnum.Character,
-    rarity: index === 0 ? AppearanceRarityEnum.Base : AppearanceRarityEnum.Regular,
-    title: characterTitles[index],
-    description: 'Персонаж коллекции Финвордов',
-    imageUrl: assetUrl(`assets/p1/${characterAssets[index]}`),
-    isOwned: index < 2,
-    isSelected: index === 0,
-    ...(index < 2 ? { unlockedAt: '2026-08-20T08:00:00.000Z' } : {}),
-  }));
-  const backgrounds: Appearance[] = BACKGROUND_IDS.map((appearanceId, index) => ({
-    appearanceId,
-    type: AppearanceTypeEnum.Background,
-    rarity: index === 0 ? AppearanceRarityEnum.Base : AppearanceRarityEnum.Regular,
-    title: backgroundTitles[index],
-    description: 'Фон коллекции Финвордов',
-    imageUrl: assetUrl(`assets/p1/${backgroundAssets[index]}`),
-    isOwned: index === 0,
-    isSelected: index === 0,
-    ...(index === 0 ? { unlockedAt: '2026-08-20T08:00:00.000Z' } : {}),
-  }));
-  return [...characters, ...backgrounds];
+  return createMockAppearanceCatalog();
 }
 
 interface P1FakeDbOptions {
   pendingReward?: boolean;
   chapterCompletion?: boolean;
+  campaignBoundaryLevel?: 9 | 17 | 24 | 31 | 38 | 44 | 50;
   hintBalance?: number;
   regularRewardCycle?: number;
   regularRewardProgress?: number;
   gameUnavailable?: boolean;
   clientNotFound?: boolean;
+  feedbackPreviouslyDismissed?: boolean;
+  firstRunCompleted?: boolean;
+  ownedAppearanceAssetIds?: readonly AppearanceAssetId[];
+  failAppearanceSelectionOnce?: boolean;
 }
 
 function regularRewardId(cycle: number): string {
@@ -220,13 +168,14 @@ function makeCollectingRegularReward(cycle: number, current = 0): RewardSummary 
 }
 
 function makeAvailableRegularReward(cycle: number, current: number): RewardSummary {
+  const decoration = nextUnlockAppearance(appearances, 'regular');
   return {
     rewardId: regularRewardId(cycle),
     rewardType: RewardSummaryRewardTypeEnum.Regular,
     status: RewardSummaryStatusEnum.Available,
     availableAt: '2026-08-21T12:02:00.000Z',
     hintOptionAmount: 1,
-    decorationOptionId: CHARACTER_IDS[2],
+    ...(decoration ? { decorationOptionId: decoration.appearanceId } : {}),
     progress: { current, threshold: regularRewardThreshold(cycle) },
     options: [
       {
@@ -234,12 +183,15 @@ function makeAvailableRegularReward(cycle: number, current: number): RewardSumma
         amount: 1,
         title: 'Подсказка',
       },
-      {
+      ...(decoration ? [{
         optionType: RewardOptionOptionTypeEnum.Decoration,
-        optionId: CHARACTER_IDS[2],
-        title: characterTitles[2],
-        decorationType: RewardOptionDecorationTypeEnum.Character,
-      },
+        optionId: decoration.appearanceId,
+        title: decoration.title,
+        imageUrl: decoration.imageUrl,
+        decorationType: decoration.type === AppearanceTypeEnum.Character
+          ? RewardOptionDecorationTypeEnum.Character
+          : RewardOptionDecorationTypeEnum.Background,
+      }] : []),
     ],
   };
 }
@@ -247,42 +199,65 @@ function makeAvailableRegularReward(cycle: number, current: number): RewardSumma
 function makeClientState(options: P1FakeDbOptions = {}): ClientStateResponse {
   const regularCycle = options.regularRewardCycle ?? 0;
   const regularProgress = options.regularRewardProgress ?? 0;
+  const activeLevelNumber = options.campaignBoundaryLevel ?? (options.chapterCompletion ? 9 : 1);
+  const completedKnowledge = Array.from(
+    { length: activeLevelNumber - 1 },
+    (_unused, index) => LEVELS[index + 1].targets.length,
+  ).reduce((total, count) => total + count, 0);
   const levels = Array.from({ length: 50 }, (_, index) => ({
-    levelId:
-      index === 0
-        ? LEVEL_ID
-        : `4f8fad5b-d9cb-469f-a165-80867728${String(9500 + index)}`,
+    levelId: LEVEL_IDS[index],
     status:
-      index === 0
-        ? LevelProgressSummaryStatusEnum.Available
-        : LevelProgressSummaryStatusEnum.Locked,
+      index + 1 < activeLevelNumber
+        ? LevelProgressSummaryStatusEnum.Completed
+        : index + 1 === activeLevelNumber
+          ? LevelProgressSummaryStatusEnum.Available
+          : LevelProgressSummaryStatusEnum.Locked,
+    ...(index + 1 < activeLevelNumber
+      ? { completedAt: '2026-08-21T11:00:00.000Z' }
+      : {}),
   }));
   return {
     clientState: {
       clientView: {
-        balance: { knowledgePoints: 0, hintBalance: options.hintBalance ?? 5 },
+        balance: { knowledgePoints: completedKnowledge, hintBalance: options.hintBalance ?? 5 },
         settings: {
           musicEnabled: true,
           soundEnabled: true,
-          tutorialCompleted: true,
+          tutorialCompleted:
+            options.firstRunCompleted === true || activeLevelNumber > 1,
         },
         selectedCharacterId: CHARACTER_IDS[0],
         selectedBackgroundId: BACKGROUND_IDS[0],
         campaignProgress: { isCompleted: false, isCompletionShown: false },
       },
-      chapters: chapterTitles.map((title, index) => ({
-        chapterId: `5f8fad5b-d9cb-469f-a165-80867728954${index}`,
-        number: index + 1,
-        title,
-        imageUrl: assetUrl(`assets/p1/chapter-${String(index + 1).padStart(2, '0')}.png`),
-        status:
-          index === 0
-            ? ChapterProgressStatusEnum.InProgress
-            : ChapterProgressStatusEnum.Locked,
-        completedLevels: index === 0 && options.chapterCompletion ? 8 : 0,
-        totalLevels: chapterSizes[index],
-        isNarrativeShown: true,
-      })),
+      chapters: CAMPAIGN_CHAPTERS.map((chapter, index) => {
+        const totalLevels = chapter.levelEnd - chapter.levelStart + 1;
+        const isCompleted = chapter.levelEnd < activeLevelNumber;
+        const isActive = activeLevelNumber >= chapter.levelStart && activeLevelNumber <= chapter.levelEnd;
+        const completedLevels = isCompleted
+          ? totalLevels
+          : isActive
+            ? activeLevelNumber - chapter.levelStart
+            : 0;
+        const isNarrativeShown = isCompleted || (
+          isActive && (options.firstRunCompleted === true || activeLevelNumber > 1)
+        );
+        return {
+          chapterId: `5f8fad5b-d9cb-469f-a165-80867728954${index}`,
+          number: chapter.number,
+          title: chapter.title,
+          imageUrl: `${import.meta.env.BASE_URL}assets/p1/chapter-${String(index + 1).padStart(2, '0')}.png`,
+          status: isCompleted
+            ? ChapterProgressStatusEnum.Completed
+            : isActive
+              ? ChapterProgressStatusEnum.InProgress
+              : ChapterProgressStatusEnum.Locked,
+          completedLevels,
+          totalLevels,
+          isNarrativeShown,
+          ...(!isNarrativeShown && isActive ? { narrativeText: chapter.narrative } : {}),
+        };
+      }),
       levels,
       rewards: [
         options.pendingReward
@@ -296,8 +271,8 @@ function makeClientState(options: P1FakeDbOptions = {}): ClientStateResponse {
 }
 
 let version = 1;
-let state = makeClientState();
 let appearances = makeAppearances();
+let state = makeClientState();
 let levelPlay: LevelPlayResponse | null = null;
 let resultsSnapshot: LevelResultsResponse | null = null;
 let resultsAcknowledgedAt: string | null = null;
@@ -306,8 +281,13 @@ let gameUnavailableScenario = false;
 let clientNotFoundScenario = false;
 let claimedRewardIds = new Set<string>();
 let regularRewardCycle = 0;
+let feedbackSubmittedGlobally = false;
+let feedbackEligibleChapterId: string | null = null;
+let feedbackPromptDismissals = new Map<string, string>();
+let failAppearanceSelectionOnce = false;
+let persistenceRestoreError: string | null = null;
 
-type ReplayApiId = 'bootstrap' | 'start-level' | 'submit-route' | 'use-hint' | 'submit-feedback' | 'acknowledge-results';
+type ReplayApiId = 'API-001' | 'API-003' | 'API-004' | 'API-006' | 'API-007' | 'API-010' | 'API-013' | 'API-014' | 'API-015' | 'API-017';
 
 let p2Replays = new Map<
   string,
@@ -347,6 +327,9 @@ interface PersistedP1FakeDb {
   clientNotFoundScenario: boolean;
   claimedRewardIds: string[];
   regularRewardCycle: number;
+  feedbackSubmittedGlobally: boolean;
+  feedbackEligibleChapterId: string | null;
+  feedbackPromptDismissals: Array<[string, string]>;
   p2Replays: PersistedP2Replay[];
   rewardReplays: PersistedRewardReplay[];
 }
@@ -363,10 +346,19 @@ function getBrowserStorage(): Storage | null {
 function createP1MockPersistence(
   overrides: Partial<MockPersistenceRuntimeOptions> = {},
 ): MockPersistence {
+  const runtimeConfig = typeof window === 'undefined'
+    ? undefined
+    : window.__FINWORDS_RUNTIME_CONFIG__;
+  const runtimeApiMode = runtimeConfig && 'apiMode' in runtimeConfig &&
+    typeof runtimeConfig.apiMode === 'string'
+    ? runtimeConfig.apiMode
+    : 'mock';
   return createMockPersistence({
     storage: getBrowserStorage(),
     storageKey: PERSISTED_STATE_KEY,
-    mode: overrides.mode ?? (import.meta.env.MODE === 'test' ? 'test' : 'browser'),
+    isDev: overrides.isDev ?? import.meta.env.DEV,
+    apiMode: overrides.apiMode ?? runtimeApiMode,
+    search: overrides.search ?? (typeof window === 'undefined' ? '' : window.location.search),
   });
 }
 
@@ -393,6 +385,9 @@ function persistFakeDb(): void {
     clientNotFoundScenario,
     claimedRewardIds: [...claimedRewardIds],
     regularRewardCycle,
+    feedbackSubmittedGlobally,
+    feedbackEligibleChapterId,
+    feedbackPromptDismissals: [...feedbackPromptDismissals.entries()],
     p2Replays: [...p2Replays.entries()].map(([key, replay]) => ({ key, ...replay })),
     rewardReplays: [...rewardReplays.entries()].map(([key, replay]) => ({ key, ...replay })),
   };
@@ -598,6 +593,11 @@ function isSubmitFeedbackResponse(value: unknown): value is SubmitFeedbackRespon
     value.status === SubmitFeedbackResponseStatusEnum.Submitted && typeof value.nextAction === 'string';
 }
 
+function isDismissFeedbackResponse(value: unknown): value is DismissFeedbackResponse {
+  return isRecord(value) && isUuid(value.chapterId) &&
+    typeof value.feedbackPromptShownAt === 'string' && typeof value.nextAction === 'string';
+}
+
 function isAcknowledgeLevelResultsResponse(value: unknown): value is AcknowledgeLevelResultsResponse {
   return isRecord(value) && isUuid(value.levelId) && typeof value.resultsAcknowledgedAt === 'string' &&
     value.resultsState === AcknowledgeLevelResultsResponseResultsStateEnum.Acknowledged &&
@@ -606,53 +606,83 @@ function isAcknowledgeLevelResultsResponse(value: unknown): value is Acknowledge
       (isRecord(value.pendingReward) && isUuid(value.pendingReward.rewardId)));
 }
 
+function isConfirmCampaignCompleteShownResponse(
+  value: unknown,
+): value is ConfirmCampaignCompleteShownResponse {
+  return isRecord(value) && value.isCompletionShown === true && value.nextAction === NextAction.None;
+}
+
 function replayApiId(key: string): ReplayApiId | undefined {
   const separator = key.indexOf(':');
   if (separator <= 0 || separator === key.length - 1) return undefined;
   const apiId = key.slice(0, separator) as ReplayApiId;
-  return ['bootstrap', 'start-level', 'submit-route', 'use-hint', 'submit-feedback', 'acknowledge-results'].includes(apiId)
+  return ['API-001', 'API-003', 'API-004', 'API-006', 'API-007', 'API-010', 'API-013', 'API-014', 'API-015', 'API-017'].includes(apiId)
     ? apiId
     : undefined;
 }
 
 function isReplayDescriptor(apiId: ReplayApiId, descriptor: string, body: unknown): boolean {
   switch (apiId) {
-    case 'bootstrap':
+    case 'API-001':
       return descriptor === 'bootstrap:no-body' && isClientState(body);
-    case 'start-level':
+    case 'API-003':
+      return descriptor.startsWith('narrative:') && isUuid(descriptor.slice('narrative:'.length)) &&
+        isRecord(body) && body.chapterId === descriptor.slice('narrative:'.length) &&
+        body.isNarrativeShown === true && typeof body.nextAction === 'string';
+    case 'API-004':
       return isUuid(descriptor.slice('start:'.length)) && descriptor.startsWith('start:') &&
         isLevelPlay(body);
-    case 'submit-route': {
+    case 'API-006': {
       const match = /^route:([^:]+):(?:\d+:\d+)(?:\|\d+:\d+)*$/.exec(descriptor);
       return match !== null && isUuid(match[1]) && isRouteSubmissionResponse(body);
     }
-    case 'use-hint':
+    case 'API-007':
       return descriptor.startsWith('hint:') && isUuid(descriptor.slice('hint:'.length)) &&
         isHintUseResponse(body);
-    case 'submit-feedback':
-      return isNormalizedSettingsFeedbackDescriptor(descriptor) && isSubmitFeedbackResponse(body);
-    case 'acknowledge-results':
+    case 'API-010':
+      return /^settings:music=(?:true|false|-):sound=(?:true|false|-)$/.test(descriptor) &&
+        descriptor !== 'settings:music=-:sound=-' &&
+        isRecord(body) &&
+        typeof body.musicEnabled === 'boolean' &&
+        typeof body.soundEnabled === 'boolean' &&
+        typeof body.tutorialCompleted === 'boolean' &&
+        Object.keys(body).every((field) =>
+          ['musicEnabled', 'soundEnabled', 'tutorialCompleted'].includes(field));
+    case 'API-013':
+      return isNormalizedFeedbackDescriptor(descriptor) && isSubmitFeedbackResponse(body);
+    case 'API-014':
+      return descriptor.startsWith('dismiss-feedback:') && descriptor.endsWith(':no-body') &&
+        isUuid(descriptor.slice('dismiss-feedback:'.length, -':no-body'.length)) &&
+        isDismissFeedbackResponse(body);
+    case 'API-015':
+      return descriptor === 'campaign-completion:no-body' &&
+        isConfirmCampaignCompleteShownResponse(body);
+    case 'API-017':
       return descriptor.startsWith('acknowledge:') && descriptor.endsWith(':no-body') &&
         isUuid(descriptor.slice('acknowledge:'.length, -':no-body'.length)) &&
         isAcknowledgeLevelResultsResponse(body);
   }
 }
 
-function isNormalizedSettingsFeedbackDescriptor(descriptor: string): boolean {
+function isNormalizedFeedbackDescriptor(descriptor: string): boolean {
   if (!descriptor.startsWith('feedback:')) return false;
   try {
     const body = JSON.parse(descriptor.slice('feedback:'.length)) as unknown;
-    if (!isRecord(body) || body.source !== 'settings' || typeof body.rating !== 'number' ||
+    if (!isRecord(body) || (body.source !== 'settings' && body.source !== 'chapter_completion') ||
+      typeof body.rating !== 'number' ||
       !Number.isInteger(body.rating) || body.rating < 1 || body.rating > 5 ||
       (body.comment !== undefined && typeof body.comment !== 'string')) {
       return false;
     }
     const fields = Object.keys(body);
-    if (fields.some((field) => field !== 'source' && field !== 'rating' && field !== 'comment')) {
+    if (fields.some((field) => !['source', 'chapterId', 'rating', 'comment'].includes(field))) {
       return false;
     }
+    if (body.source === 'chapter_completion' && !isUuid(body.chapterId)) return false;
+    if (body.source === 'settings' && body.chapterId !== undefined) return false;
     const normalized = {
-      source: 'settings',
+      source: body.source,
+      ...(body.source === 'chapter_completion' ? { chapterId: body.chapterId } : {}),
       rating: body.rating,
       ...(typeof body.comment === 'string' ? { comment: body.comment } : {}),
     };
@@ -707,7 +737,9 @@ function migrateFoundTargets(value: unknown): unknown {
   if (!Array.isArray(value)) return value;
   return value.map((target, index) => {
     if (!isRecord(target)) return target;
-    const matchingTargets = LEVEL1_TARGETS.filter((candidate) => candidate.word === target.word);
+    const matchingTargets = Object.values(CAMPAIGN_TARGETS)
+      .flat()
+      .filter((candidate) => candidate.word === target.word);
     const configuredTarget = matchingTargets.length === 1 ? matchingTargets[0] : undefined;
     return {
       ...target,
@@ -721,37 +753,85 @@ function isSameCell(left: CellRef, right: CellRef): boolean {
   return left.row === right.row && left.col === right.col;
 }
 
-function inferLegacyHintTarget(revealedCells: unknown): Level1Target | undefined {
+function inferLegacyHintTarget(revealedCells: unknown, levelNumber?: number): CampaignTarget | undefined {
   if (!Array.isArray(revealedCells) || revealedCells.length === 0 || !revealedCells.every(isCellRef)) {
     return undefined;
   }
   const cells = revealedCells as CellRef[];
-  const prefixMatches = LEVEL1_TARGETS.filter((target) =>
+  const migrationTargets = levelNumber && CAMPAIGN_TARGETS[levelNumber]
+    ? CAMPAIGN_TARGETS[levelNumber]
+    : Object.values(CAMPAIGN_TARGETS).flat();
+  const prefixMatches = migrationTargets.filter((target) =>
     target.cells.length >= cells.length && cells.every((cell, index) => isSameCell(cell, target.cells[index])),
   );
   if (prefixMatches.length === 1) return prefixMatches[0];
   if (prefixMatches.length > 1) return undefined;
 
-  const subsetMatches = LEVEL1_TARGETS.filter((target) =>
+  const subsetMatches = migrationTargets.filter((target) =>
     cells.every((cell) => target.cells.some((targetCell) => isSameCell(cell, targetCell))),
   );
   return subsetMatches.length === 1 ? subsetMatches[0] : undefined;
 }
 
-function migrateLegacyHintState(value: unknown): unknown {
+function migrateLegacyHintState(value: unknown, levelNumber?: number): unknown {
   if (!isRecord(value)) return value;
-  const target = inferLegacyHintTarget(value.revealedCells);
+  const target = inferLegacyHintTarget(value.revealedCells, levelNumber);
   return target ? { targetId: target.targetId, revealedCells: value.revealedCells } : undefined;
 }
 
+function migrateCampaignState(value: unknown): unknown {
+  if (!isRecord(value) || !isRecord(value.clientState)) return value;
+  const fresh = makeClientState().clientState;
+  const existingLevels = Array.isArray(value.clientState.levels)
+    ? value.clientState.levels
+    : [];
+  const levels = fresh.levels.map((base, index) => {
+    const existing = isRecord(existingLevels[index]) ? existingLevels[index] : undefined;
+    return existing ? { ...base, ...existing, levelId: base.levelId } : base;
+  });
+  if (
+    levels[0]?.status === LevelProgressSummaryStatusEnum.Completed
+    && levels[1]?.status === LevelProgressSummaryStatusEnum.Locked
+  ) {
+    levels[1] = { ...levels[1], status: LevelProgressSummaryStatusEnum.Available };
+  }
+
+  const existingChapters = Array.isArray(value.clientState.chapters)
+    ? value.clientState.chapters
+    : [];
+  const chapters = fresh.chapters.map((base, index) => {
+    const existing = isRecord(existingChapters[index]) ? existingChapters[index] : undefined;
+    return existing ? {
+      ...base,
+      ...existing,
+      number: base.number,
+      title: base.title,
+      totalLevels: base.totalLevels,
+      narrativeText: base.narrativeText,
+    } : base;
+  });
+  return {
+    ...value,
+    clientState: {
+      ...fresh,
+      ...value.clientState,
+      chapters,
+      levels,
+    },
+  };
+}
+
 function migratePersistedFakeDb(value: unknown): unknown {
-  if (!isRecord(value) || (value.schemaVersion !== 4 && value.schemaVersion !== 5)) return value;
+  if (!isRecord(value) || ![4, 5, 6, 7].includes(Number(value.schemaVersion))) return value;
 
   const levelPlayValue = value.schemaVersion === 4 && isRecord(value.levelPlay)
     ? {
         ...value.levelPlay,
         foundTargets: migrateFoundTargets(value.levelPlay.foundTargets),
-        hintState: migrateLegacyHintState(value.levelPlay.hintState),
+        hintState: migrateLegacyHintState(
+          value.levelPlay.hintState,
+          typeof value.levelPlay.levelNumber === 'number' ? value.levelPlay.levelNumber : undefined,
+        ),
       }
     : value.levelPlay;
   const resultsSnapshotValue = value.schemaVersion === 4 && isRecord(value.resultsSnapshot)
@@ -791,7 +871,7 @@ function migratePersistedFakeDb(value: unknown): unknown {
   const p2Replays = Array.isArray(value.p2Replays)
     ? value.p2Replays.map((replay) => {
         if (!isRecord(replay) || typeof replay.key !== 'string' ||
-          !replay.key.startsWith('submit-route:') ||
+          !replay.key.startsWith('API-006:') ||
           typeof replay.descriptor !== 'string' || !replayLevelId ||
           !replay.descriptor.startsWith('route:') ||
           replay.descriptor.startsWith(`route:${replayLevelId}:`)) {
@@ -804,13 +884,16 @@ function migratePersistedFakeDb(value: unknown): unknown {
   return {
     ...value,
     schemaVersion: PERSISTED_STATE_VERSION,
-    state: stateValue,
+    state: migrateCampaignState(stateValue),
     levelPlay: levelPlayValue,
     resultsSnapshot: resultsSnapshotValue,
     regularRewardCycle: value.schemaVersion === 4 ? 0 : value.regularRewardCycle,
     p2Replays,
     gameUnavailableScenario: value.schemaVersion === 5 ? false : value.gameUnavailableScenario,
     clientNotFoundScenario: value.schemaVersion === 5 ? false : value.clientNotFoundScenario,
+    feedbackSubmittedGlobally: false,
+    feedbackEligibleChapterId: null,
+    feedbackPromptDismissals: [],
   };
 }
 
@@ -836,6 +919,11 @@ function isPersistedP1FakeDb(value: unknown): value is PersistedP1FakeDb {
     typeof value.clientNotFoundScenario === 'boolean' &&
     Array.isArray(value.claimedRewardIds) && value.claimedRewardIds.every(isUuid) &&
     isNonNegativeInteger(value.regularRewardCycle) &&
+    typeof value.feedbackSubmittedGlobally === 'boolean' &&
+    (value.feedbackEligibleChapterId === null || isUuid(value.feedbackEligibleChapterId)) &&
+    Array.isArray(value.feedbackPromptDismissals) && value.feedbackPromptDismissals.every(
+      (entry) => Array.isArray(entry) && entry.length === 2 && isUuid(entry[0]) && typeof entry[1] === 'string',
+    ) &&
     Array.isArray(value.p2Replays) && value.p2Replays.every(isP2Replay) &&
     Array.isArray(value.rewardReplays) && value.rewardReplays.every(isRewardReplay) &&
     hasConsistentPersistedPointers(value as unknown as PersistedP1FakeDb);
@@ -880,9 +968,11 @@ function restoreFakeDb(): void {
     if (!rawState) return;
     const persisted = migratePersistedFakeDb(rawState);
     if (!isPersistedP1FakeDb(persisted)) {
-      clearPersistedFakeDb();
+      persistenceRestoreError = 'Persisted mock state is incompatible with campaign schema 8.';
       return;
     }
+
+    persistenceRestoreError = null;
 
     version = persisted.version;
     state = persisted.state;
@@ -895,6 +985,9 @@ function restoreFakeDb(): void {
     clientNotFoundScenario = persisted.clientNotFoundScenario;
     claimedRewardIds = new Set(persisted.claimedRewardIds);
     regularRewardCycle = persisted.regularRewardCycle;
+    feedbackSubmittedGlobally = persisted.feedbackSubmittedGlobally;
+    feedbackEligibleChapterId = persisted.feedbackEligibleChapterId;
+    feedbackPromptDismissals = new Map(persisted.feedbackPromptDismissals);
     p2Replays = new Map(
       persisted.p2Replays.map(({ key, descriptor, body, etag }) => [
         key,
@@ -907,23 +1000,28 @@ function restoreFakeDb(): void {
         { descriptor, body, response, etag },
       ]),
     );
-  } catch {
-    clearPersistedFakeDb();
+  } catch (error) {
+    persistenceRestoreError = error instanceof Error
+      ? error.message
+      : 'Persisted mock state migration failed.';
   }
 }
 
 restoreFakeDb();
 
-function makeLevelPlay(): LevelPlayResponse {
+function makeLevelPlay(levelNumber: number): LevelPlayResponse {
+  const level = LEVELS[levelNumber as keyof typeof LEVELS];
+  const targets = CAMPAIGN_TARGETS[levelNumber];
+  if (!level || !targets) throw new Error(`Missing campaign level ${levelNumber}`);
   return {
-    levelId: LEVEL_ID,
-    levelVersionId: LEVEL_VERSION_ID,
-    levelNumber: 1,
-    microtheme: 'Личные финансы',
+    levelId: LEVEL_IDS[levelNumber - 1],
+    levelVersionId: LEVEL_VERSION_IDS[levelNumber - 1],
+    levelNumber,
+    microtheme: level.title,
     status: LevelPlayResponseStatusEnum.InProgress,
     board: {
-      size: 6,
-      cells: LEVEL_GRID.flatMap((row, rowIndex) =>
+      size: level.grid.length,
+      cells: level.grid.flatMap((row, rowIndex) =>
         row.map((letter, colIndex) => ({
           row: rowIndex,
           col: colIndex,
@@ -933,7 +1031,7 @@ function makeLevelPlay(): LevelPlayResponse {
         })),
       ).reverse(),
     },
-    targetsRemaining: LEVEL1_TARGETS.length,
+    targetsRemaining: targets.length,
     foundTargets: [],
     bonusWords: [],
     startedAt: '2026-08-21T12:00:00.000Z',
@@ -1023,7 +1121,7 @@ function p2Response(
   });
 }
 
-// Stores a non-mutating submit-route outcome (invalid/repeated) for idempotent
+// Stores a non-mutating API-006 outcome (invalid/repeated) for idempotent
 // replay without bumping the ETag/revision or changing game state.
 function p2IdempotentResponse(
   apiId: ReplayApiId,
@@ -1049,14 +1147,81 @@ function validationProblem(type: string, field: string, text: string) {
   );
 }
 
-type ValidSettingsFeedback = {
-  source: 'settings';
+function parseSettingsRequest(rawBody: string):
+  | { settings: UpdateSettingsRequest; descriptor: string }
+  | { error: Response } {
+  if (new TextEncoder().encode(rawBody).byteLength > 32 * 1024) {
+    return {
+      error: validationProblem('TOO_LARGE_PAYLOAD', 'body', 'Тело запроса превышает 32 KiB'),
+    };
+  }
+  let body: unknown;
+  try {
+    body = JSON.parse(rawBody);
+  } catch {
+    return {
+      error: validationProblem('INVALID_FORMAT', 'body', 'Тело запроса должно быть корректным JSON'),
+    };
+  }
+  if (!isRecord(body)) {
+    return {
+      error: validationProblem('INVALID_FORMAT', 'body', 'Тело запроса должно быть JSON-объектом'),
+    };
+  }
+  if ('tutorialCompleted' in body) {
+    return {
+      error: validationProblem(
+        'READ_ONLY_FIELD',
+        'body.tutorialCompleted',
+        'tutorialCompleted управляется сервером',
+      ),
+    };
+  }
+  const allowedFields = new Set(['musicEnabled', 'soundEnabled']);
+  const unknownField = Object.keys(body).find((field) => !allowedFields.has(field));
+  if (unknownField) {
+    return {
+      error: validationProblem('UNKNOWN_FIELD', `body.${unknownField}`, 'Поле не поддерживается'),
+    };
+  }
+  if (!('musicEnabled' in body) && !('soundEnabled' in body)) {
+    return {
+      error: validationProblem(
+        'REQUIRED_FIELD',
+        'body',
+        'Требуется хотя бы одно из полей musicEnabled или soundEnabled',
+      ),
+    };
+  }
+  if ('musicEnabled' in body && typeof body.musicEnabled !== 'boolean') {
+    return {
+      error: validationProblem('INVALID_FORMAT', 'body.musicEnabled', 'Ожидается boolean'),
+    };
+  }
+  if ('soundEnabled' in body && typeof body.soundEnabled !== 'boolean') {
+    return {
+      error: validationProblem('INVALID_FORMAT', 'body.soundEnabled', 'Ожидается boolean'),
+    };
+  }
+  const settings: UpdateSettingsRequest = {
+    ...('musicEnabled' in body ? { musicEnabled: body.musicEnabled as boolean } : {}),
+    ...('soundEnabled' in body ? { soundEnabled: body.soundEnabled as boolean } : {}),
+  };
+  return {
+    settings,
+    descriptor: `settings:music=${settings.musicEnabled ?? '-'}:sound=${settings.soundEnabled ?? '-'}`,
+  };
+}
+
+type ValidFeedback = {
+  source: 'settings' | 'chapter_completion';
+  chapterId?: string;
   rating: number;
   comment?: string;
 };
 
-function parseSettingsFeedback(rawBody: string):
-  | { feedback: ValidSettingsFeedback; descriptor: string }
+function parseFeedback(rawBody: string):
+  | { feedback: ValidFeedback; descriptor: string }
   | { error: Response } {
   let body: unknown;
   try {
@@ -1075,11 +1240,17 @@ function parseSettingsFeedback(rawBody: string):
   if (body.source === undefined || body.rating === undefined) {
     return { error: validationProblem('REQUIRED_FIELD', 'body', 'Поля source и rating обязательны') };
   }
-  if (body.source !== 'settings') {
+  if (body.source !== 'settings' && body.source !== 'chapter_completion') {
     return { error: validationProblem('INVALID_VALUE', 'body.source', 'Недопустимое значение source') };
   }
-  if ('chapterId' in body) {
+  if (body.source === 'settings' && 'chapterId' in body) {
     return { error: validationProblem('FORBIDDEN_FIELD', 'body.chapterId', 'chapterId запрещён для source=settings') };
+  }
+  if (body.source === 'chapter_completion' && !('chapterId' in body)) {
+    return { error: validationProblem('REQUIRED_FIELD', 'body.chapterId', 'chapterId обязателен для source=chapter_completion') };
+  }
+  if (body.source === 'chapter_completion' && !isUuid(body.chapterId)) {
+    return { error: validationProblem('INVALID_FORMAT', 'body.chapterId', 'Некорректный chapterId') };
   }
   const rating = body.rating;
   if (typeof rating !== 'number' || !Number.isInteger(rating) || rating < 1 || rating > 5) {
@@ -1091,8 +1262,9 @@ function parseSettingsFeedback(rawBody: string):
   if (typeof body.comment === 'string' && body.comment.length > 500) {
     return { error: validationProblem('TOO_LONG', 'body.comment', 'comment не должен превышать 500 символов') };
   }
-  const feedback: ValidSettingsFeedback = {
-    source: 'settings',
+  const feedback: ValidFeedback = {
+    source: body.source,
+    ...(body.source === 'chapter_completion' ? { chapterId: String(body.chapterId) } : {}),
     rating,
     ...(typeof body.comment === 'string' ? { comment: body.comment } : {}),
   };
@@ -1100,6 +1272,12 @@ function parseSettingsFeedback(rawBody: string):
 }
 
 function availabilityError(): Response | null {
+  if (persistenceRestoreError) {
+    return HttpResponse.json({
+      type: 'PERSISTENCE_MIGRATION_FAILED',
+      payload: { reason: persistenceRestoreError },
+    }, { status: 500 });
+  }
   const persisted = mockPersistence.restore();
   const gameUnavailable = gameUnavailableScenario ||
     (isRecord(persisted) && persisted.gameUnavailableScenario === true);
@@ -1203,8 +1381,26 @@ function acknowledgementNextAction(snapshot: LevelResultsResponse): NextAction {
     : NextAction.StartLevel;
 }
 
+function nextActionAfterChapter(chapterId: string): NextAction {
+  const chapter = state.clientState.chapters.find((item) => item.chapterId === chapterId);
+  return chapter?.number === 7 && state.clientState.clientView.campaignProgress.isCompleted
+    ? NextAction.CampaignComplete
+    : NextAction.NextChapter;
+}
+
+function activeLevelNumber(): number | undefined {
+  return levelPlay?.levelNumber;
+}
+
+function activeLevelTargets(): CampaignTarget[] {
+  const levelNumber = activeLevelNumber();
+  return levelNumber ? CAMPAIGN_TARGETS[levelNumber] ?? [] : [];
+}
+
 function routeWord(route: CellRef[]): string {
-  return route.map((cell) => LEVEL_GRID[cell.row]?.[cell.col] ?? '').join('');
+  const levelNumber = activeLevelNumber();
+  const grid = levelNumber ? LEVELS[levelNumber as keyof typeof LEVELS]?.grid : undefined;
+  return route.map((cell) => grid?.[cell.row]?.[cell.col] ?? '').join('');
 }
 
 function normalizeSelectedBoardWord(word: string): string {
@@ -1215,7 +1411,7 @@ function routeSignature(route: CellRef[]): string {
   return route.map((cell) => `${cell.row}:${cell.col}`).join('|');
 }
 
-function makeFoundTarget(target: Level1Target, foundSequence: number): FoundTarget {
+function makeFoundTarget(target: CampaignTarget, foundSequence: number): FoundTarget {
   return {
     targetId: target.targetId,
     foundSequence,
@@ -1226,41 +1422,47 @@ function makeFoundTarget(target: Level1Target, foundSequence: number): FoundTarg
   };
 }
 
-function activeHintTarget(): Level1Target | undefined {
+function activeHintTarget(): CampaignTarget | undefined {
   if (!levelPlay) return undefined;
+  const targets = activeLevelTargets();
   const activeTargetId = levelPlay.hintState?.targetId;
-  const activeTarget = LEVEL1_TARGETS.find((target) => target.targetId === activeTargetId);
+  const activeTarget = targets.find((target) => target.targetId === activeTargetId);
   if (activeTarget && !levelPlay.foundTargets.some((found) => found.targetId === activeTarget.targetId)) {
     return activeTarget;
   }
-  return LEVEL1_TARGETS.find(
+  return targets.find(
     (target) => !levelPlay?.foundTargets.some((found) => found.targetId === target.targetId),
   );
 }
 
-function makeChapterGoldenReward(): RewardSummary {
+function makeChapterGoldenReward(chapterNumber = 1, threshold = 9): RewardSummary {
+  const decoration = nextUnlockAppearance(appearances, 'special');
+  const rewardId = CHAPTER_GOLDEN_REWARD_IDS[chapterNumber - 1];
+  if (!rewardId) throw new Error(`Missing golden reward id for chapter ${chapterNumber}`);
   return {
-    rewardId: CHAPTER_GOLDEN_REWARD_ID,
+    rewardId,
     rewardType: RewardSummaryRewardTypeEnum.ChapterGolden,
     status: RewardSummaryStatusEnum.Available,
     availableAt: '2026-08-21T12:02:00.000Z',
     hintOptionAmount: 3,
-    decorationOptionId: CHARACTER_IDS[2],
-    progress: { current: 9, threshold: 9 },
+    ...(decoration ? { decorationOptionId: decoration.appearanceId } : {}),
+    progress: { current: threshold, threshold },
     options: [
       {
         optionType: RewardOptionOptionTypeEnum.Hint,
         amount: 3,
         title: 'Три подсказки',
-        imageUrl: assetUrl('assets/p1/reward-envelope.png'),
+        imageUrl: `${import.meta.env.BASE_URL}assets/p1/reward-hints.png`,
       },
-      {
+      ...(decoration ? [{
         optionType: RewardOptionOptionTypeEnum.Decoration,
-        optionId: CHARACTER_IDS[2],
-        title: characterTitles[2],
-        imageUrl: assetUrl(`assets/p1/${characterAssets[2]}`),
-        decorationType: RewardOptionDecorationTypeEnum.Character,
-      },
+        optionId: decoration.appearanceId,
+        title: decoration.title,
+        imageUrl: decoration.imageUrl,
+        decorationType: decoration.type === AppearanceTypeEnum.Character
+          ? RewardOptionDecorationTypeEnum.Character
+          : RewardOptionDecorationTypeEnum.Background,
+      }] : []),
     ],
   };
 }
@@ -1271,17 +1473,31 @@ function finalizeLevelCompletion(
 ): void {
   if (!levelPlay) throw new Error('Cannot finalize a missing level');
 
-  const currentChapter = state.clientState.chapters[0];
-  const completionKind = chapterCompletionScenario
+  const levelNumber = levelPlay.levelNumber;
+  const chapterIndex = CAMPAIGN_CHAPTERS.findIndex((chapter) => (
+    levelNumber >= chapter.levelStart && levelNumber <= chapter.levelEnd
+  ));
+  const chapterDefinition = CAMPAIGN_CHAPTERS[chapterIndex];
+  const currentChapter = state.clientState.chapters[chapterIndex];
+  if (!chapterDefinition || !currentChapter) {
+    throw new Error(`Missing campaign chapter for level ${levelNumber}`);
+  }
+  const targets = activeLevelTargets();
+  const completesChapter = chapterCompletionScenario || levelNumber === chapterDefinition.levelEnd;
+  const completionKind = completesChapter
     ? LevelResultsResponseCompletionKindEnum.Chapter
     : LevelResultsResponseCompletionKindEnum.Level;
-  const chapterStatus = chapterCompletionScenario
+  const chapterStatus = completesChapter
     ? LevelResultsResponseStatusEnum1.Completed
     : LevelResultsResponseStatusEnum1.InProgress;
-  const completedLevels = chapterCompletionScenario
-    ? currentChapter.totalLevels
-    : currentChapter.completedLevels + 1;
-  const reward = chapterCompletionScenario ? makeChapterGoldenReward() : undefined;
+  const alreadyCompleted = state.clientState.levels
+    .slice(chapterDefinition.levelStart - 1, chapterDefinition.levelEnd)
+    .filter((level) => level.status === LevelProgressSummaryStatusEnum.Completed)
+    .length;
+  const completedLevels = Math.min(currentChapter.totalLevels, alreadyCompleted + 1);
+  const reward = completesChapter
+    ? makeChapterGoldenReward(currentChapter.number, currentChapter.totalLevels)
+    : undefined;
   const nextAction = reward ? NextAction.ClaimReward : NextAction.StartLevel;
 
   levelPlay = { ...levelPlay, nextAction };
@@ -1300,18 +1516,18 @@ function finalizeLevelCompletion(
       })),
     },
     foundTargets: levelPlay.foundTargets.map((target) =>
-      target.word === LEVEL1_COURSE_OFFER_TARGET_WORD
+      levelNumber === 6 && target.word === 'КУРС'
         ? { ...target, courseOffer: LEVEL1_COURSE_OFFER }
         : target,
     ),
     bonusWords: levelPlay.bonusWords,
     completedAt,
     summary: {
-      earnedKnowledgePoints: LEVEL1_TARGETS.length,
+      earnedKnowledgePoints: targets.length,
       knowledgePointsTotal: balance.knowledgePoints,
       targets: {
         foundCount: levelPlay.foundTargets.length,
-        totalCount: LEVEL1_TARGETS.length,
+        totalCount: targets.length,
       },
       bonuses: { foundCount: levelPlay.bonusWords.length },
     },
@@ -1330,28 +1546,39 @@ function finalizeLevelCompletion(
     ...state,
     clientState: {
       ...state.clientState,
-      clientView: { ...state.clientState.clientView, balance },
+      clientView: {
+        ...state.clientState.clientView,
+        balance,
+        campaignProgress: {
+          ...state.clientState.clientView.campaignProgress,
+          isCompleted: levelNumber === 50,
+        },
+      },
       inProgressLevel: undefined,
       chapters: state.clientState.chapters.map((chapter, index) =>
-        index === 0
+        index === chapterIndex
           ? {
               ...chapter,
               completedLevels,
-              status: chapterCompletionScenario
+              status: completesChapter
                 ? ChapterProgressStatusEnum.Completed
                 : ChapterProgressStatusEnum.InProgress,
             }
-          : chapter,
+          : index === chapterIndex + 1 && completesChapter
+            ? { ...chapter, status: ChapterProgressStatusEnum.Available }
+            : chapter,
       ),
       levels: state.clientState.levels.map((level) =>
-        level.levelId === LEVEL_ID
+        level.levelId === levelPlay?.levelId
           ? { ...level, status: LevelProgressSummaryStatusEnum.Completed, completedAt }
+          : !completesChapter && level.levelId === LEVEL_IDS[levelNumber]
+            ? { ...level, status: LevelProgressSummaryStatusEnum.Available }
           : level,
       ),
       rewards: reward ? [...state.clientState.rewards, reward] : state.clientState.rewards,
       pendingResults: reward
-        ? { levelId: LEVEL_ID, rewardId: reward.rewardId }
-        : { levelId: LEVEL_ID },
+        ? { levelId: levelPlay.levelId, rewardId: reward.rewardId }
+        : { levelId: levelPlay.levelId },
       nextAction,
     },
   };
@@ -1359,15 +1586,18 @@ function finalizeLevelCompletion(
 
 export function resetP1FakeDb(options: P1FakeDbOptions = {}) {
   clearPersistedFakeDb();
+  persistenceRestoreError = null;
   version = 1;
   const regularCycle = options.regularRewardCycle ?? 0;
   const regularProgress = options.regularRewardProgress ?? 0;
+  appearances = options.ownedAppearanceAssetIds
+    ? createMockAppearanceCatalog(options.ownedAppearanceAssetIds)
+    : makeAppearances();
   state = makeClientState({
     ...options,
     regularRewardCycle: regularCycle,
     regularRewardProgress: regularProgress,
   });
-  appearances = makeAppearances();
   levelPlay = null;
   resultsSnapshot = null;
   resultsAcknowledgedAt = null;
@@ -1376,30 +1606,74 @@ export function resetP1FakeDb(options: P1FakeDbOptions = {}) {
   clientNotFoundScenario = options.clientNotFound === true;
   claimedRewardIds = new Set();
   regularRewardCycle = regularCycle;
+  feedbackSubmittedGlobally = false;
+  feedbackEligibleChapterId = null;
+  feedbackPromptDismissals = options.feedbackPreviouslyDismissed
+    ? new Map([[state.clientState.chapters[1].chapterId, '2026-08-28T12:00:00.000Z']])
+    : new Map();
+  failAppearanceSelectionOnce = options.failAppearanceSelectionOnce === true;
   p2Replays = new Map();
   rewardReplays = new Map();
   persistFakeDb();
 }
 
 export const p1Handlers = [
-  http.post(apiPath('bootstrap'), ({ request }) => {
+  http.post(apiPath('API-001'), ({ request }) => {
     const unavailable = availabilityError();
     if (unavailable) return unavailable;
-    const replay = p2Replay('bootstrap', request, 'bootstrap:no-body');
+    const replay = p2Replay('API-001', request, 'bootstrap:no-body');
     if (replay.response) return replay.response;
     const error = protocolError(request, false);
-    return error ?? p2IdempotentResponse('bootstrap', replay.key, 'bootstrap:no-body', state);
+    return error ?? p2IdempotentResponse('API-001', replay.key, 'bootstrap:no-body', state);
   }),
-  http.get(apiPath('state'), () => {
+  http.get(apiPath('API-002'), () => {
     const unavailable = availabilityError();
     return unavailable ?? response(state);
   }),
-  http.post(apiPath('start-level'), ({ request, params }) => {
+  http.post(apiPath('API-003'), ({ request, params }) => {
+    const unavailable = availabilityError();
+    if (unavailable) return unavailable;
+    const chapterId = String(params.chapterId);
+    const descriptor = `narrative:${chapterId}`;
+    const replay = p2Replay('API-003', request, descriptor);
+    if (replay.response) return replay.response;
+    const error = protocolError(request, true);
+    if (error) return error;
+    const chapter = state.clientState.chapters.find((candidate) => candidate.chapterId === chapterId);
+    if (!chapter) {
+      return HttpResponse.json({ type: 'CHAPTER_NOT_FOUND' }, { status: 404 });
+    }
+    const body: ConfirmNarrativeShownResponse = {
+      chapterId,
+      isNarrativeShown: true,
+      nextAction: state.clientState.inProgressLevel ? NextAction.Play : NextAction.StartLevel,
+    };
+    if (chapter.isNarrativeShown) {
+      return p2IdempotentResponse('API-003', replay.key, descriptor, body);
+    }
+    if (chapter.status === ChapterProgressStatusEnum.Locked) {
+      return HttpResponse.json({ type: 'CHAPTER_LOCKED' }, { status: 409 });
+    }
+    state = {
+      ...state,
+      clientState: {
+        ...state.clientState,
+        chapters: state.clientState.chapters.map((candidate) =>
+          candidate.chapterId === chapterId
+            ? { ...candidate, isNarrativeShown: true, narrativeText: undefined }
+            : candidate,
+        ),
+        nextAction: body.nextAction,
+      },
+    };
+    return p2Response('API-003', replay.key, descriptor, body);
+  }),
+  http.post(apiPath('API-004'), ({ request, params }) => {
     const unavailable = availabilityError();
     if (unavailable) return unavailable;
     const levelId = String(params.levelId);
     const descriptor = `start:${levelId}`;
-    const replay = p2Replay('start-level', request, descriptor);
+    const replay = p2Replay('API-004', request, descriptor);
     if (replay.response) return replay.response;
     const error = protocolError(request, true);
     if (error) return error;
@@ -1409,27 +1683,40 @@ export const p1Handlers = [
     if (!candidate || candidate.status !== LevelProgressSummaryStatusEnum.Available) {
       return HttpResponse.json({ type: 'LEVEL_LOCKED' }, { status: 409 });
     }
-    levelPlay = makeLevelPlay();
+    const levelIndex = LEVEL_IDS.indexOf(levelId);
+    if (levelIndex < 0) {
+      return HttpResponse.json({ type: 'LEVEL_LOCKED' }, { status: 409 });
+    }
+    const levelNumber = levelIndex + 1;
+    levelPlay = makeLevelPlay(levelNumber);
     state = {
       ...state,
       clientState: {
         ...state.clientState,
+        clientView: {
+          ...state.clientState.clientView,
+          settings: {
+            ...state.clientState.clientView.settings,
+            tutorialCompleted:
+              state.clientState.clientView.settings.tutorialCompleted || levelNumber === 1,
+          },
+        },
         inProgressLevel: {
-          levelId: LEVEL_ID,
-          levelVersionId: LEVEL_VERSION_ID,
+          levelId,
+          levelVersionId: LEVEL_VERSION_IDS[levelIndex],
           startedAt: levelPlay.startedAt,
         },
         levels: state.clientState.levels.map((level) =>
-          level.levelId === LEVEL_ID
+          level.levelId === levelId
             ? { ...level, status: LevelProgressSummaryStatusEnum.InProgress }
             : level,
         ),
         nextAction: NextAction.Play,
       },
     };
-    return p2Response('start-level', replay.key, descriptor, levelPlay);
+    return p2Response('API-004', replay.key, descriptor, levelPlay);
   }),
-  http.get(apiPath('resume-level'), ({ params }) => {
+  http.get(apiPath('API-005'), ({ params }) => {
     const unavailable = availabilityError();
     if (unavailable) return unavailable;
     if (!levelPlay || String(params.levelId) !== levelPlay.levelId) {
@@ -1437,12 +1724,12 @@ export const p1Handlers = [
     }
     return response(levelPlay);
   }),
-  http.post(apiPath('use-hint'), ({ request, params }) => {
+  http.post(apiPath('API-007'), ({ request, params }) => {
     const unavailable = availabilityError();
     if (unavailable) return unavailable;
     const levelId = String(params.levelId);
     const descriptor = `hint:${levelId}`;
-    const replay = p2Replay('use-hint', request, descriptor);
+    const replay = p2Replay('API-007', request, descriptor);
     if (replay.response) return replay.response;
     const error = protocolError(request, true);
     if (error) return error;
@@ -1477,7 +1764,7 @@ export const p1Handlers = [
       knowledgeGain = 1;
     }
 
-    const targetsRemaining = LEVEL1_TARGETS.length - foundTargets.length;
+    const targetsRemaining = activeLevelTargets().length - foundTargets.length;
     const levelCompleted = targetsRemaining === 0;
     const nextBalance = {
       hintBalance: balance.hintBalance - 1,
@@ -1512,9 +1799,9 @@ export const p1Handlers = [
       levelCompleted,
       nextAction: levelCompleted ? levelPlay.nextAction : NextAction.Play,
     };
-    return p2Response('use-hint', replay.key, descriptor, body);
+    return p2Response('API-007', replay.key, descriptor, body);
   }),
-  http.post(apiPath('submit-route'), async ({ request, params }) => {
+  http.post(apiPath('API-006'), async ({ request, params }) => {
     const unavailable = availabilityError();
     if (unavailable) return unavailable;
     const levelId = String(params.levelId);
@@ -1524,7 +1811,7 @@ export const p1Handlers = [
     const signature = routeSignature(route);
     const descriptor = `route:${levelId}:${signature}`;
 
-    const replay = p2Replay('submit-route', request, descriptor);
+    const replay = p2Replay('API-006', request, descriptor);
     if (replay.response) return replay.response;
 
     const error = protocolError(request, true);
@@ -1537,7 +1824,8 @@ export const p1Handlers = [
       return HttpResponse.json({ type: 'LEVEL_NOT_IN_PROGRESS' }, { status: 409 });
     }
 
-    const matchedTarget = LEVEL1_TARGETS.find(
+    const targets = activeLevelTargets();
+    const matchedTarget = targets.find(
       (target) =>
         signature === routeSignature(target.cells) ||
         signature === routeSignature([...target.cells].reverse()),
@@ -1548,7 +1836,7 @@ export const p1Handlers = [
         (target) => target.targetId === matchedTarget.targetId,
       );
       if (targetAlreadyFound) {
-        return p2IdempotentResponse('submit-route', replay.key, descriptor, {
+        return p2IdempotentResponse('API-006', replay.key, descriptor, {
           result: RouteSubmissionResponseResultEnum3.Repeated,
           levelCompleted: false,
           newFoundTargets: [],
@@ -1563,7 +1851,7 @@ export const p1Handlers = [
       };
       const foundTarget = makeFoundTarget(matchedTarget, levelPlay.foundTargets.length + 1);
       const foundTargets = [...levelPlay.foundTargets, foundTarget];
-      const targetsRemaining = LEVEL1_TARGETS.length - foundTargets.length;
+      const targetsRemaining = targets.length - foundTargets.length;
       const levelCompleted = targetsRemaining === 0;
       levelPlay = {
         ...levelPlay,
@@ -1584,7 +1872,7 @@ export const p1Handlers = [
           },
         };
       }
-      return p2Response('submit-route', replay.key, descriptor, {
+      return p2Response('API-006', replay.key, descriptor, {
         result: RouteSubmissionResponseResultEnum3.Found,
         isTarget: true,
         word: matchedTarget.word,
@@ -1598,11 +1886,11 @@ export const p1Handlers = [
       });
     }
 
-    const configuredTarget = LEVEL1_TARGETS.find(
+    const configuredTarget = targets.find(
       (target) => normalizeSelectedBoardWord(target.word) === word,
     );
     if (configuredTarget) {
-      return p2IdempotentResponse('submit-route', replay.key, descriptor, {
+      return p2IdempotentResponse('API-006', replay.key, descriptor, {
         result: RouteSubmissionResponseResultEnum3.Invalid,
         outcomeCode: 'TARGET_NONCANONICAL_PATH',
         levelCompleted: false,
@@ -1614,7 +1902,7 @@ export const p1Handlers = [
 
     const alreadyFoundBonus = levelPlay.bonusWords.some((bonus) => bonus.word === word);
     if (alreadyFoundBonus) {
-      return p2IdempotentResponse('submit-route', replay.key, descriptor, {
+      return p2IdempotentResponse('API-006', replay.key, descriptor, {
         result: RouteSubmissionResponseResultEnum3.Repeated,
         levelCompleted: false,
         newFoundTargets: [],
@@ -1623,7 +1911,10 @@ export const p1Handlers = [
       });
     }
 
-    if (LEVEL1_BONUS_WORDS.includes(word)) {
+    const activeBonusWords = levelPlay
+      ? LEVELS[levelPlay.levelNumber as keyof typeof LEVELS].bonusWords
+      : [];
+    if (activeBonusWords.includes(word)) {
       const balance = state.clientState.clientView.balance;
       const nextBalance = {
         hintBalance: balance.hintBalance,
@@ -1666,7 +1957,7 @@ export const p1Handlers = [
           nextAction: rewardOpened ? NextAction.ClaimReward : NextAction.Play,
         },
       };
-      return p2Response('submit-route', replay.key, descriptor, {
+      return p2Response('API-006', replay.key, descriptor, {
         result: RouteSubmissionResponseResultEnum3.Found,
         isTarget: false,
         word,
@@ -1682,7 +1973,7 @@ export const p1Handlers = [
       });
     }
 
-    return p2IdempotentResponse('submit-route', replay.key, descriptor, {
+    return p2IdempotentResponse('API-006', replay.key, descriptor, {
       result: RouteSubmissionResponseResultEnum3.Invalid,
       levelCompleted: false,
       newFoundTargets: [],
@@ -1690,15 +1981,18 @@ export const p1Handlers = [
       nextAction: NextAction.Play,
     });
   }),
-  http.patch(apiPath('update-settings'), async ({ request }) => {
+  http.patch(apiPath('API-010'), async ({ request }) => {
     const unavailable = availabilityError();
     if (unavailable) return unavailable;
+    const parsed = parseSettingsRequest(await request.text());
+    if ('error' in parsed) return parsed.error;
+    const replay = p2Replay('API-010', request, parsed.descriptor);
+    if (replay.response) return replay.response;
     const error = protocolError(request, true);
     if (error) return error;
-    const body = (await request.json()) as UpdateSettingsRequest;
     const settings: SettingsResponse = {
       ...state.clientState.clientView.settings,
-      ...body,
+      ...parsed.settings,
     };
     state = {
       ...state,
@@ -1707,9 +2001,9 @@ export const p1Handlers = [
         clientView: { ...state.clientState.clientView, settings },
       },
     };
-    return response(settings, true);
+    return p2Response('API-010', replay.key, parsed.descriptor, settings);
   }),
-  http.get(apiPath('appearances'), () => {
+  http.get(apiPath('API-011'), () => {
     const unavailable = availabilityError();
     if (unavailable) return unavailable;
     const body: AppearanceCatalogResponse = {
@@ -1719,11 +2013,15 @@ export const p1Handlers = [
     };
     return response(body);
   }),
-  http.post(apiPath('select-appearance'), ({ request, params }) => {
+  http.post(apiPath('API-012'), ({ request, params }) => {
     const unavailable = availabilityError();
     if (unavailable) return unavailable;
     const error = protocolError(request, true);
     if (error) return error;
+    if (failAppearanceSelectionOnce) {
+      failAppearanceSelectionOnce = false;
+      return HttpResponse.json({ type: 'INTERNAL_ERROR' }, { status: 500 });
+    }
     const appearanceId = String(params.appearanceId);
     const selected = appearances.find((appearance) => appearance.appearanceId === appearanceId);
     if (!selected?.isOwned) {
@@ -1766,24 +2064,107 @@ export const p1Handlers = [
     };
     return response(body, true);
   }),
-  http.post(apiPath('submit-feedback'), async ({ request }) => {
+  http.post(apiPath('API-013'), async ({ request }) => {
     const unavailable = availabilityError();
     if (unavailable) return unavailable;
     const rawBody = await request.text();
-    const parsed = parseSettingsFeedback(rawBody);
+    const parsed = parseFeedback(rawBody);
     if ('error' in parsed) return parsed.error;
-    const replay = p2Replay('submit-feedback', request, parsed.descriptor);
+    const replay = p2Replay('API-013', request, parsed.descriptor);
     if (replay.response) return replay.response;
     const error = protocolError(request, true);
     if (error) return error;
+    if (
+      parsed.feedback.source === 'chapter_completion' &&
+      feedbackEligibleChapterId !== parsed.feedback.chapterId
+    ) {
+      return HttpResponse.json({ type: 'FEEDBACK_NOT_ELIGIBLE' }, { status: 409 });
+    }
+    feedbackSubmittedGlobally = true;
+    feedbackEligibleChapterId = null;
+    const nextAction = parsed.feedback.source === 'chapter_completion'
+      ? nextActionAfterChapter(parsed.feedback.chapterId ?? '')
+      : NextAction.None;
+    if (parsed.feedback.source === 'chapter_completion') {
+      state = {
+        ...state,
+        clientState: { ...state.clientState, nextAction },
+      };
+    }
     const result: SubmitFeedbackResponse = {
       feedbackId: '6f8fad5b-d9cb-469f-a165-808677289550',
       status: SubmitFeedbackResponseStatusEnum.Submitted,
+      nextAction,
+    };
+    return p2Response('API-013', replay.key, parsed.descriptor, result);
+  }),
+  http.post(apiPath('API-014'), ({ request, params }) => {
+    const unavailable = availabilityError();
+    if (unavailable) return unavailable;
+    const chapterId = String(params.chapterId);
+    if (!isUuid(chapterId)) {
+      return validationProblem('INVALID_FORMAT', 'path.chapterId', 'Некорректный chapterId');
+    }
+    const descriptor = `dismiss-feedback:${chapterId}:no-body`;
+    const replay = p2Replay('API-014', request, descriptor);
+    if (replay.response) return replay.response;
+    const error = protocolError(request, true);
+    if (error) return error;
+    if (!state.clientState.chapters.some((chapter) => chapter.chapterId === chapterId)) {
+      return HttpResponse.json({ type: 'CHAPTER_NOT_FOUND' }, { status: 404 });
+    }
+    const previousDismissal = feedbackPromptDismissals.get(chapterId);
+    const feedbackPromptShownAt = previousDismissal ?? '2026-09-03T12:00:00.000Z';
+    const nextAction = nextActionAfterChapter(chapterId);
+    const result: DismissFeedbackResponse = {
+      chapterId,
+      feedbackPromptShownAt,
+      nextAction,
+    };
+    if (previousDismissal) {
+      return p2IdempotentResponse('API-014', replay.key, descriptor, result);
+    }
+    feedbackPromptDismissals.set(chapterId, feedbackPromptShownAt);
+    feedbackEligibleChapterId = null;
+    state = {
+      ...state,
+      clientState: { ...state.clientState, nextAction },
+    };
+    return p2Response('API-014', replay.key, descriptor, result);
+  }),
+  http.post(apiPath('API-015'), ({ request }) => {
+    const unavailable = availabilityError();
+    if (unavailable) return unavailable;
+    const descriptor = 'campaign-completion:no-body';
+    const replay = p2Replay('API-015', request, descriptor);
+    if (replay.response) return replay.response;
+    const error = protocolError(request, true);
+    if (error) return error;
+    const progress = state.clientState.clientView.campaignProgress;
+    if (!progress.isCompleted) {
+      return HttpResponse.json({ type: 'CAMPAIGN_NOT_COMPLETED' }, { status: 409 });
+    }
+    const result: ConfirmCampaignCompleteShownResponse = {
+      isCompletionShown: true,
       nextAction: NextAction.None,
     };
-    return p2Response('submit-feedback', replay.key, parsed.descriptor, result);
+    if (progress.isCompletionShown) {
+      return p2IdempotentResponse('API-015', replay.key, descriptor, result);
+    }
+    state = {
+      ...state,
+      clientState: {
+        ...state.clientState,
+        clientView: {
+          ...state.clientState.clientView,
+          campaignProgress: { ...progress, isCompletionShown: true },
+        },
+        nextAction: NextAction.None,
+      },
+    };
+    return p2Response('API-015', replay.key, descriptor, result);
   }),
-  http.get(apiPath('level-results'), ({ params }) => {
+  http.get(apiPath('API-008'), ({ params }) => {
     const unavailable = availabilityError();
     if (unavailable) return unavailable;
     if (!resultsSnapshot || resultsSnapshot.levelId !== String(params.levelId)) {
@@ -1791,12 +2172,12 @@ export const p1Handlers = [
     }
     return response(resultsSnapshot);
   }),
-  http.post(apiPath('acknowledge-results'), ({ request, params }) => {
+  http.post(apiPath('API-017'), ({ request, params }) => {
     const unavailable = availabilityError();
     if (unavailable) return unavailable;
     const levelId = String(params.levelId);
     const descriptor = `acknowledge:${levelId}:no-body`;
-    const replay = p2Replay('acknowledge-results', request, descriptor);
+    const replay = p2Replay('API-017', request, descriptor);
     if (replay.response) return replay.response;
 
     const error = protocolError(request, true);
@@ -1837,9 +2218,9 @@ export const p1Handlers = [
       nextAction,
       ...(pendingReward ? { pendingReward } : {}),
     };
-    return p2Response('acknowledge-results', replay.key, descriptor, body);
+    return p2Response('API-017', replay.key, descriptor, body);
   }),
-  http.post(apiPath('claim-reward'), async ({ request, params }) => {
+  http.post(apiPath('API-009'), async ({ request, params }) => {
     const unavailable = availabilityError();
     if (unavailable) return unavailable;
     const key = request.headers.get('idempotency-key');
@@ -1924,8 +2305,25 @@ export const p1Handlers = [
       );
     }
     const isRegularReward = reward.rewardType === RewardSummaryRewardTypeEnum.Regular;
+    const completedChapter = !isRegularReward
+      ? state.clientState.chapters.find(
+          (chapter) => chapter.chapterId === resultsSnapshot?.chapter.chapterId,
+        )
+      : undefined;
     if (isRegularReward) regularRewardCycle += 1;
-    const nextAction = isRegularReward ? NextAction.Play : NextAction.StartLevel;
+    const nextAction = isRegularReward
+      ? NextAction.Play
+      : feedbackSubmittedGlobally
+        ? nextActionAfterChapter(completedChapter?.chapterId ?? '')
+        : NextAction.OpenFeedback;
+    if (!isRegularReward) {
+      feedbackEligibleChapterId = nextAction === NextAction.OpenFeedback
+        ? completedChapter?.chapterId ?? null
+        : null;
+    }
+    const nextChapterDefinition = completedChapter
+      ? CAMPAIGN_CHAPTERS[completedChapter.number]
+      : undefined;
     state = {
       ...state,
       clientState: {
@@ -1938,6 +2336,12 @@ export const p1Handlers = [
               ? [makeCollectingRegularReward(regularRewardCycle)]
               : [],
         ),
+        levels: state.clientState.levels.map((level) => (
+          nextChapterDefinition
+          && level.levelId === LEVEL_IDS[nextChapterDefinition.levelStart - 1]
+            ? { ...level, status: LevelProgressSummaryStatusEnum.Available }
+            : level
+        )),
         pendingReward:
           state.clientState.pendingReward?.rewardId === reward.rewardId
             ? undefined
@@ -1946,6 +2350,11 @@ export const p1Handlers = [
       },
     };
     claimedRewardIds.add(reward.rewardId);
+    if (!isRegularReward) {
+      levelPlay = null;
+      resultsSnapshot = null;
+      resultsAcknowledgedAt = null;
+    }
     const result: ClaimRewardResponse = {
       rewardId: reward.rewardId,
       rewardType:

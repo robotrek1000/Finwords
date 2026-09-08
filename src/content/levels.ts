@@ -32,7 +32,7 @@ const levelOneTargets: TargetWord[] = [
       description:
         'Курс «Как работают акции» — о доходности, рисках и правах акционера.',
       ctaLabel: 'Открыть курс',
-      destination: 'demo://learning/how-stocks-work',
+      destination: 'bcs://education/how-stocks-work',
       autoShow: false,
       campaignId: 'finwords-mvp-stock-course',
     },
@@ -115,11 +115,11 @@ const levelTwoTargets: TargetWord[] = [
       title: 'ИИС',
       definition:
         'Индивидуальный инвестиционный счёт помогает инвестировать на длительный срок и может давать право на налоговые льготы.',
-      badgeLabel: 'Учебный материал',
+      badgeLabel: 'Продукт БКС',
       description:
-        'Узнайте, как устроен ИИС, какие ограничения действуют и когда возможны налоговые льготы.',
+        'Узнайте об условиях открытия ИИС и доступных стратегиях в БКС.',
       ctaLabel: 'Подробнее об ИИС',
-      destination: 'demo://learning/iis',
+      destination: 'bcs://products/iis',
       autoShow: true,
       autoShowPriority: 10,
       campaignId: 'finwords-mvp-iis',

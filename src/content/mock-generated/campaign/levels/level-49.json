@@ -1,0 +1,281 @@
+{
+  "schemaVersion": "1",
+  "id": "level-49",
+  "number": 49,
+  "chapterId": "chapter-07",
+  "chapterTitle": "Финансовая свобода",
+  "microtheme": "Долгий горизонт",
+  "rows": 6,
+  "cols": 6,
+  "desiredTurns": {
+    "min": 2,
+    "max": 4
+  },
+  "difficulty": "Продвинутая",
+  "sourceWords": [
+    "ГОРИЗОНТ",
+    "ТЕРПЕНИЕ",
+    "ДИСЦИПЛИНА",
+    "ВРЕМЯ",
+    "РЕЖИМ"
+  ],
+  "gridStatus": "TBD_AFTER_DATA_MODEL",
+  "contentStatus": "Draft",
+  "validation": "VALID",
+  "grid": [
+    [
+      "Е",
+      "Т",
+      "О",
+      "Р",
+      "Ц",
+      "И"
+    ],
+    [
+      "Р",
+      "Т",
+      "Г",
+      "И",
+      "С",
+      "П"
+    ],
+    [
+      "П",
+      "Н",
+      "О",
+      "З",
+      "И",
+      "Л"
+    ],
+    [
+      "Е",
+      "Н",
+      "И",
+      "Е",
+      "Д",
+      "И"
+    ],
+    [
+      "М",
+      "Е",
+      "Р",
+      "Е",
+      "Р",
+      "Н"
+    ],
+    [
+      "И",
+      "Ж",
+      "Я",
+      "М",
+      "В",
+      "А"
+    ]
+  ],
+  "targets": [
+    {
+      "targetId": "target-49-01",
+      "order": 1,
+      "word": "ГОРИЗОНТ",
+      "normalized": "ГОРИЗОНТ",
+      "definition": "Период, на который инвестор или организация планирует решение.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 1,
+          "col": 2
+        },
+        {
+          "row": 0,
+          "col": 2
+        },
+        {
+          "row": 0,
+          "col": 3
+        },
+        {
+          "row": 1,
+          "col": 3
+        },
+        {
+          "row": 2,
+          "col": 3
+        },
+        {
+          "row": 2,
+          "col": 2
+        },
+        {
+          "row": 2,
+          "col": 1
+        },
+        {
+          "row": 1,
+          "col": 1
+        }
+      ]
+    },
+    {
+      "targetId": "target-49-02",
+      "order": 2,
+      "word": "ТЕРПЕНИЕ",
+      "normalized": "ТЕРПЕНИЕ",
+      "definition": "Способность спокойно ждать результата и не действовать импульсивно.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 0,
+          "col": 1
+        },
+        {
+          "row": 0,
+          "col": 0
+        },
+        {
+          "row": 1,
+          "col": 0
+        },
+        {
+          "row": 2,
+          "col": 0
+        },
+        {
+          "row": 3,
+          "col": 0
+        },
+        {
+          "row": 3,
+          "col": 1
+        },
+        {
+          "row": 3,
+          "col": 2
+        },
+        {
+          "row": 3,
+          "col": 3
+        }
+      ]
+    },
+    {
+      "targetId": "target-49-03",
+      "order": 3,
+      "word": "ДИСЦИПЛИНА",
+      "normalized": "ДИСЦИПЛИНА",
+      "definition": "Последовательное соблюдение выбранных правил и плана.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 3,
+          "col": 4
+        },
+        {
+          "row": 2,
+          "col": 4
+        },
+        {
+          "row": 1,
+          "col": 4
+        },
+        {
+          "row": 0,
+          "col": 4
+        },
+        {
+          "row": 0,
+          "col": 5
+        },
+        {
+          "row": 1,
+          "col": 5
+        },
+        {
+          "row": 2,
+          "col": 5
+        },
+        {
+          "row": 3,
+          "col": 5
+        },
+        {
+          "row": 4,
+          "col": 5
+        },
+        {
+          "row": 5,
+          "col": 5
+        }
+      ]
+    },
+    {
+      "targetId": "target-49-04",
+      "order": 4,
+      "word": "ВРЕМЯ",
+      "normalized": "ВРЕМЯ",
+      "definition": "Ресурс и последовательность событий, влияющие на достижение долгосрочной цели.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 5,
+          "col": 4
+        },
+        {
+          "row": 4,
+          "col": 4
+        },
+        {
+          "row": 4,
+          "col": 3
+        },
+        {
+          "row": 5,
+          "col": 3
+        },
+        {
+          "row": 5,
+          "col": 2
+        }
+      ]
+    },
+    {
+      "targetId": "target-49-05",
+      "order": 5,
+      "word": "РЕЖИМ",
+      "normalized": "РЕЖИМ",
+      "definition": "Установленный порядок действий, работы или распределения времени.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 4,
+          "col": 2
+        },
+        {
+          "row": 4,
+          "col": 1
+        },
+        {
+          "row": 5,
+          "col": 1
+        },
+        {
+          "row": 5,
+          "col": 0
+        },
+        {
+          "row": 4,
+          "col": 0
+        }
+      ]
+    }
+  ]
+}

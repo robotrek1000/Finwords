@@ -1,0 +1,164 @@
+{
+  "schemaVersion": "1",
+  "id": "level-07",
+  "number": 7,
+  "chapterId": "chapter-01",
+  "chapterTitle": "Азбука денег",
+  "microtheme": "Валюты мира",
+  "rows": 4,
+  "cols": 4,
+  "desiredTurns": {
+    "min": 0,
+    "max": 1
+  },
+  "difficulty": "Начальная",
+  "sourceWords": [
+    "ЕВРО",
+    "ЮАНЬ",
+    "ДРАМ",
+    "ЛИРА"
+  ],
+  "gridStatus": "TBD_AFTER_DATA_MODEL",
+  "contentStatus": "Draft",
+  "validation": "VALID",
+  "grid": [
+    [
+      "Ю",
+      "А",
+      "Н",
+      "Ь"
+    ],
+    [
+      "М",
+      "А",
+      "Р",
+      "Д"
+    ],
+    [
+      "Л",
+      "И",
+      "Р",
+      "А"
+    ],
+    [
+      "О",
+      "Р",
+      "В",
+      "Е"
+    ]
+  ],
+  "targets": [
+    {
+      "targetId": "target-07-01",
+      "order": 1,
+      "word": "ЕВРО",
+      "normalized": "ЕВРО",
+      "definition": "Единая валюта ряда европейских государств.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 3,
+          "col": 3
+        },
+        {
+          "row": 3,
+          "col": 2
+        },
+        {
+          "row": 3,
+          "col": 1
+        },
+        {
+          "row": 3,
+          "col": 0
+        }
+      ]
+    },
+    {
+      "targetId": "target-07-02",
+      "order": 2,
+      "word": "ЮАНЬ",
+      "normalized": "ЮАНЬ",
+      "definition": "Основная денежная единица Китайской Народной Республики.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 0,
+          "col": 0
+        },
+        {
+          "row": 0,
+          "col": 1
+        },
+        {
+          "row": 0,
+          "col": 2
+        },
+        {
+          "row": 0,
+          "col": 3
+        }
+      ]
+    },
+    {
+      "targetId": "target-07-03",
+      "order": 3,
+      "word": "ДРАМ",
+      "normalized": "ДРАМ",
+      "definition": "Официальная денежная единица Армении.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 1,
+          "col": 3
+        },
+        {
+          "row": 1,
+          "col": 2
+        },
+        {
+          "row": 1,
+          "col": 1
+        },
+        {
+          "row": 1,
+          "col": 0
+        }
+      ]
+    },
+    {
+      "targetId": "target-07-04",
+      "order": 4,
+      "word": "ЛИРА",
+      "normalized": "ЛИРА",
+      "definition": "Название национальной валюты нескольких государств, включая Турцию.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 2,
+          "col": 0
+        },
+        {
+          "row": 2,
+          "col": 1
+        },
+        {
+          "row": 2,
+          "col": 2
+        },
+        {
+          "row": 2,
+          "col": 3
+        }
+      ]
+    }
+  ]
+}

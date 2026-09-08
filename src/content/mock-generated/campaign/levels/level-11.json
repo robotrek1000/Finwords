@@ -1,0 +1,224 @@
+{
+  "schemaVersion": "1",
+  "id": "level-11",
+  "number": 11,
+  "chapterId": "chapter-02",
+  "chapterTitle": "Финансовая подушка",
+  "microtheme": "Семейный бюджет",
+  "rows": 5,
+  "cols": 5,
+  "desiredTurns": {
+    "min": 1,
+    "max": 2
+  },
+  "difficulty": "Базовая",
+  "sourceWords": [
+    "ДОХОД",
+    "ТРАТА",
+    "СУММА",
+    "ПЛАТА",
+    "СЕМЬЯ"
+  ],
+  "gridStatus": "TBD_AFTER_DATA_MODEL",
+  "contentStatus": "Draft",
+  "validation": "VALID",
+  "grid": [
+    [
+      "П",
+      "М",
+      "А",
+      "А",
+      "Т"
+    ],
+    [
+      "Л",
+      "М",
+      "У",
+      "С",
+      "А"
+    ],
+    [
+      "А",
+      "О",
+      "Д",
+      "Т",
+      "Р"
+    ],
+    [
+      "Т",
+      "Х",
+      "О",
+      "Д",
+      "Я"
+    ],
+    [
+      "А",
+      "С",
+      "Е",
+      "М",
+      "Ь"
+    ]
+  ],
+  "targets": [
+    {
+      "targetId": "target-11-01",
+      "order": 1,
+      "word": "ДОХОД",
+      "normalized": "ДОХОД",
+      "definition": "Деньги или прирост стоимости, полученные за определённый период.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 3,
+          "col": 3
+        },
+        {
+          "row": 3,
+          "col": 2
+        },
+        {
+          "row": 3,
+          "col": 1
+        },
+        {
+          "row": 2,
+          "col": 1
+        },
+        {
+          "row": 2,
+          "col": 2
+        }
+      ]
+    },
+    {
+      "targetId": "target-11-02",
+      "order": 2,
+      "word": "ТРАТА",
+      "normalized": "ТРАТА",
+      "definition": "Использование денег на покупку, услугу или выполнение обязательства.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 2,
+          "col": 3
+        },
+        {
+          "row": 2,
+          "col": 4
+        },
+        {
+          "row": 1,
+          "col": 4
+        },
+        {
+          "row": 0,
+          "col": 4
+        },
+        {
+          "row": 0,
+          "col": 3
+        }
+      ]
+    },
+    {
+      "targetId": "target-11-03",
+      "order": 3,
+      "word": "СУММА",
+      "normalized": "СУММА",
+      "definition": "Общий результат сложения нескольких денежных или числовых величин.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 1,
+          "col": 3
+        },
+        {
+          "row": 1,
+          "col": 2
+        },
+        {
+          "row": 1,
+          "col": 1
+        },
+        {
+          "row": 0,
+          "col": 1
+        },
+        {
+          "row": 0,
+          "col": 2
+        }
+      ]
+    },
+    {
+      "targetId": "target-11-04",
+      "order": 4,
+      "word": "ПЛАТА",
+      "normalized": "ПЛАТА",
+      "definition": "Деньги, передаваемые за товар, услугу, пользование или работу.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 0,
+          "col": 0
+        },
+        {
+          "row": 1,
+          "col": 0
+        },
+        {
+          "row": 2,
+          "col": 0
+        },
+        {
+          "row": 3,
+          "col": 0
+        },
+        {
+          "row": 4,
+          "col": 0
+        }
+      ]
+    },
+    {
+      "targetId": "target-11-05",
+      "order": 5,
+      "word": "СЕМЬЯ",
+      "normalized": "СЕМЬЯ",
+      "definition": "Группа близких людей, которая часто ведёт общий бюджет и совместно планирует расходы.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 4,
+          "col": 1
+        },
+        {
+          "row": 4,
+          "col": 2
+        },
+        {
+          "row": 4,
+          "col": 3
+        },
+        {
+          "row": 4,
+          "col": 4
+        },
+        {
+          "row": 3,
+          "col": 4
+        }
+      ]
+    }
+  ]
+}

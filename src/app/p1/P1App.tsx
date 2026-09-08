@@ -3,6 +3,7 @@ import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react
 import type { CellId, LevelId } from '../../app/types';
 import type {
   AppearanceCatalogResponse,
+  BoardView,
   BonusWord,
   CellRef,
   ClaimRewardRequest,
@@ -11,22 +12,22 @@ import type {
   LevelPlayResponse,
   LevelResultsResponse,
   RewardOption,
-  NextAction,
   RewardSummary,
   RouteSubmissionResponse,
   SettingsResponse,
   SubmitFeedbackRequest,
   UpdateSettingsRequest,
-} from '../../shared/demoTypes';
+} from '../../infra/api/generated/data-contracts';
 import {
+  AppearanceTypeEnum,
+  CellViewStateEnum,
+  NextAction,
   RouteSubmissionResponseResultEnum3,
   RouteSubmissionResponseOutcomeCodeEnum,
   RewardOptionOptionTypeEnum,
   RewardSummaryRewardTypeEnum,
-} from '../../shared/demoTypes';
+} from '../../infra/api/generated/data-contracts';
 import { BackgroundSurface } from '../../shared/ui/BackgroundSurface';
-import { assetUrl } from '../../shared/assetUrl';
-import type { BackgroundId } from '../../shared/ui/PatternTile';
 import { Button } from '../../shared/ui/Button';
 import { IconButton } from '../../shared/ui/IconButton';
 import { Icon } from '../../shared/ui/icons';
@@ -38,12 +39,29 @@ import { defaultP1Api, type P1Api } from './p1Api';
 import { GameScreen, type BonusProgress, type GameNotice } from './GameScreen';
 import { FieldReviewScreen, ResultsScreen } from './P1Results';
 import { cellIdsToRoute } from '../../features/game/routeBuilder';
-import { type RouteAccentState } from '../../features/game/BoardViewGameBoard';
-import { resolveTargetPresentation } from '../../features/game/targetPresentation';
+import { BoardViewGameBoard, type RouteAccentState } from '../../features/game/BoardViewGameBoard';
+import {
+  resolveGameFoundTargetPresentation,
+  resolveFoundTargetPresentation,
+  resolveLocalCourseOffer,
+} from '../../features/game/targetPresentation';
 import styles from './P1App.module.css';
+import { isBcsDeepLink, normalizeBcsDeepLink, openDeepLink } from './deepLink';
+import { useFinwordsAudio } from './useFinwordsAudio';
 import { useModalFocusBoundary } from './useModalFocusBoundary';
 
-type Phase = 'loading' | 'error' | 'home' | 'appearance' | 'game' | 'results' | 'field-review';
+type Phase =
+  | 'loading'
+  | 'error'
+  | 'home'
+  | 'tutorial'
+  | 'narrative'
+  | 'appearance'
+  | 'game'
+  | 'results'
+  | 'field-review'
+  | 'next-chapter-unavailable'
+  | 'campaign-complete';
 type Modal =
   | 'none'
   | 'settings'
@@ -54,6 +72,18 @@ type Modal =
   | 'course-error'
   | 'bonus-words';
 type AsyncStatus = 'idle' | 'loading' | 'success' | 'error';
+type TargetOpenSource = 'game' | 'results_card' | 'results_field';
+
+interface TargetModalContext {
+  target: FoundTarget;
+  source: TargetOpenSource;
+  destination?: string;
+  offerTitle?: string;
+}
+
+type FeedbackContext =
+  | { source: 'settings' }
+  | { source: 'chapter_completion'; chapterId: string };
 
 export interface P1AppProps {
   api?: P1Api;
@@ -65,17 +95,7 @@ export interface P1AppProps {
 const wait = (duration: number) =>
   new Promise<void>((resolve) => window.setTimeout(resolve, duration));
 
-const appearanceBackgrounds: BackgroundId[] = [
-  'background-default',
-  'background-cabin',
-  'background-port',
-  'background-open-sea',
-  'background-business-harbor',
-  'background-bridge',
-  'background-golden-bay',
-  'background-night-ocean',
-  'background-freedom-horizon',
-];
+const GAME_NOTICE_DURATION_MS = 3_200;
 
 function mergeByWord<T extends { word: string }>(existing: T[], added: T[]): T[] {
   const seen = new Set(existing.map((item) => item.word));
@@ -103,13 +123,104 @@ function regularRewardProgress(state: ClientStateResponse | null): BonusProgress
   return regularReward?.progress;
 }
 
+function isLocalLevelId(value: number): value is LevelId {
+  return Number.isInteger(value) && value >= 1 && value <= 9;
+}
+
+function problemType(error: unknown): string | undefined {
+  return typeof error === 'object' && error !== null && 'type' in error
+    ? String(error.type)
+    : undefined;
+}
+
+function clampProgress(completedLevels: number, totalLevels: number): number {
+  return Math.min(Math.max(completedLevels, 0), totalLevels);
+}
+
+function localCourseOfferContext(
+  offer: ReturnType<typeof resolveLocalCourseOffer>,
+): Pick<TargetModalContext, 'destination' | 'offerTitle'> {
+  if (!offer) return {};
+  const destination = normalizeBcsDeepLink(offer.destination);
+  const [descriptionTitle] = offer.description.split(' — ', 1);
+  return {
+    ...(destination ? { destination } : {}),
+    offerTitle: descriptionTitle || offer.title,
+  };
+}
+
+const TUTORIAL_BOARD: BoardView = {
+  size: 3,
+  cells: [
+    ['Н', 'О', 'С'],
+    ['П', 'А', 'Л'],
+    ['Ы', 'Р', 'Х'],
+  ].flatMap((row, rowIndex) => row.map((letter, colIndex) => ({
+    row: rowIndex,
+    col: colIndex,
+    letter,
+    state: CellViewStateEnum.Letter,
+    belongsToFoundWord: false,
+  }))),
+};
+
+const TUTORIAL_STEPS = [
+  {
+    word: 'НОС',
+    path: ['1:1', '1:2', '1:3'] as CellId[],
+    text: 'Начните с первой буквы и проведите по соседним клеткам.',
+  },
+  {
+    word: 'ПАР',
+    path: ['2:1', '2:2', '3:2'] as CellId[],
+    text: 'Слово может поворачивать, но диагональные переходы не используются.',
+  },
+  {
+    word: 'СОН',
+    path: ['1:3', '1:2', '1:1'] as CellId[],
+    text: 'Целевое слово можно собрать в прямом или точном обратном порядке.',
+  },
+  {
+    word: 'ПАР',
+    path: ['2:1', '2:2', '3:2'] as CellId[],
+    text: 'Дополнительные слова (не загаданные на уровне) заполняют белый конверт с наградами.',
+  },
+  {
+    word: 'НОС',
+    path: ['1:1', '1:2', '1:3'] as CellId[],
+    text: 'Найденные слова остаются на поле и больше не участвуют в маршрутах.',
+  },
+  {
+    word: 'ПАР',
+    path: ['2:1', '2:2', '3:2'] as CellId[],
+    text: 'Нажмите на найденное слово, чтобы открыть его определение.',
+  },
+] as const;
+
+function tutorialTarget(word: 'НОС' | 'ПАР', sequence: number): FoundTarget {
+  const path = word === 'НОС' ? TUTORIAL_STEPS[0].path : TUTORIAL_STEPS[1].path;
+  return {
+    targetId: `7f8fad5b-d9cb-469f-a165-80867728959${sequence}`,
+    word,
+    definition: word === 'ПАР'
+      ? 'Вода в газообразном состоянии.'
+      : 'Учебное слово для знакомства с игровым полем.',
+    cells: path.map((cellId) => {
+      const [row, col] = cellId.split(':').map(Number);
+      return { row: row - 1, col: col - 1 };
+    }),
+    foundAt: '2026-08-06T10:00:00.000Z',
+    foundSequence: sequence,
+  };
+}
+
 function LoadingScreen({ state }: { state: LoadingProgressState }) {
   return (
     <section className={styles.systemScreen} aria-label="Загрузка игры">
       <BackgroundSurface />
       <h1 className={styles.loadingLogo}>ФИНВОРДЫ</h1>
       <div className={styles.loadingArt}>
-        <img src={assetUrl('assets/p1/loading-scene.png')} alt="" />
+        <img src={`${import.meta.env.BASE_URL}assets/p1/loading-scene.png`} alt="" />
       </div>
       <LoadingProgress state={state} className={styles.loadingProgress} />
     </section>
@@ -126,7 +237,7 @@ function ErrorScreen({ onRefresh }: { onRefresh: () => void }) {
         <span />
       </header>
       <div className={styles.errorBody}>
-        <img src={assetUrl('assets/p1/error-worker.png')} alt="" />
+        <img src={`${import.meta.env.BASE_URL}assets/p1/error-worker.png`} alt="" />
         <div>
           <h1>Что-то пошло не так</h1>
           <p>Не удалось загрузить данные игры. Проверьте соединение и попробуйте ещё раз.</p>
@@ -170,19 +281,22 @@ function Home({
     client.chapters.find(
       (chapter) => chapter.status === 'in_progress' || chapter.status === 'available',
   ) ?? client.chapters[0];
-  const envelopeProgress = regularRewardProgress(state);
-  const envelopeCurrent = envelopeProgress?.current;
-  const envelopeThreshold = envelopeProgress?.threshold;
-  const hasEnvelopeProgress = envelopeCurrent !== undefined
-    && envelopeThreshold !== undefined
-    && envelopeThreshold > 0;
-  const defaultLevelNumber = Math.min(
-    (currentChapter?.completedLevels ?? 0) + 1,
-    currentChapter?.totalLevels ?? 1,
+  const envelopeThreshold = Math.max(currentChapter?.totalLevels ?? 0, 0);
+  const envelopeCurrent = clampProgress(
+    currentChapter?.completedLevels ?? 0,
+    envelopeThreshold,
   );
-  const primaryLabel = client.inProgressLevel
-    ? 'Продолжить'
-    : `Уровень ${defaultLevelNumber}`;
+  const hasEnvelopeProgress = envelopeThreshold > 0;
+  const availableLevelIndex = client.levels.findIndex((level) => level.status === 'available');
+  const defaultLevelNumber = availableLevelIndex >= 0
+    ? availableLevelIndex + 1
+    : Math.min(envelopeCurrent + 1, envelopeThreshold || 1);
+  const primaryLabel = client.clientView.campaignProgress.isCompleted
+    && client.clientView.campaignProgress.isCompletionShown
+    ? 'Итоги игры'
+    : client.inProgressLevel
+      ? 'Продолжить'
+      : `Уровень ${defaultLevelNumber}`;
   const railRef = useRef<HTMLDivElement | null>(null);
   const currentChapterRef = useRef<HTMLElement | null>(null);
 
@@ -228,7 +342,7 @@ function Home({
         className={styles.knowledgeBadge}
         aria-label={`Знания: ${client.clientView.balance.knowledgePoints}`}
       >
-        <img src={assetUrl('assets/p1/knowledge-badge.png')} alt="" />
+        <img src={`${import.meta.env.BASE_URL}assets/p1/knowledge-badge.png`} alt="" />
         <strong>{client.clientView.balance.knowledgePoints}</strong>
       </div>
 
@@ -237,6 +351,8 @@ function Home({
           {client.chapters.map((chapter, index) => {
             const current = chapter.chapterId === currentChapter?.chapterId;
             const completed = chapter.status === 'completed';
+            const totalLevels = Math.max(chapter.totalLevels, 0);
+            const completedLevels = clampProgress(chapter.completedLevels, totalLevels);
             return (
               <article
                 className={[
@@ -249,20 +365,20 @@ function Home({
                 aria-current={current ? 'step' : undefined}
               >
                 <span className={styles.chapterArt}>
-                  {current ? <img className={styles.chapterRing} src={assetUrl('assets/p1/chapter-ring.svg')} alt="" /> : null}
+                  {current ? <img className={styles.chapterRing} src={`${import.meta.env.BASE_URL}assets/p1/chapter-ring.svg`} alt="" /> : null}
                   <img
                     className={styles.chapterImage}
-                    src={assetUrl(`assets/p1/chapter-${String(index + 1).padStart(2, '0')}.png`)}
+                    src={`${import.meta.env.BASE_URL}assets/p1/chapter-${String(index + 1).padStart(2, '0')}.png`}
                     alt=""
                   />
                   {current ? (
                     <strong className={styles.chapterProgress}>
-                      {chapter.completedLevels}/{chapter.totalLevels}
+                       {completedLevels}/{totalLevels}
                     </strong>
                   ) : null}
                 </span>
                 <h2>{chapter.title}</h2>
-                {!current ? <small>{chapter.completedLevels}/{chapter.totalLevels}</small> : null}
+                {!current ? <small>{completedLevels}/{totalLevels}</small> : null}
                 {completed ? <span className={styles.chapterComplete} aria-hidden="true">✓</span> : null}
               </article>
             );
@@ -271,12 +387,19 @@ function Home({
       </div>
 
       <article className={styles.envelopeCard}>
-        <img src={assetUrl('assets/p1/home-envelope.png')} alt="" />
+        <img src={`${import.meta.env.BASE_URL}assets/envelope-golden.webp`} alt="Золотой конверт" />
         <div>
-          <strong>Бонусный конверт</strong>
+          <strong>Золотой конверт</strong>
           {hasEnvelopeProgress ? (
             <>
-              <span className={styles.envelopeTrack}>
+              <span
+                className={styles.envelopeTrack}
+                role="progressbar"
+                aria-label="Прогресс золотого конверта"
+                aria-valuemin={0}
+                aria-valuemax={envelopeThreshold}
+                aria-valuenow={envelopeCurrent}
+              >
                 <i style={{ width: `${envelopeThreshold > 0 ? (envelopeCurrent / envelopeThreshold) * 100 : 0}%` }} />
               </span>
               <small>{envelopeCurrent}/{envelopeThreshold}</small>
@@ -302,6 +425,169 @@ function Home({
   );
 }
 
+interface TutorialScreenProps {
+  mode: 'first-run' | 'replay';
+  onComplete: () => void;
+  onExit: () => void;
+}
+
+function TutorialScreen({ mode, onComplete, onExit }: TutorialScreenProps) {
+  const [stepIndex, setStepIndex] = useState(0);
+  const [stepComplete, setStepComplete] = useState(false);
+  const [selectedWord, setSelectedWord] = useState('');
+  const [definitionOpen, setDefinitionOpen] = useState(false);
+  const definitionRef = useRef<HTMLElement | null>(null);
+  const step = TUTORIAL_STEPS[stepIndex];
+  const isDefinitionStep = stepIndex === 5;
+  const foundTargets = isDefinitionStep
+    ? [tutorialTarget('ПАР', 1)]
+    : stepIndex === 4 && stepComplete
+      ? [tutorialTarget('НОС', 1)]
+      : [];
+
+  useModalFocusBoundary({
+    active: definitionOpen,
+    dialogRef: definitionRef,
+    onEscape: () => setDefinitionOpen(false),
+  });
+
+  function finishRoute(path: CellId[]) {
+    if (isDefinitionStep) return;
+    setStepComplete(
+      path.length === step.path.length
+      && path.every((cellId, index) => cellId === step.path[index]),
+    );
+  }
+
+  function advance() {
+    if (!stepComplete) return;
+    if (stepIndex === TUTORIAL_STEPS.length - 1) {
+      onComplete();
+      return;
+    }
+    setStepIndex((current) => current + 1);
+    setStepComplete(false);
+    setSelectedWord('');
+  }
+
+  const statusLabel = stepIndex === 3 && stepComplete
+    ? 'ПАР · КОНВЕРТ 1/4'
+    : stepIndex === 4 && stepComplete
+      ? 'НОС · НАЙДЕНО'
+      : selectedWord || step.word;
+
+  return (
+    <section className={styles.tutorialScreen} aria-label="Обучение">
+      <BackgroundSurface backgroundId="background-default" />
+      <header className={styles.tutorialHeader}>
+        {mode === 'replay' ? (
+          <IconButton icon="close" label="Закрыть обучение" onClick={onExit} />
+        ) : <span />}
+        <h1>Обучение</h1>
+        <span />
+      </header>
+      <article className={styles.tutorialMentor}>
+        <img src={`${import.meta.env.BASE_URL}assets/character-analyst.webp`} alt="" />
+        <p>{step.text}</p>
+      </article>
+      <p className={styles.tutorialWord} aria-live="polite">{statusLabel}</p>
+      <div className={styles.tutorialBoard}>
+        <BoardViewGameBoard
+          board={TUTORIAL_BOARD}
+          foundTargets={foundTargets}
+          retainSelection={stepComplete && stepIndex < 4}
+          inputDisabled={stepComplete && stepIndex < 4}
+          onOpenTarget={(target) => {
+            if (isDefinitionStep && target.word === 'ПАР') setDefinitionOpen(true);
+          }}
+          onSelectionChange={(word) => setSelectedWord(word)}
+          onSelectionEnd={finishRoute}
+        />
+      </div>
+      <footer className={styles.tutorialFooter}>
+        <p>{stepIndex === 3
+          ? 'Шаг 4 из 6 · учебный прогресс'
+          : `Шаг ${stepIndex + 1} из 6`}</p>
+        <span className={styles.tutorialProgress} aria-hidden="true">
+          <i style={{ width: `${((stepIndex + 1) / TUTORIAL_STEPS.length) * 100}%` }} />
+        </span>
+        <div className={styles.tutorialActions}>
+          <Button disabled={!stepComplete} onClick={advance}>Далее</Button>
+          {mode === 'replay' ? (
+            <Button variant="secondary" onClick={onExit}>Пропустить обучение</Button>
+          ) : null}
+        </div>
+      </footer>
+
+      {definitionOpen ? (
+        <div className={`${styles.scrim} ${styles.gameInfoScrim}`}>
+          <section
+            ref={definitionRef}
+            className={styles.tutorialDefinition}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="tutorial-definition-title"
+            tabIndex={-1}
+          >
+            <h2 id="tutorial-definition-title">ПАР</h2>
+            <p>Вода в газообразном состоянии.</p>
+            <Button
+              onClick={() => {
+                setDefinitionOpen(false);
+                setStepComplete(true);
+              }}
+            >
+              Понятно
+            </Button>
+          </section>
+        </div>
+      ) : null}
+    </section>
+  );
+}
+
+interface NarrativeScreenProps {
+  chapterTitle: string;
+  narrativeText: string;
+  status: AsyncStatus | 'locked';
+  onContinue: () => void;
+  onRetry: () => void;
+}
+
+function NarrativeScreen({
+  chapterTitle,
+  narrativeText,
+  status,
+  onContinue,
+  onRetry,
+}: NarrativeScreenProps) {
+  return (
+    <section className={styles.narrativeScreen} aria-label="История главы">
+      <BackgroundSurface backgroundId="background-default" />
+      <div className={styles.narrativeCard}>
+        <span className={styles.narrativeEyebrow}>Новая глава</span>
+        <img src={`${import.meta.env.BASE_URL}assets/character-analyst.webp`} alt="" />
+        <h1>{chapterTitle}</h1>
+        <p>{narrativeText}</p>
+        {status === 'locked' ? (
+          <p className={styles.narrativeError} role="alert">Глава пока недоступна</p>
+        ) : status === 'error' ? (
+          <p className={styles.narrativeError} role="alert">
+            Не удалось подтвердить историю главы. Попробуйте ещё раз.
+          </p>
+        ) : null}
+        {status === 'error' ? (
+          <Button onClick={onRetry}>Повторить</Button>
+        ) : status !== 'locked' ? (
+          <Button disabled={status === 'loading'} onClick={onContinue}>
+            {status === 'loading' ? 'Продолжаем…' : 'Продолжить'}
+          </Button>
+        ) : null}
+      </div>
+    </section>
+  );
+}
+
 interface SettingsModalProps {
   settings: SettingsResponse;
   status: AsyncStatus;
@@ -309,6 +595,7 @@ interface SettingsModalProps {
   isInert: boolean;
   onClose: () => void;
   onChange: (body: UpdateSettingsRequest) => void;
+  onTutorial: () => void;
   onFeedback: () => void;
 }
 
@@ -319,6 +606,7 @@ function SettingsModal({
   isInert,
   onClose,
   onChange,
+  onTutorial,
   onFeedback,
 }: SettingsModalProps) {
   const dialogRef = useRef<HTMLElement | null>(null);
@@ -387,7 +675,10 @@ function SettingsModal({
         {status === 'success' ? <p role="status">Настройки сохранены</p> : null}
         {status === 'error' ? <p className={styles.inlineError} role="alert">Не удалось сохранить настройки</p> : null}
         <div className={styles.sheetSpacer} />
-        <Button variant="secondary" onClick={onFeedback}>Оценить игру</Button>
+        <div className={styles.sheetActions}>
+          <Button variant="secondary" onClick={onTutorial}>Пройти обучение</Button>
+          <Button variant="secondary" onClick={onFeedback}>Оценить игру</Button>
+        </div>
       </section>
     </div>
   );
@@ -395,11 +686,12 @@ function SettingsModal({
 
 interface FeedbackModalProps {
   status: AsyncStatus;
+  context: FeedbackContext;
   onClose: () => void;
   onSubmit: (body: SubmitFeedbackRequest) => void;
 }
 
-function FeedbackModal({ status, onClose, onSubmit }: FeedbackModalProps) {
+function FeedbackModal({ status, context, onClose, onSubmit }: FeedbackModalProps) {
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState('');
   const dialogRef = useRef<HTMLElement | null>(null);
@@ -496,7 +788,8 @@ function FeedbackModal({ status, onClose, onSubmit }: FeedbackModalProps) {
           disabled={rating === 0 || status === 'loading'}
           onClick={() =>
             onSubmit({
-              source: 'settings',
+              source: context.source,
+              ...(context.source === 'chapter_completion' ? { chapterId: context.chapterId } : {}),
               rating,
               ...(comment.trim() ? { comment: comment.trim() } : {}),
             } as SubmitFeedbackRequest)
@@ -506,6 +799,101 @@ function FeedbackModal({ status, onClose, onSubmit }: FeedbackModalProps) {
         </Button>
       </section>
     </div>
+  );
+}
+
+function LifecycleTerminal() {
+  return (
+    <section className={styles.lifecycleTerminal} aria-label="Статус кампании">
+      <div className={styles.lifecycleTerminalCard}>
+        <span className={styles.lifecycleTerminalIcon} aria-hidden="true">⚓</span>
+        <h1>Следующая глава пока недоступна</h1>
+        <p>Первая глава пройдена. Продолжение не входит в эту версию.</p>
+      </div>
+    </section>
+  );
+}
+
+function CampaignCompleteScreen({
+  state,
+  catalog,
+  onHome,
+}: {
+  state: ClientStateResponse;
+  catalog: AppearanceCatalogResponse;
+  onHome: () => void;
+}) {
+  const headingRef = useRef<HTMLHeadingElement | null>(null);
+  const client = state.clientState;
+  const completedLevels = client.levels.filter((level) => level.status === 'completed').length;
+  const completedChapters = client.chapters.filter((chapter) => chapter.status === 'completed').length;
+  const ownedAppearances = catalog.items.filter((appearance) => appearance.isOwned).length;
+  const selectedCharacter = catalog.items.find(
+    (appearance) => appearance.appearanceId === catalog.selectedCharacterId,
+  ) ?? catalog.items.find(
+    (appearance) => appearance.type === AppearanceTypeEnum.Character && appearance.title === 'Аналитик',
+  ) ?? catalog.items.find((appearance) => appearance.type === AppearanceTypeEnum.Character);
+
+  useEffect(() => {
+    headingRef.current?.focus();
+  }, []);
+
+  return (
+    <section className={styles.campaignCompleteScreen} aria-label="Итоги кампании">
+      <div className={styles.campaignCompleteCard}>
+        <header className={styles.campaignCompleteHeader}>
+          <h1 ref={headingRef} tabIndex={-1}>Вы прошли 50 уровней!</h1>
+          <p>Новые главы и финансовые открытия уже на подходе.</p>
+        </header>
+
+        <div className={styles.campaignHero}>
+          <span className={styles.campaignGlow} aria-hidden="true" />
+          <span className={styles.campaignRay} data-ray="left" aria-hidden="true" />
+          <span className={styles.campaignRay} data-ray="center" aria-hidden="true" />
+          <span className={styles.campaignRay} data-ray="right" aria-hidden="true" />
+          {selectedCharacter ? (
+            <img
+              className={styles.campaignCharacter}
+              src={selectedCharacter.imageUrl}
+              alt={selectedCharacter.title}
+            />
+          ) : null}
+          <div className={styles.campaignCertificate}>
+            <strong>Финворды</strong>
+            <span>Кампания завершена</span>
+            <b>{completedLevels}/{client.levels.length}</b>
+            <small>
+              <span className={styles.campaignChapterCount}>
+                {completedChapters}/{client.chapters.length}
+              </span> глав
+            </small>
+          </div>
+        </div>
+
+        <div className={styles.campaignStats} aria-label="Статистика кампании">
+          <article>
+            <img src={`${import.meta.env.BASE_URL}assets/p1/knowledge-badge.png`} alt="" />
+            <span>Знания</span>
+            <strong>{client.clientView.balance.knowledgePoints}</strong>
+          </article>
+          <article>
+            <img src={`${import.meta.env.BASE_URL}assets/envelope-regular.webp`} alt="" />
+            <span>Бонусные слова</span>
+            <strong>0</strong>
+          </article>
+          <article>
+            {selectedCharacter ? <img src={selectedCharacter.imageUrl} alt="" /> : null}
+            <span>Облики</span>
+            <strong>{ownedAppearances} из {catalog.items.length}</strong>
+          </article>
+        </div>
+
+        <Button onClick={onHome}>На главную</Button>
+      </div>
+      <div className={styles.campaignConfetti} aria-hidden="true">
+        <i /><i /><i /><i /><i /><i /><i /><i />
+      </div>
+    </section>
   );
 }
 
@@ -567,19 +955,14 @@ function WordDefinitionModal({
         aria-labelledby="p1-word-definition-dialog-title"
         tabIndex={-1}
       >
-        <span className={styles.sheetHandle} aria-hidden="true" />
         <header className={styles.sheetHeader}>
           <span />
           <h2 id="p1-word-definition-dialog-title">{target.word}</h2>
           <IconButton icon="close" label="Закрыть определение" depth="flat" onClick={onClose} />
         </header>
-        <p>{target.definition}</p>
-        {target.courseOffer ? (
-          <article className={styles.courseOfferCard}>
-            <span>{target.courseOffer.badgeLabel}</span>
-            <strong>{target.courseOffer.title}</strong>
-          </article>
-        ) : null}
+        <div className={styles.wordDefinitionContent}>
+          <p>{target.definition}</p>
+        </div>
         <Button autoFocus onClick={onClose}>Понятно</Button>
       </section>
     </div>
@@ -588,39 +971,61 @@ function WordDefinitionModal({
 
 function CourseErrorModal({
   target,
+  destination,
+  offerTitle,
   onClose,
+  onReturnToField,
 }: {
   target: FoundTarget;
+  destination?: string;
+  offerTitle?: string;
   onClose: () => void;
+  onReturnToField: () => void;
 }) {
   const dialogRef = useRef<HTMLElement | null>(null);
+  const canRetry = Boolean(destination && isBcsDeepLink(destination));
   useModalFocusBoundary({ active: true, dialogRef, onEscape: onClose });
 
   return (
-    <div className={`${styles.scrim} ${styles.gameInfoScrim}`}>
+    <div className={`${styles.scrim} ${styles.courseErrorScrim}`}>
       <section
-        className={styles.gameInfoSheet}
+        className={styles.courseErrorSheet}
         ref={dialogRef}
         role="dialog"
         aria-modal="true"
         aria-labelledby="p1-course-error-dialog-title"
         tabIndex={-1}
       >
-        <span className={styles.sheetHandle} aria-hidden="true" />
         <header className={styles.sheetHeader}>
           <span />
           <h2 id="p1-course-error-dialog-title">{target.word}</h2>
-          <IconButton icon="close" label="Закрыть определение" depth="flat" onClick={onClose} />
+          <IconButton icon="close" label="Закрыть окно курса" depth="flat" onClick={onClose} />
         </header>
-        <p>{target.definition}</p>
-        <article className={styles.courseOfferCard}>
-          <span>Мини-курс</span>
-          <strong>Курс «Как работают акции»</strong>
-        </article>
-        <p>Не удалось открыть страницу. Попробуйте ещё раз.</p>
-        <p>Прогресс уровня сохранён</p>
-        <Button disabled>Повторить</Button>
-        <Button autoFocus onClick={onClose}>Вернуться к полю</Button>
+        <div className={styles.courseContentZone}>
+          <p className={styles.courseDefinition}>{target.definition}</p>
+          <span className={styles.coursePill}>
+            <Icon name="book" />
+            {target.courseOffer?.badgeLabel ?? 'Мини-курс'}
+          </span>
+          <p className={styles.courseTitle}>{offerTitle ?? target.courseOffer?.title}</p>
+        </div>
+        <p className={styles.courseErrorCard}>
+          Не удалось открыть страницу. Попробуйте ещё раз.
+        </p>
+        <p className={styles.courseSavedCard}>Прогресс уровня сохранён</p>
+        <div className={styles.courseActions}>
+          <Button
+            disabled={!canRetry}
+            onClick={() => {
+              if (destination && canRetry) openDeepLink(destination);
+            }}
+          >
+            Повторить
+          </Button>
+          <Button variant="secondary" onClick={onReturnToField}>
+            Вернуться к полю
+          </Button>
+        </div>
       </section>
     </div>
   );
@@ -685,7 +1090,7 @@ function BonusWordsModal({
 
         {hasProgress && progress && foundCount !== undefined ? (
           <article className={styles.bonusProgressCard}>
-            <img src={assetUrl('assets/p1/home-envelope.png')} alt="" />
+            <img src={`${import.meta.env.BASE_URL}assets/p1/home-envelope.png`} alt="" />
             <div>
               <strong>Бонусный конверт</strong>
               <span
@@ -909,13 +1314,21 @@ function AppearanceScreen({
 }: AppearanceScreenProps) {
   const [tab, setTab] = useState<'character' | 'background'>('character');
   const items = catalog?.items.filter((appearance) => appearance.type === tab) ?? [];
+  const ownedCount = catalog?.items.filter((appearance) => appearance.isOwned).length ?? 0;
+  const totalCount = catalog?.items.length ?? 0;
+  const hasCatalog = Boolean(catalog);
   return (
     <section className={styles.appearanceScreen} aria-label="Облики">
       <BackgroundSurface />
       <header className={styles.appearanceHeader}>
         <IconButton icon="back" label="Назад" variant="ghost" onClick={onBack} />
         <h1>Облики</h1>
-        <span />
+        <span
+          className={styles.appearanceCount}
+          aria-label={`Получено обликов: ${ownedCount} из ${totalCount}`}
+        >
+          {ownedCount}/{totalCount}
+        </span>
       </header>
       <div className={styles.appearanceTabs} role="tablist" aria-label="Тип облика">
         <button
@@ -935,34 +1348,36 @@ function AppearanceScreen({
           Фоны
         </button>
       </div>
-      {status === 'loading' ? <p className={styles.catalogState}>Загружаем облики…</p> : null}
-      {status === 'error' ? (
+      {status === 'loading' && !hasCatalog ? <p className={styles.catalogState}>Загружаем облики…</p> : null}
+      {status === 'error' && !hasCatalog ? (
         <div className={styles.catalogState}>
           <p>Не удалось загрузить облики</p>
           <Button onClick={onRetry}>Повторить</Button>
         </div>
       ) : null}
-      {status === 'success' && items.length === 0 ? (
+      {status === 'error' && hasCatalog ? (
+        <p className={styles.appearanceInlineError} role="alert">
+          Не удалось выбрать облик. Попробуйте ещё раз.
+        </p>
+      ) : null}
+      {hasCatalog && items.length === 0 ? (
         <p className={styles.catalogState}>В этой категории пока нет обликов</p>
       ) : null}
-      {status === 'success' && items.length > 0 ? (
-        <div className={styles.appearanceGrid}>
-          {items.map((appearance, index) => (
+      {hasCatalog && items.length > 0 ? (
+        <div className={styles.appearanceGrid} aria-busy={status === 'loading'}>
+          {items.map((appearance) => (
             <button
               type="button"
               key={appearance.appearanceId}
               aria-label={appearance.title}
               aria-pressed={appearance.isSelected}
-              disabled={!appearance.isOwned}
+              disabled={!appearance.isOwned || status === 'loading'}
               className={appearance.isSelected ? styles.appearanceSelected : ''}
               onClick={() => onSelect(appearance.appearanceId)}
             >
               <span className={styles.appearancePreview}>
                 {appearance.type === 'background' ? (
-                  <BackgroundSurface
-                    backgroundId={appearanceBackgrounds[index] ?? 'background-default'}
-                    className={styles.backgroundPreview}
-                  />
+                  <img className={styles.backgroundPreviewImage} src={appearance.imageUrl} alt="" />
                 ) : (
                   <img src={appearance.imageUrl} alt="" />
                 )}
@@ -989,20 +1404,30 @@ export function P1App({
   const [clientState, setClientState] = useState<ClientStateResponse | null>(null);
   const [settingsStatus, setSettingsStatus] = useState<AsyncStatus>('idle');
   const [feedbackStatus, setFeedbackStatus] = useState<AsyncStatus>('idle');
+  const [feedbackContext, setFeedbackContext] = useState<FeedbackContext>({ source: 'settings' });
+  const [feedbackNextAction, setFeedbackNextAction] = useState<NextAction | null>(null);
   const [rewardStatus, setRewardStatus] = useState<AsyncStatus>('idle');
   const [catalogStatus, setCatalogStatus] = useState<AsyncStatus>('idle');
   const [catalog, setCatalog] = useState<AppearanceCatalogResponse | null>(null);
+  const catalogRef = useRef<AppearanceCatalogResponse | null>(null);
+  const [campaignCompleteMode, setCampaignCompleteMode] = useState<'automatic' | 'replay' | null>(null);
+  const campaignConfirmationStartedRef = useRef(false);
   const [entryStatus, setEntryStatus] = useState<AsyncStatus>('idle');
+  const [tutorialMode, setTutorialMode] = useState<'first-run' | 'replay'>('first-run');
+  const [narrativeStatus, setNarrativeStatus] = useState<AsyncStatus | 'locked'>('idle');
+  const tutorialAcknowledgedRef = useRef(false);
+  const narrativeControllerRef = useRef<AbortController | null>(null);
   const [hintStatus, setHintStatus] = useState<AsyncStatus>('idle');
   const [levelPlay, setLevelPlay] = useState<LevelPlayResponse | null>(null);
   const [gameNotice, setGameNotice] = useState<GameNotice | undefined>();
+  const gameNoticeTimerRef = useRef<number | null>(null);
+  const gameNoticeGenerationRef = useRef(0);
   const [gameCompleted, setGameCompleted] = useState(false);
   const [gameRewardOpened, setGameRewardOpened] = useState(false);
   const clientStateRef = useRef<ClientStateResponse | null>(null);
   const phaseRef = useRef<Phase>('loading');
-  const modalRef = useRef<Modal>('none');
   const rewardOpenTimerRef = useRef<{ rewardId: string; timer: number } | null>(null);
-  const [selectedTarget, setSelectedTarget] = useState<FoundTarget | null>(null);
+  const [targetModalContext, setTargetModalContext] = useState<TargetModalContext | null>(null);
   const [levelResults, setLevelResults] = useState<LevelResultsResponse | null>(null);
   const [resultsStatus, setResultsStatus] = useState<AsyncStatus>('idle');
   const [resultsLoadingVisible, setResultsLoadingVisible] = useState(false);
@@ -1036,6 +1461,30 @@ export function P1App({
   const submitHoldTimerRef = useRef<number | null>(null);
   const submitGenerationRef = useRef(0);
 
+  const clearGameNoticeTimer = useCallback(() => {
+    if (gameNoticeTimerRef.current === null) return;
+    window.clearTimeout(gameNoticeTimerRef.current);
+    gameNoticeTimerRef.current = null;
+  }, []);
+
+  const clearGameNotice = useCallback(() => {
+    gameNoticeGenerationRef.current += 1;
+    clearGameNoticeTimer();
+    setGameNotice(undefined);
+  }, [clearGameNoticeTimer]);
+
+  const showGameNotice = useCallback((notice: GameNotice) => {
+    clearGameNoticeTimer();
+    const generation = gameNoticeGenerationRef.current + 1;
+    gameNoticeGenerationRef.current = generation;
+    setGameNotice(notice);
+    gameNoticeTimerRef.current = window.setTimeout(() => {
+      if (gameNoticeGenerationRef.current !== generation) return;
+      gameNoticeTimerRef.current = null;
+      setGameNotice(undefined);
+    }, GAME_NOTICE_DURATION_MS);
+  }, [clearGameNoticeTimer]);
+
   function cancelScheduledRewardOpen() {
     if (!rewardOpenTimerRef.current) return;
     window.clearTimeout(rewardOpenTimerRef.current.timer);
@@ -1048,19 +1497,15 @@ export function P1App({
       rewardId,
       timer: window.setTimeout(() => {
         const pendingReward = availablePendingReward(clientStateRef.current);
-        rewardOpenTimerRef.current = null;
         if (
           phaseRef.current === 'game' &&
           pendingReward?.rewardId === rewardId &&
           pendingReward.rewardType === RewardSummaryRewardTypeEnum.Regular
         ) {
-          if (modalRef.current !== 'none') {
-            scheduleRewardOpen(rewardId);
-            return;
-          }
           setRewardStatus('idle');
           setModal('reward');
         }
+        rewardOpenTimerRef.current = null;
       }, 500),
     };
   }
@@ -1070,7 +1515,7 @@ export function P1App({
     signal?: AbortSignal,
   ) => {
     setEntryStatus('loading');
-    setGameNotice(undefined);
+    clearGameNotice();
     submitGenerationRef.current += 1;
     if (submitControllerRef.current) {
       submitControllerRef.current.abort();
@@ -1105,26 +1550,169 @@ export function P1App({
       setEntryStatus('error');
       throw error;
     }
+  }, [api, clearGameNotice]);
+
+  const openCampaignComplete = useCallback(async (
+    state: ClientStateResponse,
+    mode: 'automatic' | 'replay',
+    signal?: AbortSignal,
+  ) => {
+    setEntryStatus('loading');
+    const authoritativeState = mode === 'automatic'
+      ? await api.resyncState(signal)
+      : state;
+    if (!authoritativeState.clientState.clientView.campaignProgress.isCompleted) {
+      throw new Error('CAMPAIGN_NOT_COMPLETED');
+    }
+    const authoritativeCatalog = catalogRef.current ?? await api.getAppearances();
+    if (signal?.aborted) return;
+    catalogRef.current = authoritativeCatalog;
+    setCatalog(authoritativeCatalog);
+    clientStateRef.current = authoritativeState;
+    setClientState(authoritativeState);
+    if (mode === 'automatic') campaignConfirmationStartedRef.current = false;
+    setCampaignCompleteMode(mode);
+    setModal('none');
+    setPhase('campaign-complete');
+    setEntryStatus('success');
   }, [api]);
 
   const routeNextAction = useCallback(async (
     nextAction: NextAction,
     state: ClientStateResponse,
     signal?: AbortSignal,
+    completedChapterId?: string,
   ) => {
-    if (nextAction === 'play') {
-      await enterGame(state, signal);
+    setEntryStatus('idle');
+    clearGameNotice();
+    switch (nextAction) {
+      case NextAction.Play:
+        await enterGame(state, signal);
+        return;
+      case NextAction.ClaimReward:
+        setPhase('home');
+        setRewardStatus('idle');
+        setModal(availablePendingReward(state) ? 'reward' : 'none');
+        return;
+      case NextAction.OpenFeedback: {
+        const chapter = (
+          completedChapterId
+            ? state.clientState.chapters.find((candidate) => candidate.chapterId === completedChapterId)
+            : undefined
+        ) ?? state.clientState.chapters
+          .filter((candidate) => candidate.status === 'completed')
+          .at(-1)
+          ?? state.clientState.chapters[0];
+        if (!chapter) {
+          setPhase('next-chapter-unavailable');
+          setModal('none');
+          return;
+        }
+        setFeedbackContext({ source: 'chapter_completion', chapterId: chapter.chapterId });
+        setFeedbackNextAction(null);
+        setFeedbackStatus('idle');
+        setPhase('home');
+        setModal('feedback');
+        return;
+      }
+      case NextAction.NextChapter: {
+        const authoritativeState = await api.resyncState(signal);
+        clientStateRef.current = authoritativeState;
+        setClientState(authoritativeState);
+        const chapter = authoritativeState.clientState.chapters.find(
+          (candidate) => candidate.status === 'in_progress' || candidate.status === 'available',
+        );
+        setModal('none');
+        if (!chapter) {
+          setPhase('next-chapter-unavailable');
+        } else if (!chapter.isNarrativeShown) {
+          setNarrativeStatus('idle');
+          setPhase('narrative');
+        } else {
+          await enterGame(authoritativeState, signal);
+        }
+        return;
+      }
+      case NextAction.CampaignComplete:
+        await openCampaignComplete(state, 'automatic', signal);
+        return;
+      case NextAction.StartLevel:
+      case NextAction.None:
+        setPhase('home');
+        setModal('none');
+        return;
+    }
+  }, [api, clearGameNotice, enterGame, openCampaignComplete]);
+
+  const beginLevelFlow = useCallback((state: ClientStateResponse) => {
+    const chapter = state.clientState.chapters.find(
+      (candidate) => candidate.status === 'in_progress' || candidate.status === 'available',
+    ) ?? state.clientState.chapters[0];
+    if (!chapter) {
+      setEntryStatus('error');
       return;
     }
-    setEntryStatus('idle');
-    setPhase('home');
-    setModal(
-      nextAction === 'claim_reward' &&
-      availablePendingReward(state)?.rewardType === RewardSummaryRewardTypeEnum.Regular
-        ? 'reward'
-        : 'none',
-    );
+    if (
+      !state.clientState.clientView.settings.tutorialCompleted
+      && !tutorialAcknowledgedRef.current
+    ) {
+      setTutorialMode('first-run');
+      setPhase('tutorial');
+      return;
+    }
+    if (!chapter.isNarrativeShown) {
+      setNarrativeStatus('idle');
+      setPhase('narrative');
+      return;
+    }
+    void enterGame(state).catch(() => undefined);
   }, [enterGame]);
+
+  const confirmNarrativeAndEnter = useCallback(async () => {
+    const state = clientStateRef.current;
+    const chapter = state?.clientState.chapters.find(
+      (candidate) => candidate.status === 'in_progress' || candidate.status === 'available',
+    ) ?? state?.clientState.chapters[0];
+    if (!state || !chapter || narrativeStatus === 'loading' || narrativeStatus === 'locked') return;
+
+    narrativeControllerRef.current?.abort();
+    const controller = new AbortController();
+    narrativeControllerRef.current = controller;
+    setNarrativeStatus('loading');
+    try {
+      const response = await api.confirmNarrativeShown(chapter.chapterId, state, controller.signal);
+      if (controller.signal.aborted) return;
+      const nextState: ClientStateResponse = {
+        ...state,
+        clientState: {
+          ...state.clientState,
+          chapters: state.clientState.chapters.map((candidate) =>
+            candidate.chapterId === response.chapterId
+              ? { ...candidate, isNarrativeShown: response.isNarrativeShown, narrativeText: undefined }
+              : candidate,
+          ),
+          nextAction: response.nextAction,
+        },
+      };
+      clientStateRef.current = nextState;
+      setClientState(nextState);
+      setNarrativeStatus('success');
+      if (response.nextAction === 'start_level' || response.nextAction === 'play') {
+        await enterGame(nextState, controller.signal);
+      } else {
+        await routeNextAction(response.nextAction, nextState, controller.signal);
+      }
+    } catch (error) {
+      if (controller.signal.aborted) return;
+      const type = typeof error === 'object' && error !== null && 'type' in error
+        ? String(error.type)
+        : undefined;
+      setNarrativeStatus(type === 'CHAPTER_LOCKED' ? 'locked' : 'error');
+      setPhase('narrative');
+    } finally {
+      if (narrativeControllerRef.current === controller) narrativeControllerRef.current = null;
+    }
+  }, [api, enterGame, narrativeStatus, routeNextAction]);
 
   const clearResultsTimers = useCallback(() => {
     if (resultsDelayTimerRef.current !== null) {
@@ -1163,6 +1751,7 @@ export function P1App({
     ackIntentRef.current = null;
     resultsAcknowledgedRef.current = false;
     setAckStatus('idle');
+    clearGameNotice();
     setPhase('results');
     resultsDelayTimerRef.current = window.setTimeout(() => {
       if (resultsGenerationRef.current === generation) setResultsLoadingVisible(true);
@@ -1191,7 +1780,7 @@ export function P1App({
         resultsControllerRef.current = null;
       }
     }
-  }, [api, clearResultsTimers, invalidateAcknowledge, timeoutMs]);
+  }, [api, clearGameNotice, clearResultsTimers, invalidateAcknowledge, timeoutMs]);
 
   const load = useCallback(async () => {
     generationRef.current += 1;
@@ -1241,8 +1830,36 @@ export function P1App({
   useEffect(() => {
     clientStateRef.current = clientState;
     phaseRef.current = phase;
-    modalRef.current = modal;
-  }, [clientState, modal, phase]);
+  }, [clientState, phase]);
+
+  useEffect(() => {
+    if (
+      phase !== 'campaign-complete'
+      || campaignCompleteMode !== 'automatic'
+      || campaignConfirmationStartedRef.current
+    ) return;
+    campaignConfirmationStartedRef.current = true;
+    void api.confirmCampaignCompleteShown().then((response) => {
+      const current = clientStateRef.current;
+      if (!current) return;
+      const confirmedState: ClientStateResponse = {
+        ...current,
+        clientState: {
+          ...current.clientState,
+          clientView: {
+            ...current.clientState.clientView,
+            campaignProgress: {
+              ...current.clientState.clientView.campaignProgress,
+              isCompletionShown: response.isCompletionShown,
+            },
+          },
+          nextAction: response.nextAction,
+        },
+      };
+      clientStateRef.current = confirmedState;
+      setClientState(confirmedState);
+    }).catch(() => undefined);
+  }, [api, campaignCompleteMode, phase]);
 
   useEffect(() => {
     const startTimer = window.setTimeout(() => void load(), 0);
@@ -1250,6 +1867,7 @@ export function P1App({
       window.clearTimeout(startTimer);
       generationRef.current += 1;
       controllerRef.current?.abort();
+      narrativeControllerRef.current?.abort();
       resultsGenerationRef.current += 1;
       resultsControllerRef.current?.abort();
       invalidateAcknowledge();
@@ -1276,10 +1894,12 @@ export function P1App({
       submitGenerationRef.current += 1;
       resultsGenerationRef.current += 1;
       resultsControllerRef.current?.abort();
+      gameNoticeGenerationRef.current += 1;
+      clearGameNoticeTimer();
       cancelScheduledRewardOpen();
       clearResultsTimers();
     },
-    [clearResultsTimers],
+    [clearGameNoticeTimer, clearResultsTimers],
   );
 
   useLayoutEffect(() => {
@@ -1296,6 +1916,7 @@ export function P1App({
     void api
       .getAppearances()
       .then((response) => {
+        catalogRef.current = response;
         setCatalog(response);
         setCatalogStatus('success');
       })
@@ -1319,17 +1940,51 @@ export function P1App({
       cancelScheduledRewardOpen();
     }
   }, [phase, reward?.rewardId]);
-  const resultsLevelLabel = !levelResults
-    ? 'уровня'
-    : levelResults.completionKind === 'chapter'
-      ? 'уровня'
-      : `уровня ${levelResults.chapter.completedLevels}`;
+  const resultsLevelNumber =
+    levelResults && levelPlay?.levelId === levelResults.levelId
+      ? levelPlay.levelNumber
+      : undefined;
+  const resultsLevelLabel =
+    resultsLevelNumber !== undefined
+      ? `уровня ${resultsLevelNumber}`
+      : 'текущего уровня';
   const chapterGoldenReward =
     levelResults?.completionKind === 'chapter'
     && levelResults.reward?.rewardType === RewardSummaryRewardTypeEnum.ChapterGolden
     && levelResults.reward.status === 'available'
       ? levelResults.reward
       : undefined;
+
+  const openFoundTarget = useCallback((
+    target: FoundTarget,
+    source: TargetOpenSource,
+    levelNumber?: number,
+  ) => {
+    const presentation =
+      source === 'game' && levelNumber !== undefined && isLocalLevelId(levelNumber)
+        ? resolveGameFoundTargetPresentation(levelNumber, target)
+        : resolveFoundTargetPresentation(target);
+    const localOfferContext =
+      levelNumber !== undefined && isLocalLevelId(levelNumber)
+        ? localCourseOfferContext(resolveLocalCourseOffer(levelNumber, target))
+        : {};
+    const serverOfferContext = target.courseOffer
+      ? {
+          ...(localOfferContext.destination ? { destination: localOfferContext.destination } : {}),
+          ...(!target.courseOffer.title && localOfferContext.offerTitle
+            ? { offerTitle: localOfferContext.offerTitle }
+            : {}),
+        }
+      : source === 'game'
+        ? localOfferContext
+        : {};
+    setTargetModalContext({
+      target,
+      source,
+      ...serverOfferContext,
+    });
+    setModal(presentation.linked ? 'course-error' : 'word-definition');
+  }, []);
 
   function rememberRewardTrigger() {
     const activeElement = document.activeElement;
@@ -1409,6 +2064,7 @@ export function P1App({
       resultsAcknowledgedRef.current = true;
       setAckStatus('success');
       ackIntentRef.current = null;
+      clientStateRef.current = nextState;
       setClientState(nextState);
 
       if (intent === 'reward') {
@@ -1424,7 +2080,18 @@ export function P1App({
 
       if (!nextState || intent === 'home') return;
       if (response.nextAction === 'start_level' || response.nextAction === 'play') {
-        await enterGame(nextState).catch(() => undefined);
+        const authoritativeState = await api.resyncState(controller.signal);
+        if (generation !== ackGenerationRef.current) return;
+        clientStateRef.current = authoritativeState;
+        setClientState(authoritativeState);
+        if (
+          authoritativeState.clientState.nextAction === 'start_level'
+          || authoritativeState.clientState.nextAction === 'play'
+        ) {
+          await enterGame(authoritativeState);
+        } else {
+          await routeNextAction(authoritativeState.clientState.nextAction, authoritativeState);
+        }
       } else {
         await routeNextAction(response.nextAction, nextState);
       }
@@ -1511,8 +2178,54 @@ export function P1App({
   async function submitFeedback(body: SubmitFeedbackRequest) {
     setFeedbackStatus('loading');
     try {
-      await api.submitFeedback(body);
+      const response = await api.submitFeedback(body);
+      setFeedbackNextAction(response.nextAction);
+      if (clientState) {
+        const nextState = {
+          ...clientState,
+          clientState: { ...clientState.clientState, nextAction: response.nextAction },
+        };
+        clientStateRef.current = nextState;
+        setClientState(nextState);
+      }
       setFeedbackStatus('success');
+    } catch (error) {
+      if (feedbackContext.source === 'chapter_completion' && problemType(error) === 'FEEDBACK_NOT_ELIGIBLE') {
+        setFeedbackStatus('idle');
+        setModal('none');
+        if (clientState) await routeNextAction(NextAction.NextChapter, clientState);
+        return;
+      }
+      setFeedbackStatus('error');
+    }
+  }
+
+  async function closeFeedback() {
+    if (feedbackContext.source === 'settings') {
+      setModal('settings');
+      return;
+    }
+    if (feedbackStatus === 'success' && feedbackNextAction) {
+      setModal('none');
+      if (clientState) await routeNextAction(feedbackNextAction, clientState);
+      return;
+    }
+    if (feedbackStatus === 'loading') return;
+    setFeedbackStatus('loading');
+    try {
+      const response = await api.dismissFeedback(feedbackContext.chapterId);
+      const nextState = clientState
+        ? {
+            ...clientState,
+            clientState: { ...clientState.clientState, nextAction: response.nextAction },
+          }
+        : null;
+      if (nextState) {
+        clientStateRef.current = nextState;
+        setClientState(nextState);
+        setModal('none');
+        await routeNextAction(response.nextAction, nextState);
+      }
     } catch {
       setFeedbackStatus('error');
     }
@@ -1554,6 +2267,26 @@ export function P1App({
       await routeNextAction(fallbackState.clientState.nextAction, fallbackState);
     } finally {
       window.clearTimeout(timeoutId);
+    }
+  }
+
+  async function recoverResultsAcknowledgement(error: unknown): Promise<boolean> {
+    if (problemType(error) !== 'RESULTS_ACKNOWLEDGEMENT_REQUIRED') return false;
+    try {
+      const authoritative = await api.loadState();
+      clientStateRef.current = authoritative;
+      setClientState(authoritative);
+      setRewardStatus('idle');
+      setModal('none');
+      const levelId = authoritative.clientState.pendingResults?.levelId ?? levelResults?.levelId;
+      if (!levelId) {
+        setPhase('home');
+        return true;
+      }
+      await loadResults(levelId);
+      return true;
+    } catch {
+      return false;
     }
   }
 
@@ -1601,7 +2334,8 @@ export function P1App({
       setClientState(nextState);
       setRewardStatus('success');
       await reloadClientStateAfterRegularClaim(nextState, pendingReward.rewardId, response.nextAction);
-    } catch {
+    } catch (error) {
+      if (await recoverResultsAcknowledgement(error)) return;
       setRewardStatus('error');
     }
   }
@@ -1634,13 +2368,20 @@ export function P1App({
           nextAction: response.nextAction,
         },
       };
+      clientStateRef.current = nextState;
       setClientState(nextState);
       setRewardStatus('success');
       setModal('none');
       setLevelResults(null);
       setResultsStatus('idle');
-      await routeNextAction(response.nextAction, nextState);
-    } catch {
+      await routeNextAction(
+        response.nextAction,
+        nextState,
+        undefined,
+        levelResults.chapter.chapterId,
+      );
+    } catch (error) {
+      if (await recoverResultsAcknowledgement(error)) return;
       setRewardStatus('error');
     }
   }
@@ -1690,7 +2431,8 @@ export function P1App({
       setClientState(nextState);
       setRewardStatus('success');
       await routeNextAction(response.nextAction, nextState);
-    } catch {
+    } catch (error) {
+      if (await recoverResultsAcknowledgement(error)) return;
       setRewardStatus('error');
     }
   }
@@ -1698,7 +2440,7 @@ export function P1App({
   async function handleGameHint() {
     if (!levelPlay || hintStatus === 'loading' || gameCompleted) return;
     setHintStatus('loading');
-    setGameNotice(undefined);
+    clearGameNotice();
     try {
       const response = await api.useHint(levelPlay.levelId);
       setLevelPlay((current) =>
@@ -1755,7 +2497,7 @@ export function P1App({
           : response.hintBalance === 1
             ? { tone: 'info', text: 'Осталась последняя подсказка' }
             : { tone: 'info', text: 'Первая буква слова открыта' };
-      setGameNotice(hintNotice);
+      showGameNotice(hintNotice);
       setHintStatus('success');
       if (response.levelCompleted) {
         void loadResults(levelPlay.levelId);
@@ -1765,7 +2507,7 @@ export function P1App({
         typeof error === 'object' && error !== null && 'type' in error
           ? error.type
           : undefined;
-      setGameNotice({
+      showGameNotice({
         tone: 'error',
         text: type === 'HINTS_EXHAUSTED'
           ? 'Подсказки закончились'
@@ -1810,7 +2552,7 @@ export function P1App({
     if (result === RouteSubmissionResponseResultEnum3.Invalid) {
       setSubmitLoading(false);
       setSubmitPending(false);
-      setGameNotice({
+      showGameNotice({
         tone: 'error',
         text: response.outcomeCode === RouteSubmissionResponseOutcomeCodeEnum.TARGET_NONCANONICAL_PATH
           ? 'Собери слово по-другому'
@@ -1823,7 +2565,7 @@ export function P1App({
     if (result === RouteSubmissionResponseResultEnum3.Repeated) {
       setSubmitLoading(false);
       setSubmitPending(false);
-      setGameNotice({ tone: 'info', text: 'Это бонусное слово уже найдено' });
+      showGameNotice({ tone: 'info', text: 'Это бонусное слово уже найдено' });
       holdRouteOutcome(generation, 'repeated', 420);
       return;
     }
@@ -1869,8 +2611,8 @@ export function P1App({
                 ? {
                     ...reward,
                     progress: {
+                      ...reward.progress,
                       current: response.rewardProgress!,
-                      threshold: regularReward.progress!.threshold,
                     },
                   }
                 : reward,
@@ -1911,19 +2653,19 @@ export function P1App({
     setSubmitLoading(false);
     setSubmitPending(false);
 
-    if (response.levelCompleted && levelPlay) {
-      void loadResults(levelPlay.levelId);
-    }
-
     if (isTarget) {
       setRouteHold(false);
       setRouteState(undefined);
-      setGameNotice({ tone: 'success', text: '+1 знание' });
+      showGameNotice({ tone: 'success', text: '+1 знание' });
     } else {
       const word = response.newBonusWords?.[0]?.word ?? '';
-      setGameNotice({ tone: 'success', text: `${word} · бонусное слово` });
+      showGameNotice({ tone: 'success', text: `${word} · бонусное слово` });
       holdRouteOutcome(generation, 'bonus', 420);
       if (response.rewardOpened) scheduleRewardOpen(response.rewardOpened.rewardId);
+    }
+
+    if (response.levelCompleted && levelPlay) {
+      void loadResults(levelPlay.levelId);
     }
   }
 
@@ -1945,7 +2687,7 @@ export function P1App({
 
     setSubmitPending(true);
     setSubmitLoading(false);
-    setGameNotice(undefined);
+    clearGameNotice();
     setRouteHold(true);
     setRouteState('pending');
     if (submitHoldTimerRef.current !== null) {
@@ -1983,7 +2725,7 @@ export function P1App({
       setSubmitPending(false);
       setRouteHold(false);
       setRouteState(undefined);
-      setGameNotice({ tone: 'error', text: 'Не удалось отправить слово' });
+      showGameNotice({ tone: 'error', text: 'Не удалось отправить слово' });
     }
   }
 
@@ -2001,16 +2743,10 @@ export function P1App({
         retainSelection={routeHold}
         routeState={routeState}
         onBack={() => setModal('exit')}
+        onDismissNotice={clearGameNotice}
         onHint={() => void handleGameHint()}
         onOpenBonusWords={() => setModal('bonus-words')}
-        onOpenTarget={(target) => {
-          setSelectedTarget(target);
-          setModal(
-            resolveTargetPresentation(levelPlay.levelNumber as LevelId, target.word).linked
-              ? 'course-error'
-              : 'word-definition',
-          );
-        }}
+        onOpenTarget={(target) => openFoundTarget(target, 'game', levelPlay.levelNumber)}
         onSelectionEnd={handleRouteSubmit}
       />
     ) : null
@@ -2019,7 +2755,54 @@ export function P1App({
   const hasResultsSurface = resultsStatus !== 'idle' || levelResults !== null;
   const showResults = phase === 'results' || (phase === 'home' && (hasPendingResults || hasResultsSurface));
   const showHome = phase === 'home' && clientState && !hasPendingResults && !hasResultsSurface;
+  const narrativeChapter = clientState?.clientState.chapters.find(
+    (chapter) => chapter.status === 'in_progress' || chapter.status === 'available',
+  ) ?? clientState?.clientState.chapters[0];
   const isModalOpen = modal !== 'none';
+
+  useFinwordsAudio(phase, settings ?? null);
+
+  useEffect(() => {
+    if (!import.meta.env.DEV) return undefined;
+    const advanceTime = (ms: number) => {
+      window.dispatchEvent(new CustomEvent('finwords:advance-time', { detail: ms }));
+    };
+    const renderGameToText = () => JSON.stringify({
+      coordinateSystem:
+        'Grid cells use 1-based row:column coordinates; origin is top-left, rows increase downward, columns increase rightward.',
+      phase,
+      modal,
+      levelId: levelPlay?.levelId ?? resultsLevelId,
+      levelNumber: levelPlay?.levelNumber ?? null,
+      grid: phase === 'game'
+        ? levelPlay?.board
+        : phase === 'field-review'
+          ? levelResults?.board
+          : undefined,
+      foundTargets: (levelPlay?.foundTargets ?? levelResults?.foundTargets ?? []).map((target) => ({
+        targetId: target.targetId,
+        word: target.word,
+        cells: target.cells,
+      })),
+      bonusWords: (levelPlay?.bonusWords ?? levelResults?.bonusWords ?? []).map((word) => word.word),
+      knowledge: clientState?.clientState.clientView.balance.knowledgePoints ?? 0,
+      hints: clientState?.clientState.clientView.balance.hintBalance ?? 0,
+      completedLevels: clientState?.clientState.levels
+        .filter((level) => level.status === 'completed')
+        .map((level) => level.levelId) ?? [],
+      nextAction: clientState?.clientState.nextAction ?? null,
+      selectedCharacterId: clientState?.clientState.clientView.selectedCharacterId ?? null,
+      selectedBackgroundId: clientState?.clientState.clientView.selectedBackgroundId ?? null,
+      notice: gameNotice?.text ?? null,
+    });
+
+    window.advanceTime = advanceTime;
+    window.render_game_to_text = renderGameToText;
+    return () => {
+      if (window.advanceTime === advanceTime) delete window.advanceTime;
+      if (window.render_game_to_text === renderGameToText) delete window.render_game_to_text;
+    };
+  }, [clientState, gameNotice, levelPlay, levelResults, modal, phase, resultsLevelId]);
 
   useLayoutEffect(() => {
     [gameBoundaryRef, resultsBoundaryRef, fieldReviewBoundaryRef].forEach((boundaryRef) => {
@@ -2042,12 +2825,49 @@ export function P1App({
             setModal('settings');
           }}
           onAppearance={openAppearance}
-          onPrimary={() => void enterGame(clientState).catch(() => undefined)}
+          onPrimary={() => {
+            if (
+              clientState.clientState.clientView.campaignProgress.isCompleted
+              && clientState.clientState.clientView.campaignProgress.isCompletionShown
+            ) {
+              void openCampaignComplete(clientState, 'replay').catch(() => setEntryStatus('error'));
+              return;
+            }
+            beginLevelFlow(clientState);
+          }}
           onClaimReward={() => {
             setRewardStatus('idle');
             setModal('reward');
           }}
           onClose={() => setModal('exit')}
+        />
+      ) : null}
+      {phase === 'tutorial' ? (
+        <TutorialScreen
+          mode={tutorialMode}
+          onComplete={() => {
+            if (tutorialMode === 'replay') {
+              setPhase('home');
+              setModal('settings');
+              return;
+            }
+            tutorialAcknowledgedRef.current = true;
+            setNarrativeStatus('idle');
+            setPhase('narrative');
+          }}
+          onExit={() => {
+            setPhase('home');
+            setModal('settings');
+          }}
+        />
+      ) : null}
+      {phase === 'narrative' && narrativeChapter ? (
+        <NarrativeScreen
+          chapterTitle={narrativeChapter.title}
+          narrativeText={narrativeChapter.narrativeText ?? ''}
+          status={narrativeStatus}
+          onContinue={() => void confirmNarrativeAndEnter()}
+          onRetry={() => void confirmNarrativeAndEnter()}
         />
       ) : null}
       {phase === 'appearance' ? (
@@ -2057,6 +2877,17 @@ export function P1App({
           onBack={() => setPhase('home')}
           onRetry={openAppearance}
           onSelect={(appearanceId) => void selectAppearance(appearanceId)}
+        />
+      ) : null}
+      {phase === 'next-chapter-unavailable' ? <LifecycleTerminal /> : null}
+      {phase === 'campaign-complete' && clientState && catalog ? (
+        <CampaignCompleteScreen
+          state={clientState}
+          catalog={catalog}
+          onHome={() => {
+            setCampaignCompleteMode(null);
+            setPhase('home');
+          }}
         />
       ) : null}
       {phase === 'game' ? <div ref={gameBoundaryRef}>{gameSurface}</div> : null}
@@ -2081,8 +2912,7 @@ export function P1App({
               setPhase('field-review');
             }}
             onOpenTarget={(target) => {
-              setSelectedTarget(target);
-              setModal('word-definition');
+              openFoundTarget(target, 'results_card', resultsLevelNumber);
             }}
             onClaimReward={
               chapterGoldenReward
@@ -2110,8 +2940,7 @@ export function P1App({
             results={levelResults}
             onHide={() => setPhase('results')}
             onOpenTarget={(target) => {
-              setSelectedTarget(target);
-              setModal('word-definition');
+              openFoundTarget(target, 'results_field', resultsLevelNumber);
             }}
             onPrimary={() => void acknowledgeResults(chapterGoldenReward ? 'reward' : 'next')}
             primaryLabel={chapterGoldenReward ? 'Забрать награду' : 'Следующий уровень'}
@@ -2120,7 +2949,7 @@ export function P1App({
         </div>
       ) : null}
 
-      {(modal === 'settings' || modal === 'feedback') && settings ? (
+      {(modal === 'settings' || (modal === 'feedback' && feedbackContext.source === 'settings')) && settings ? (
         <SettingsModal
           settings={settings}
           status={settingsStatus}
@@ -2128,7 +2957,14 @@ export function P1App({
           isInert={modal === 'feedback'}
           onClose={() => setModal('none')}
           onChange={(body) => void updateSettings(body)}
+          onTutorial={() => {
+            setTutorialMode('replay');
+            setModal('none');
+            setPhase('tutorial');
+          }}
           onFeedback={() => {
+            setFeedbackContext({ source: 'settings' });
+            setFeedbackNextAction(null);
             setFeedbackStatus('idle');
             setModal('feedback');
           }}
@@ -2137,7 +2973,8 @@ export function P1App({
       {modal === 'feedback' ? (
         <FeedbackModal
           status={feedbackStatus}
-          onClose={() => setModal('settings')}
+          context={feedbackContext}
+          onClose={() => void closeFeedback()}
           onSubmit={(body) => void submitFeedback(body)}
         />
       ) : null}
@@ -2193,6 +3030,7 @@ export function P1App({
                   setSubmitLoading(false);
                   setRouteHold(false);
                   setRouteState(undefined);
+                  clearGameNotice();
                   if (levelPlay) {
                     setClientState((current) =>
                       current
@@ -2216,11 +3054,20 @@ export function P1App({
           }
         />
       ) : null}
-      {modal === 'word-definition' && selectedTarget ? (
-        <WordDefinitionModal target={selectedTarget} onClose={() => setModal('none')} />
+      {modal === 'word-definition' && targetModalContext ? (
+        <WordDefinitionModal target={targetModalContext.target} onClose={() => setModal('none')} />
       ) : null}
-      {modal === 'course-error' && selectedTarget ? (
-        <CourseErrorModal target={selectedTarget} onClose={() => setModal('none')} />
+      {modal === 'course-error' && targetModalContext ? (
+        <CourseErrorModal
+          target={targetModalContext.target}
+          destination={targetModalContext.destination}
+          offerTitle={targetModalContext.offerTitle}
+          onClose={() => setModal('none')}
+          onReturnToField={() => {
+            setModal('none');
+            if (targetModalContext.source === 'results_card') setPhase('field-review');
+          }}
+        />
       ) : null}
       {modal === 'bonus-words' && levelPlay ? (
         <BonusWordsModal

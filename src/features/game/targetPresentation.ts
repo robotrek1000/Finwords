@@ -1,6 +1,6 @@
 import type { CellId, LevelId, WordOffer } from '../../app/types';
-import type { CellRef, CourseOffer, FoundTarget } from '../../shared/demoTypes';
-import { LEVELS } from '../../content/levels';
+import type { CellRef, CourseOffer, FoundTarget } from '../../infra/api/generated/data-contracts';
+import { LEVELS } from '../../content/campaign';
 import { cellToCoordinates } from './gameEngine';
 
 export type FoldedCorner = 'top-left' | 'bottom-right';
@@ -59,6 +59,36 @@ export function resolveFoundTargetPresentation(target: FoundTarget): TargetPrese
     firstCellId: firstCell ? `${firstCell.row + 1}:${firstCell.col + 1}` : undefined,
     linked: Boolean(target.courseOffer),
     offer: target.courseOffer,
+  };
+}
+
+/** Returns the known local course mapping for an exact active level and target word. */
+export function resolveLocalCourseOffer(
+  levelId: LevelId,
+  target: FoundTarget,
+): WordOffer | undefined {
+  const offer = resolveTargetPresentation(levelId, target.word).offer;
+  return offer?.type === 'course' ? offer : undefined;
+}
+
+/**
+ * Uses the local course mapping exclusively for a game target without a server offer.
+ * Callers must supply the factual active local level; result views use server offers only.
+ */
+export function resolveGameFoundTargetPresentation(
+  levelId: LevelId,
+  target: FoundTarget,
+): TargetPresentation {
+  const serverPresentation = resolveFoundTargetPresentation(target);
+  if (serverPresentation.linked) return serverPresentation;
+
+  const localCourseOffer = resolveLocalCourseOffer(levelId, target);
+  if (!localCourseOffer) return serverPresentation;
+
+  return {
+    ...serverPresentation,
+    linked: true,
+    offer: localCourseOffer,
   };
 }
 

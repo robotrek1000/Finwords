@@ -1,0 +1,295 @@
+{
+  "schemaVersion": "1",
+  "id": "level-42",
+  "number": 42,
+  "chapterId": "chapter-06",
+  "chapterTitle": "Акции и компании",
+  "microtheme": "Анализ компании",
+  "rows": 6,
+  "cols": 6,
+  "desiredTurns": {
+    "min": 2,
+    "max": 4
+  },
+  "difficulty": "Продвинутая",
+  "sourceWords": [
+    "ОТЧЁТ",
+    "МЕТРИКА",
+    "ПРОГНОЗ",
+    "ФАКТОР",
+    "ТРЕНД",
+    "МОДЕЛЬ"
+  ],
+  "gridStatus": "TBD_AFTER_DATA_MODEL",
+  "contentStatus": "Draft",
+  "validation": "VALID",
+  "grid": [
+    [
+      "Л",
+      "Ь",
+      "Т",
+      "Е",
+      "Е",
+      "Т"
+    ],
+    [
+      "Е",
+      "О",
+      "Т",
+      "Ч",
+      "М",
+      "Р"
+    ],
+    [
+      "Д",
+      "Д",
+      "Н",
+      "Е",
+      "К",
+      "И"
+    ],
+    [
+      "О",
+      "М",
+      "Т",
+      "Р",
+      "А",
+      "П"
+    ],
+    [
+      "Т",
+      "О",
+      "Р",
+      "О",
+      "Н",
+      "Р"
+    ],
+    [
+      "К",
+      "А",
+      "Ф",
+      "З",
+      "Г",
+      "О"
+    ]
+  ],
+  "targets": [
+    {
+      "targetId": "target-42-01",
+      "order": 1,
+      "word": "ОТЧЁТ",
+      "normalized": "ОТЧЕТ",
+      "definition": "Документ с систематизированными данными о результатах и состоянии объекта.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "offerId": "offer-42",
+      "canonicalPath": [
+        {
+          "row": 1,
+          "col": 1
+        },
+        {
+          "row": 1,
+          "col": 2
+        },
+        {
+          "row": 1,
+          "col": 3
+        },
+        {
+          "row": 0,
+          "col": 3
+        },
+        {
+          "row": 0,
+          "col": 2
+        }
+      ]
+    },
+    {
+      "targetId": "target-42-02",
+      "order": 2,
+      "word": "МЕТРИКА",
+      "normalized": "МЕТРИКА",
+      "definition": "Количественный показатель, используемый для оценки результата или процесса.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 1,
+          "col": 4
+        },
+        {
+          "row": 0,
+          "col": 4
+        },
+        {
+          "row": 0,
+          "col": 5
+        },
+        {
+          "row": 1,
+          "col": 5
+        },
+        {
+          "row": 2,
+          "col": 5
+        },
+        {
+          "row": 2,
+          "col": 4
+        },
+        {
+          "row": 3,
+          "col": 4
+        }
+      ]
+    },
+    {
+      "targetId": "target-42-03",
+      "order": 3,
+      "word": "ПРОГНОЗ",
+      "normalized": "ПРОГНОЗ",
+      "definition": "Оценка вероятного будущего результата на основе доступных данных.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 3,
+          "col": 5
+        },
+        {
+          "row": 4,
+          "col": 5
+        },
+        {
+          "row": 5,
+          "col": 5
+        },
+        {
+          "row": 5,
+          "col": 4
+        },
+        {
+          "row": 4,
+          "col": 4
+        },
+        {
+          "row": 4,
+          "col": 3
+        },
+        {
+          "row": 5,
+          "col": 3
+        }
+      ]
+    },
+    {
+      "targetId": "target-42-04",
+      "order": 4,
+      "word": "ФАКТОР",
+      "normalized": "ФАКТОР",
+      "definition": "Условие или причина, способные повлиять на результат.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 5,
+          "col": 2
+        },
+        {
+          "row": 5,
+          "col": 1
+        },
+        {
+          "row": 5,
+          "col": 0
+        },
+        {
+          "row": 4,
+          "col": 0
+        },
+        {
+          "row": 4,
+          "col": 1
+        },
+        {
+          "row": 4,
+          "col": 2
+        }
+      ]
+    },
+    {
+      "targetId": "target-42-05",
+      "order": 5,
+      "word": "ТРЕНД",
+      "normalized": "ТРЕНД",
+      "definition": "Устойчивое направление изменения показателя во времени.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 3,
+          "col": 2
+        },
+        {
+          "row": 3,
+          "col": 3
+        },
+        {
+          "row": 2,
+          "col": 3
+        },
+        {
+          "row": 2,
+          "col": 2
+        },
+        {
+          "row": 2,
+          "col": 1
+        }
+      ]
+    },
+    {
+      "targetId": "target-42-06",
+      "order": 6,
+      "word": "МОДЕЛЬ",
+      "normalized": "МОДЕЛЬ",
+      "definition": "Упрощённое представление объекта или процесса для анализа и прогнозирования.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 3,
+          "col": 1
+        },
+        {
+          "row": 3,
+          "col": 0
+        },
+        {
+          "row": 2,
+          "col": 0
+        },
+        {
+          "row": 1,
+          "col": 0
+        },
+        {
+          "row": 0,
+          "col": 0
+        },
+        {
+          "row": 0,
+          "col": 1
+        }
+      ]
+    }
+  ]
+}

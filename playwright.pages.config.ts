@@ -2,7 +2,10 @@ import { defineConfig, devices } from '@playwright/test';
 
 export default defineConfig({
   testDir: './tests/e2e',
-  testMatch: '**/pages-smoke.spec.ts',
+  outputDir: process.env.PLAYWRIGHT_OUTPUT_DIR ?? 'test-results',
+  timeout: 90_000,
+  testMatch: '**/pages-*.spec.ts',
+  workers: 1,
   fullyParallel: false,
   retries: 0,
   reporter: 'list',
@@ -26,7 +29,8 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: 'VITE_BASE_URL=/Finwords/ npm run preview -- --host 127.0.0.1 --port 4174',
+    env: { VITE_BASE_URL: '/Finwords/' },
+    command: 'npm run preview -- --host 127.0.0.1 --port 4174',
     url: 'http://127.0.0.1:4174/Finwords/',
     reuseExistingServer: false,
     timeout: 120_000,

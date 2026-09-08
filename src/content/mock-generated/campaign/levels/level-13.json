@@ -1,0 +1,224 @@
+{
+  "schemaVersion": "1",
+  "id": "level-13",
+  "number": 13,
+  "chapterId": "chapter-02",
+  "chapterTitle": "Финансовая подушка",
+  "microtheme": "Финансовые риски",
+  "rows": 5,
+  "cols": 5,
+  "desiredTurns": {
+    "min": 1,
+    "max": 2
+  },
+  "difficulty": "Базовая",
+  "sourceWords": [
+    "ШТРАФ",
+    "УЩЕРБ",
+    "ОТКАЗ",
+    "ВЫЗОВ",
+    "СТРАХ"
+  ],
+  "gridStatus": "TBD_AFTER_DATA_MODEL",
+  "contentStatus": "Draft",
+  "validation": "VALID",
+  "grid": [
+    [
+      "Р",
+      "А",
+      "Ф",
+      "Е",
+      "Р"
+    ],
+    [
+      "Т",
+      "Ш",
+      "У",
+      "Щ",
+      "Б"
+    ],
+    [
+      "О",
+      "В",
+      "Х",
+      "А",
+      "О"
+    ],
+    [
+      "З",
+      "С",
+      "Т",
+      "Р",
+      "Т"
+    ],
+    [
+      "Ы",
+      "В",
+      "З",
+      "А",
+      "К"
+    ]
+  ],
+  "targets": [
+    {
+      "targetId": "target-13-01",
+      "order": 1,
+      "word": "ШТРАФ",
+      "normalized": "ШТРАФ",
+      "definition": "Денежное взыскание за нарушение правила, договора или закона.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 1,
+          "col": 1
+        },
+        {
+          "row": 1,
+          "col": 0
+        },
+        {
+          "row": 0,
+          "col": 0
+        },
+        {
+          "row": 0,
+          "col": 1
+        },
+        {
+          "row": 0,
+          "col": 2
+        }
+      ]
+    },
+    {
+      "targetId": "target-13-02",
+      "order": 2,
+      "word": "УЩЕРБ",
+      "normalized": "УЩЕРБ",
+      "definition": "Материальные или иные потери, возникшие из-за неблагоприятного события.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 1,
+          "col": 2
+        },
+        {
+          "row": 1,
+          "col": 3
+        },
+        {
+          "row": 0,
+          "col": 3
+        },
+        {
+          "row": 0,
+          "col": 4
+        },
+        {
+          "row": 1,
+          "col": 4
+        }
+      ]
+    },
+    {
+      "targetId": "target-13-03",
+      "order": 3,
+      "word": "ОТКАЗ",
+      "normalized": "ОТКАЗ",
+      "definition": "Решение не выполнять действие либо прекращение работы системы или услуги.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 2,
+          "col": 4
+        },
+        {
+          "row": 3,
+          "col": 4
+        },
+        {
+          "row": 4,
+          "col": 4
+        },
+        {
+          "row": 4,
+          "col": 3
+        },
+        {
+          "row": 4,
+          "col": 2
+        }
+      ]
+    },
+    {
+      "targetId": "target-13-04",
+      "order": 4,
+      "word": "ВЫЗОВ",
+      "normalized": "ВЫЗОВ",
+      "definition": "Сложная ситуация, требующая решения и дополнительных ресурсов.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 4,
+          "col": 1
+        },
+        {
+          "row": 4,
+          "col": 0
+        },
+        {
+          "row": 3,
+          "col": 0
+        },
+        {
+          "row": 2,
+          "col": 0
+        },
+        {
+          "row": 2,
+          "col": 1
+        }
+      ]
+    },
+    {
+      "targetId": "target-13-05",
+      "order": 5,
+      "word": "СТРАХ",
+      "normalized": "СТРАХ",
+      "definition": "Эмоциональная реакция на предполагаемую угрозу или возможную потерю.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 3,
+          "col": 1
+        },
+        {
+          "row": 3,
+          "col": 2
+        },
+        {
+          "row": 3,
+          "col": 3
+        },
+        {
+          "row": 2,
+          "col": 3
+        },
+        {
+          "row": 2,
+          "col": 2
+        }
+      ]
+    }
+  ]
+}

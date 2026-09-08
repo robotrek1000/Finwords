@@ -1,0 +1,294 @@
+{
+  "schemaVersion": "1",
+  "id": "level-21",
+  "number": 21,
+  "chapterId": "chapter-03",
+  "chapterTitle": "Морская торговля",
+  "microtheme": "Берег и пролив",
+  "rows": 6,
+  "cols": 6,
+  "desiredTurns": {
+    "min": 1,
+    "max": 2
+  },
+  "difficulty": "Базовая",
+  "sourceWords": [
+    "ОСТРОВ",
+    "ЛАГУНА",
+    "ПРИЧАЛ",
+    "ОТМЕЛЬ",
+    "ПРОТОК",
+    "ПРОЛИВ"
+  ],
+  "gridStatus": "TBD_AFTER_DATA_MODEL",
+  "contentStatus": "Draft",
+  "validation": "VALID",
+  "grid": [
+    [
+      "Р",
+      "И",
+      "Ч",
+      "П",
+      "Р",
+      "О"
+    ],
+    [
+      "П",
+      "Л",
+      "А",
+      "Ь",
+      "Л",
+      "Т"
+    ],
+    [
+      "А",
+      "О",
+      "Т",
+      "М",
+      "Е",
+      "О"
+    ],
+    [
+      "Н",
+      "У",
+      "Г",
+      "А",
+      "Л",
+      "К"
+    ],
+    [
+      "С",
+      "Т",
+      "Р",
+      "О",
+      "В",
+      "П"
+    ],
+    [
+      "О",
+      "В",
+      "И",
+      "Л",
+      "О",
+      "Р"
+    ]
+  ],
+  "targets": [
+    {
+      "targetId": "target-21-01",
+      "order": 1,
+      "word": "ОСТРОВ",
+      "normalized": "ОСТРОВ",
+      "definition": "Участок суши, со всех сторон окружённый водой.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 5,
+          "col": 0
+        },
+        {
+          "row": 4,
+          "col": 0
+        },
+        {
+          "row": 4,
+          "col": 1
+        },
+        {
+          "row": 4,
+          "col": 2
+        },
+        {
+          "row": 4,
+          "col": 3
+        },
+        {
+          "row": 4,
+          "col": 4
+        }
+      ]
+    },
+    {
+      "targetId": "target-21-02",
+      "order": 2,
+      "word": "ЛАГУНА",
+      "normalized": "ЛАГУНА",
+      "definition": "Мелководный водоём, отделённый от моря полосой суши или рифом.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 3,
+          "col": 4
+        },
+        {
+          "row": 3,
+          "col": 3
+        },
+        {
+          "row": 3,
+          "col": 2
+        },
+        {
+          "row": 3,
+          "col": 1
+        },
+        {
+          "row": 3,
+          "col": 0
+        },
+        {
+          "row": 2,
+          "col": 0
+        }
+      ]
+    },
+    {
+      "targetId": "target-21-03",
+      "order": 3,
+      "word": "ПРИЧАЛ",
+      "normalized": "ПРИЧАЛ",
+      "definition": "Сооружение у берега, к которому швартуются суда.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 1,
+          "col": 0
+        },
+        {
+          "row": 0,
+          "col": 0
+        },
+        {
+          "row": 0,
+          "col": 1
+        },
+        {
+          "row": 0,
+          "col": 2
+        },
+        {
+          "row": 1,
+          "col": 2
+        },
+        {
+          "row": 1,
+          "col": 1
+        }
+      ]
+    },
+    {
+      "targetId": "target-21-04",
+      "order": 4,
+      "word": "ОТМЕЛЬ",
+      "normalized": "ОТМЕЛЬ",
+      "definition": "Мелководный участок водоёма, опасный для судоходства.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 2,
+          "col": 1
+        },
+        {
+          "row": 2,
+          "col": 2
+        },
+        {
+          "row": 2,
+          "col": 3
+        },
+        {
+          "row": 2,
+          "col": 4
+        },
+        {
+          "row": 1,
+          "col": 4
+        },
+        {
+          "row": 1,
+          "col": 3
+        }
+      ]
+    },
+    {
+      "targetId": "target-21-05",
+      "order": 5,
+      "word": "ПРОТОК",
+      "normalized": "ПРОТОК",
+      "definition": "Естественный водный проход между участками суши или водоёмами.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 0,
+          "col": 3
+        },
+        {
+          "row": 0,
+          "col": 4
+        },
+        {
+          "row": 0,
+          "col": 5
+        },
+        {
+          "row": 1,
+          "col": 5
+        },
+        {
+          "row": 2,
+          "col": 5
+        },
+        {
+          "row": 3,
+          "col": 5
+        }
+      ]
+    },
+    {
+      "targetId": "target-21-06",
+      "order": 6,
+      "word": "ПРОЛИВ",
+      "normalized": "ПРОЛИВ",
+      "definition": "Узкое водное пространство, соединяющее два водоёма.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 4,
+          "col": 5
+        },
+        {
+          "row": 5,
+          "col": 5
+        },
+        {
+          "row": 5,
+          "col": 4
+        },
+        {
+          "row": 5,
+          "col": 3
+        },
+        {
+          "row": 5,
+          "col": 2
+        },
+        {
+          "row": 5,
+          "col": 1
+        }
+      ]
+    }
+  ]
+}

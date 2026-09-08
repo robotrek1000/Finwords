@@ -1,0 +1,294 @@
+{
+  "schemaVersion": "1",
+  "id": "level-39",
+  "number": 39,
+  "chapterId": "chapter-06",
+  "chapterTitle": "Акции и компании",
+  "microtheme": "Владение компанией",
+  "rows": 6,
+  "cols": 6,
+  "desiredTurns": {
+    "min": 2,
+    "max": 4
+  },
+  "difficulty": "Продвинутая",
+  "sourceWords": [
+    "АКЦИОНЕР",
+    "ПАКЕТ",
+    "ГОЛОС",
+    "СОВЕТ",
+    "ВЛАДЕЛЕЦ",
+    "ПРАВО"
+  ],
+  "gridStatus": "TBD_AFTER_DATA_MODEL",
+  "contentStatus": "Draft",
+  "validation": "VALID",
+  "grid": [
+    [
+      "О",
+      "Г",
+      "В",
+      "Е",
+      "Л",
+      "А"
+    ],
+    [
+      "Л",
+      "С",
+      "О",
+      "Т",
+      "В",
+      "Д"
+    ],
+    [
+      "О",
+      "С",
+      "Р",
+      "П",
+      "Ц",
+      "Е"
+    ],
+    [
+      "Е",
+      "Т",
+      "А",
+      "В",
+      "Е",
+      "Л"
+    ],
+    [
+      "К",
+      "Р",
+      "Е",
+      "О",
+      "А",
+      "К"
+    ],
+    [
+      "А",
+      "П",
+      "Н",
+      "О",
+      "И",
+      "Ц"
+    ]
+  ],
+  "targets": [
+    {
+      "targetId": "target-39-01",
+      "order": 1,
+      "word": "АКЦИОНЕР",
+      "normalized": "АКЦИОНЕР",
+      "definition": "Владелец акций компании и связанных с ними прав.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 4,
+          "col": 4
+        },
+        {
+          "row": 4,
+          "col": 5
+        },
+        {
+          "row": 5,
+          "col": 5
+        },
+        {
+          "row": 5,
+          "col": 4
+        },
+        {
+          "row": 5,
+          "col": 3
+        },
+        {
+          "row": 5,
+          "col": 2
+        },
+        {
+          "row": 4,
+          "col": 2
+        },
+        {
+          "row": 4,
+          "col": 1
+        }
+      ]
+    },
+    {
+      "targetId": "target-39-02",
+      "order": 2,
+      "word": "ПАКЕТ",
+      "normalized": "ПАКЕТ",
+      "definition": "Определённое количество акций или других активов, рассматриваемых вместе.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 5,
+          "col": 1
+        },
+        {
+          "row": 5,
+          "col": 0
+        },
+        {
+          "row": 4,
+          "col": 0
+        },
+        {
+          "row": 3,
+          "col": 0
+        },
+        {
+          "row": 3,
+          "col": 1
+        }
+      ]
+    },
+    {
+      "targetId": "target-39-03",
+      "order": 3,
+      "word": "ГОЛОС",
+      "normalized": "ГОЛОС",
+      "definition": "Право участника влиять на решение посредством голосования.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 0,
+          "col": 1
+        },
+        {
+          "row": 0,
+          "col": 0
+        },
+        {
+          "row": 1,
+          "col": 0
+        },
+        {
+          "row": 2,
+          "col": 0
+        },
+        {
+          "row": 2,
+          "col": 1
+        }
+      ]
+    },
+    {
+      "targetId": "target-39-04",
+      "order": 4,
+      "word": "СОВЕТ",
+      "normalized": "СОВЕТ",
+      "definition": "Коллегиальный орган или рекомендация для принятия решения.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 1,
+          "col": 1
+        },
+        {
+          "row": 1,
+          "col": 2
+        },
+        {
+          "row": 0,
+          "col": 2
+        },
+        {
+          "row": 0,
+          "col": 3
+        },
+        {
+          "row": 1,
+          "col": 3
+        }
+      ]
+    },
+    {
+      "targetId": "target-39-05",
+      "order": 5,
+      "word": "ВЛАДЕЛЕЦ",
+      "normalized": "ВЛАДЕЛЕЦ",
+      "definition": "Человек или организация, которым принадлежит имущество или право.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 1,
+          "col": 4
+        },
+        {
+          "row": 0,
+          "col": 4
+        },
+        {
+          "row": 0,
+          "col": 5
+        },
+        {
+          "row": 1,
+          "col": 5
+        },
+        {
+          "row": 2,
+          "col": 5
+        },
+        {
+          "row": 3,
+          "col": 5
+        },
+        {
+          "row": 3,
+          "col": 4
+        },
+        {
+          "row": 2,
+          "col": 4
+        }
+      ]
+    },
+    {
+      "targetId": "target-39-06",
+      "order": 6,
+      "word": "ПРАВО",
+      "normalized": "ПРАВО",
+      "definition": "Закреплённая законом или договором возможность действовать определённым образом.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 2,
+          "col": 3
+        },
+        {
+          "row": 2,
+          "col": 2
+        },
+        {
+          "row": 3,
+          "col": 2
+        },
+        {
+          "row": 3,
+          "col": 3
+        },
+        {
+          "row": 4,
+          "col": 3
+        }
+      ]
+    }
+  ]
+}

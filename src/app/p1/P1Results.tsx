@@ -3,15 +3,18 @@ import {
   RewardSummaryRewardTypeEnum,
   type FoundTarget,
   type LevelResultsResponse,
-} from '../../shared/demoTypes';
+} from '../../infra/api/generated/data-contracts';
 import { BoardViewGameBoard } from '../../features/game/BoardViewGameBoard';
 import { BackgroundSurface } from '../../shared/ui/BackgroundSurface';
-import { assetUrl } from '../../shared/assetUrl';
 import { Button } from '../../shared/ui/Button';
 import { IconButton } from '../../shared/ui/IconButton';
 import styles from './P1App.module.css';
 
 type ResultsStatus = 'loading' | 'error' | 'success';
+
+function clampProgress(completedLevels: number, totalLevels: number): number {
+  return Math.min(Math.max(completedLevels, 0), totalLevels);
+}
 
 interface ResultsScreenProps {
   levelLabel: string;
@@ -83,8 +86,8 @@ export function ResultsScreen({
     && results.reward?.rewardType === RewardSummaryRewardTypeEnum.ChapterGolden
       ? results.reward
       : undefined;
-  const completedLevels = results.chapter.completedLevels;
-  const totalLevels = results.chapter.totalLevels;
+  const totalLevels = Math.max(results.chapter.totalLevels, 0);
+  const completedLevels = clampProgress(results.chapter.completedLevels, totalLevels);
   const chapterProgressLabel = `Уровней ${completedLevels} из ${totalLevels}`;
   const remainingLevels = Math.max(totalLevels - completedLevels, 0);
   const progressPercent = totalLevels > 0 ? (completedLevels / totalLevels) * 100 : 0;
@@ -110,7 +113,7 @@ export function ResultsScreen({
         <main className={styles.resultsContent}>
           <article className={styles.resultsKnowledgeCard}>
             <div className={styles.resultsKnowledgeGroup}>
-              <img src={assetUrl('assets/p1/knowledge-badge.png')} alt="" />
+              <img src={`${import.meta.env.BASE_URL}assets/p1/knowledge-badge.png`} alt="" />
               <div className={styles.resultsKnowledgeCopy}>
                 <strong>+{results.summary.earnedKnowledgePoints} знаний</strong>
                 <span>Всего</span>
@@ -135,7 +138,7 @@ export function ResultsScreen({
             : styles.resultsEnvelopeCard}
           >
             <img
-              src={assetUrl('assets/envelope-golden.webp')}
+              src={`${import.meta.env.BASE_URL}assets/envelope-golden.webp`}
               alt={goldenReward ? 'Золотой конверт' : 'Конверт'}
             />
           <div>

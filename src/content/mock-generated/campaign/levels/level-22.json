@@ -1,0 +1,295 @@
+{
+  "schemaVersion": "1",
+  "id": "level-22",
+  "number": 22,
+  "chapterId": "chapter-03",
+  "chapterTitle": "Морская торговля",
+  "microtheme": "Команда судна",
+  "rows": 6,
+  "cols": 6,
+  "desiredTurns": {
+    "min": 1,
+    "max": 2
+  },
+  "difficulty": "Базовая",
+  "sourceWords": [
+    "МАТРОС",
+    "БОЦМАН",
+    "РАДИСТ",
+    "КОРСАР",
+    "ШКИПЕР",
+    "ЛОЦМАН"
+  ],
+  "gridStatus": "TBD_AFTER_DATA_MODEL",
+  "contentStatus": "Draft",
+  "validation": "VALID",
+  "grid": [
+    [
+      "А",
+      "М",
+      "М",
+      "Н",
+      "Д",
+      "А"
+    ],
+    [
+      "Н",
+      "Ц",
+      "А",
+      "А",
+      "И",
+      "Р"
+    ],
+    [
+      "Ш",
+      "О",
+      "Т",
+      "М",
+      "С",
+      "Р"
+    ],
+    [
+      "К",
+      "Л",
+      "Р",
+      "Ц",
+      "Т",
+      "А"
+    ],
+    [
+      "И",
+      "С",
+      "О",
+      "О",
+      "Б",
+      "С"
+    ],
+    [
+      "П",
+      "Е",
+      "Р",
+      "К",
+      "О",
+      "Р"
+    ]
+  ],
+  "targets": [
+    {
+      "targetId": "target-22-01",
+      "order": 1,
+      "word": "МАТРОС",
+      "normalized": "МАТРОС",
+      "definition": "Член экипажа судна, выполняющий палубные и технические работы.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 0,
+          "col": 2
+        },
+        {
+          "row": 1,
+          "col": 2
+        },
+        {
+          "row": 2,
+          "col": 2
+        },
+        {
+          "row": 3,
+          "col": 2
+        },
+        {
+          "row": 4,
+          "col": 2
+        },
+        {
+          "row": 4,
+          "col": 1
+        }
+      ]
+    },
+    {
+      "targetId": "target-22-02",
+      "order": 2,
+      "word": "БОЦМАН",
+      "normalized": "БОЦМАН",
+      "definition": "Старший специалист палубной команды, отвечающий за порядок и оборудование.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 4,
+          "col": 4
+        },
+        {
+          "row": 4,
+          "col": 3
+        },
+        {
+          "row": 3,
+          "col": 3
+        },
+        {
+          "row": 2,
+          "col": 3
+        },
+        {
+          "row": 1,
+          "col": 3
+        },
+        {
+          "row": 0,
+          "col": 3
+        }
+      ]
+    },
+    {
+      "targetId": "target-22-03",
+      "order": 3,
+      "word": "РАДИСТ",
+      "normalized": "РАДИСТ",
+      "definition": "Специалист, обеспечивающий радиосвязь и передачу сообщений.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 1,
+          "col": 5
+        },
+        {
+          "row": 0,
+          "col": 5
+        },
+        {
+          "row": 0,
+          "col": 4
+        },
+        {
+          "row": 1,
+          "col": 4
+        },
+        {
+          "row": 2,
+          "col": 4
+        },
+        {
+          "row": 3,
+          "col": 4
+        }
+      ]
+    },
+    {
+      "targetId": "target-22-04",
+      "order": 4,
+      "word": "КОРСАР",
+      "normalized": "КОРСАР",
+      "definition": "Мореплаватель, получивший разрешение государства нападать на вражеские суда.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 5,
+          "col": 3
+        },
+        {
+          "row": 5,
+          "col": 4
+        },
+        {
+          "row": 5,
+          "col": 5
+        },
+        {
+          "row": 4,
+          "col": 5
+        },
+        {
+          "row": 3,
+          "col": 5
+        },
+        {
+          "row": 2,
+          "col": 5
+        }
+      ]
+    },
+    {
+      "targetId": "target-22-05",
+      "order": 5,
+      "word": "ШКИПЕР",
+      "normalized": "ШКИПЕР",
+      "definition": "Капитан или руководитель небольшого судна.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 2,
+          "col": 0
+        },
+        {
+          "row": 3,
+          "col": 0
+        },
+        {
+          "row": 4,
+          "col": 0
+        },
+        {
+          "row": 5,
+          "col": 0
+        },
+        {
+          "row": 5,
+          "col": 1
+        },
+        {
+          "row": 5,
+          "col": 2
+        }
+      ]
+    },
+    {
+      "targetId": "target-22-06",
+      "order": 6,
+      "word": "ЛОЦМАН",
+      "normalized": "ЛОЦМАН",
+      "definition": "Специалист, который проводит судно через сложный или незнакомый участок пути.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "offerId": "offer-22",
+      "canonicalPath": [
+        {
+          "row": 3,
+          "col": 1
+        },
+        {
+          "row": 2,
+          "col": 1
+        },
+        {
+          "row": 1,
+          "col": 1
+        },
+        {
+          "row": 0,
+          "col": 1
+        },
+        {
+          "row": 0,
+          "col": 0
+        },
+        {
+          "row": 1,
+          "col": 0
+        }
+      ]
+    }
+  ]
+}

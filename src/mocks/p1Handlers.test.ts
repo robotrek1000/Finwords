@@ -13,7 +13,7 @@ import type {
   RewardSummary,
   RouteSubmissionResponse,
   ValidationProblem,
-} from '../shared/demoTypes';
+} from '../infra/api/generated/data-contracts';
 import {
   ClaimRewardResponseRewardTypeEnum,
   ClaimRewardResponseStateEnum,
@@ -25,19 +25,18 @@ import {
   RewardSummaryStatusEnum,
   RewardSummaryStatusEnum1,
   RouteSubmissionResponseResultEnum3,
-  RouteSubmissionResponseOutcomeCodeEnum,
   SelectedOptionSelectedOptionTypeEnum,
   ValidationErrorItemTypeEnum,
   ValidationProblemTypeEnum,
-} from '../shared/demoTypes';
-import { LEVELS } from '../content/levels';
+} from '../infra/api/generated/data-contracts';
+import { LEVELS } from '../content/chapter1';
 import { server } from './server';
 import { p1Handlers, resetP1FakeDb } from './p1Handlers';
 import { createP1Api } from '../app/p1/p1Api';
 import type { P1Api } from '../app/p1/p1Api';
 
 async function acknowledgeLevelResults(levelId: string, etag: string, key: string = crypto.randomUUID()) {
-  return fetch(`http://localhost/demo-api/levels/${levelId}/results/acknowledge`, {
+  return fetch(`http://localhost/api/v1/levels/${levelId}/results/acknowledge`, {
     method: 'POST',
     headers: {
       'if-match': etag,
@@ -85,15 +84,11 @@ function expectAvailableRewardOptions(reward: RewardSummary) {
 function expectClaimedReward(response: Awaited<ReturnType<P1Api['claimReward']>>) {
   expect(response.state).toBe(ClaimRewardResponseStateEnum.Claimed);
   expect(response.rewardType).toBe(ClaimRewardResponseRewardTypeEnum.ChapterGolden);
-  expect(response.nextAction).toBe(NextAction.StartLevel);
+  expect(response.nextAction).toBe(NextAction.OpenFeedback);
 }
 
 
-/**
- * Уровень 1 (контракт прототипа src/content/levels.ts, Level 1):
- * 7 целей + 8 бонусов. Координаты ниже — уже API 0-based (row/col),
- * как их принимает submit-route. Обратный маршрут цели также валиден.
- */
+/** Chapter 1 Level 1 is derived from the scoped Registry bundle. */
 
 interface Level1TargetCase {
   id: string;
@@ -108,66 +103,24 @@ function cells(pairs: Array<[number, number]>): CellRef[] {
   return pairs.map(([row, col]) => ({ row, col }));
 }
 
-const TARGET_FUND: Level1TargetCase = {
-  id: 'fund',
-  word: 'ФОНД',
-  route: cells([[1, 4], [0, 4], [0, 5], [1, 5]]),
-  canonicalCells: cells([[1, 4], [0, 4], [0, 5], [1, 5]]),
-};
+function targetCase(index: number): Level1TargetCase {
+  const target = LEVELS[1].targets[index];
+  const canonicalCells = target.path.map((cellId) => {
+    const [row, col] = cellId.split(':').map(Number);
+    return { row: row - 1, col: col - 1 };
+  });
+  return { id: target.id, word: target.word, route: canonicalCells, canonicalCells };
+}
 
-const TARGET_CAPITAL: Level1TargetCase = {
-  id: 'capital',
-  word: 'КАПИТАЛ',
-  route: cells([[2, 5], [3, 5], [4, 5], [5, 5], [5, 4], [4, 4], [3, 4]]),
-  canonicalCells: cells([[2, 5], [3, 5], [4, 5], [5, 5], [5, 4], [4, 4], [3, 4]]),
-};
+const TARGET_FUND = targetCase(0);
+const TARGET_CAPITAL = targetCase(1);
+const TARGET_STOCK = targetCase(2);
+const TARGET_INCOME = TARGET_STOCK;
 
-const TARGET_STOCK: Level1TargetCase = {
-  id: 'stock',
-  word: 'АКЦИЯ',
-  route: cells([[2, 4], [2, 3], [1, 3], [0, 3], [0, 2]]),
-  canonicalCells: cells([[2, 4], [2, 3], [1, 3], [0, 3], [0, 2]]),
-};
-
-const COURSE_OFFER = {
-  courseId: '6f8fad5b-d9cb-469f-a165-80867728951e',
-  locale: 'ru-RU',
-  badgeLabel: 'Мини-курс',
-  title: 'АКЦИЯ',
-};
-
-const TARGET_RISK: Level1TargetCase = {
-  id: 'risk',
-  word: 'РИСК',
-  route: cells([[0, 1], [0, 0], [1, 0], [1, 1]]),
-  canonicalCells: cells([[0, 1], [0, 0], [1, 0], [1, 1]]),
-};
-
-const TARGET_MARKET: Level1TargetCase = {
-  id: 'market',
-  word: 'РЫНОК',
-  route: cells([[1, 2], [2, 2], [2, 1], [2, 0], [3, 0]]),
-  canonicalCells: cells([[1, 2], [2, 2], [2, 1], [2, 0], [3, 0]]),
-};
-
-const TARGET_INDEX: Level1TargetCase = {
-  id: 'index',
-  word: 'ИНДЕКС',
-  route: cells([[4, 0], [5, 0], [5, 1], [5, 2], [5, 3], [4, 3]]),
-  canonicalCells: cells([[4, 0], [5, 0], [5, 1], [5, 2], [5, 3], [4, 3]]),
-};
-
-const TARGET_INCOME: Level1TargetCase = {
-  id: 'income',
-  word: 'ДОХОД',
-  route: cells([[3, 3], [3, 2], [3, 1], [4, 1], [4, 2]]),
-  canonicalCells: cells([[3, 3], [3, 2], [3, 1], [4, 1], [4, 2]]),
-};
-
-// Exact reverse КАПИТАЛ: контракт принимает прямое и обратное направления.
+// Exact reverse: контракт принимает прямое и обратное направления.
 const TARGET_CAPITAL_REVERSED: Level1TargetCase = {
   id: 'capital-reversed',
-  word: 'КАПИТАЛ',
+  word: TARGET_CAPITAL.word,
   route: [...TARGET_CAPITAL.canonicalCells].reverse(),
   canonicalCells: TARGET_CAPITAL.canonicalCells,
 };
@@ -176,17 +129,26 @@ const ALL_TARGETS: Level1TargetCase[] = [
   TARGET_FUND,
   TARGET_CAPITAL,
   TARGET_STOCK,
-  TARGET_RISK,
-  TARGET_MARKET,
-  TARGET_INDEX,
-  TARGET_INCOME,
 ];
+
+function targetCasesForLevel(levelNumber: number): Level1TargetCase[] {
+  return LEVELS[levelNumber].targets.map((target) => {
+    const canonicalCells = target.path.map((cellId) => {
+      const [row, col] = cellId.split(':').map(Number);
+      return { row: row - 1, col: col - 1 };
+    });
+    return { id: target.id, word: target.word, route: canonicalCells, canonicalCells };
+  });
+}
+
+async function completeActiveLevel(api: P1Api, level: LevelPlayResponse): Promise<void> {
+  for (const target of targetCasesForLevel(level.levelNumber)) {
+    await api.submitRoute(level.levelId, target.route);
+  }
+}
 
 // ЛАПА: единственный каноничный bonus-маршрут уровня 1 (уровень 1, доска прототипа).
 const LAPA_ROUTE: CellRef[] = cells([[3, 4], [4, 4], [4, 5], [3, 5]]);
-const TIP_ROUTE: CellRef[] = cells([[5, 4], [5, 5], [4, 5]]);
-const SON_ROUTE: CellRef[] = cells([[1, 0], [2, 0], [2, 1]]);
-const FON_ROUTE: CellRef[] = cells([[1, 4], [0, 4], [0, 5]]);
 const HOD_ROUTE: CellRef[] = cells([[3, 1], [3, 2], [3, 3]]);
 const NONCANONICAL_INCOME_ROUTE: CellRef[] = cells([
   [3, 3],
@@ -196,8 +158,7 @@ const NONCANONICAL_INCOME_ROUTE: CellRef[] = cells([
   [5, 1],
 ]);
 
-// Authoritative income-цель из LEVELS[1]: 1-based путь конвертируем в 0-based API-координаты.
-const LEVEL_1_INCOME = LEVELS[1].targets.find((target) => target.id === 'income')!;
+const LEVEL_1_INCOME = LEVELS[1].targets[2];
 const INCOME_WORD = LEVEL_1_INCOME.word;
 const UUID_V4 = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
@@ -231,7 +192,7 @@ function expectFoundTarget(
 
 function expectRuntimeHintState(value: unknown): HintState {
   if (typeof value !== 'object' || value === null) {
-    throw new Error('use-hint must expose a persisted hint state');
+    throw new Error('API-007 must expose a persisted hint state');
   }
   const state = value as Partial<HintState>;
   expect(state.targetId).toMatch(UUID_V4);
@@ -254,25 +215,130 @@ beforeAll(() => server.listen({ onUnhandledRequest: 'error' }));
 beforeEach(() => {
   server.resetHandlers(...p1Handlers);
   resetP1FakeDb();
+  window.__FINWORDS_RUNTIME_CONFIG__ = {
+    apiMode: 'mock',
+    apiBaseUrl: 'http://localhost',
+  };
 });
 afterEach(() => {
   server.resetHandlers(...p1Handlers);
+  delete window.__FINWORDS_RUNTIME_CONFIG__;
 });
 afterAll(() => server.close());
 
-describe('P1 mock Level 1 контракт (RED regression, start-level/005/006)', () => {
-  it('state pendingReward points to an available reward with normalized options', async () => {
+async function expectControlledPersistenceMigrationFailure(
+  storageKey: string,
+  expectedPersistedValue: string,
+): Promise<void> {
+  expect(window.localStorage.getItem(storageKey)).toBe(expectedPersistedValue);
+  const response = await fetch('http://localhost/api/v1/clients/me/state');
+  expect(response.status).toBe(500);
+  await expect(response.json()).resolves.toMatchObject({
+    type: 'PERSISTENCE_MIGRATION_FAILED',
+    payload: { reason: expect.any(String) },
+  });
+  expect(window.localStorage.getItem(storageKey)).toBe(expectedPersistedValue);
+}
+
+describe('Stage 6 API-010 settings wire behavior', () => {
+  it('replays the same idempotency key before If-Match and rejects descriptor reuse', async () => {
+    const stateResponse = await fetch('http://localhost/api/v1/clients/me/state');
+    const initialEtag = stateResponse.headers.get('etag') ?? '';
+    const key = 'c0a80121-7ac0-4bd2-84a2-08a767981001';
+    const request = (body: object, ifMatch = initialEtag) => fetch(
+      'http://localhost/api/v1/clients/me/settings',
+      {
+        method: 'PATCH',
+        headers: {
+          'content-type': 'application/json',
+          'idempotency-key': key,
+          'if-match': ifMatch,
+        },
+        body: JSON.stringify(body),
+      },
+    );
+
+    const processed = await request({ musicEnabled: false });
+    expect(processed.status).toBe(200);
+    expect(processed.headers.get('idempotency-key-status')).toBe('processed');
+    const processedEtag = processed.headers.get('etag');
+    await expect(processed.json()).resolves.toEqual({
+      musicEnabled: false,
+      soundEnabled: true,
+      tutorialCompleted: false,
+    });
+
+    const replayed = await request({ musicEnabled: false }, initialEtag);
+    expect(replayed.status).toBe(200);
+    expect(replayed.headers.get('idempotency-key-status')).toBe('replayed');
+    expect(replayed.headers.get('etag')).toBe(processedEtag);
+
+    const reused = await request({ soundEnabled: false }, processedEtag ?? '');
+    expect(reused.status).toBe(409);
+    await expect(reused.json()).resolves.toMatchObject({ type: 'IDEMPOTENCY_KEY_REUSED' });
+  });
+
+  it.each([
+    [{}, 'REQUIRED_FIELD', 'body'],
+    [{ tutorialCompleted: true }, 'READ_ONLY_FIELD', 'body.tutorialCompleted'],
+    [{ volume: 0 }, 'UNKNOWN_FIELD', 'body.volume'],
+    [{ musicEnabled: 'yes' }, 'INVALID_FORMAT', 'body.musicEnabled'],
+  ])('rejects noncanonical API-010 body %# with VALIDATION_ERROR/%s', async (body, fieldType, field) => {
+    const stateResponse = await fetch('http://localhost/api/v1/clients/me/state');
+    const response = await fetch('http://localhost/api/v1/clients/me/settings', {
+      method: 'PATCH',
+      headers: {
+        'content-type': 'application/json',
+        'idempotency-key': crypto.randomUUID(),
+        'if-match': stateResponse.headers.get('etag') ?? '',
+      },
+      body: JSON.stringify(body),
+    });
+
+    expect(response.status).toBe(400);
+    await expect(response.json()).resolves.toMatchObject({
+      type: 'VALIDATION_ERROR',
+      errors: [{ type: fieldType, field }],
+    });
+  });
+});
+
+describe('Stage 7 API-015 completion authority', () => {
+  it('rejects confirmation while authoritative campaign progress is incomplete', async () => {
+    const stateResponse = await fetch('http://localhost/api/v1/clients/me/state');
+    const response = await fetch('http://localhost/api/v1/campaigns/current/completion-shown', {
+      method: 'POST',
+      headers: {
+        'idempotency-key': crypto.randomUUID(),
+        'if-match': stateResponse.headers.get('etag') ?? '',
+      },
+    });
+
+    expect(response.status).toBe(409);
+    await expect(response.json()).resolves.toEqual({ type: 'CAMPAIGN_NOT_COMPLETED' });
+    const after = await fetch('http://localhost/api/v1/clients/me/state');
+    await expect(after.json()).resolves.toMatchObject({
+      clientState: {
+        clientView: { campaignProgress: { isCompleted: false, isCompletionShown: false } },
+      },
+    });
+    expect(after.headers.get('etag')).toBe(stateResponse.headers.get('etag'));
+  });
+});
+
+describe('P1 mock Level 1 контракт (RED regression, API-004/005/006)', () => {
+  it('API-002 pendingReward points to an available reward with normalized options', async () => {
     resetP1FakeDb({ pendingReward: true });
     const api = createP1Api();
     const state = await api.loadState();
 
     expect('pendingReward' in state.clientState).toBe(true);
     if (!('pendingReward' in state.clientState)) {
-      throw new Error('state pendingReward is required for an available reward');
+      throw new Error('API-002 pendingReward is required for an available reward');
     }
     const pendingReward = state.clientState.pendingReward;
     expect(pendingReward).toBeDefined();
-    if (!pendingReward) throw new Error('state pendingReward must include rewardId');
+    if (!pendingReward) throw new Error('API-002 pendingReward must include rewardId');
     state.clientState.rewards
       .filter((candidate) => candidate.status === RewardSummaryStatusEnum.Available)
       .forEach(expectAvailableRewardOptions);
@@ -280,20 +346,20 @@ describe('P1 mock Level 1 контракт (RED regression, start-level/005/006)
       (candidate) => candidate.rewardId === pendingReward.rewardId,
     );
     expect(reward).toBeDefined();
-    if (!reward) throw new Error('state pendingReward must resolve to a reward');
+    if (!reward) throw new Error('API-002 pendingReward must resolve to a reward');
     expectAvailableRewardOptions(reward);
   });
 
-  it('старт уровня 1 возвращает 7 оставшихся целей, без найденных целей и без бонусов', async () => {
+  it('старт scoped уровня 1 возвращает 3 оставшиеся цели, без найденных целей и бонусов', async () => {
     const { level } = await startLevel1();
 
-    expect(level.targetsRemaining).toBe(7);
+    expect(level.targetsRemaining).toBe(3);
     expect(level.foundTargets).toEqual([]);
     expect(level.bonusWords).toEqual([]);
   });
 
   it.each(ALL_TARGETS)(
-    'submit-route: маршрут цели $id ($word) распознаётся как found с каноническими cells',
+    'API-006: маршрут цели $id ($word) распознаётся как found с каноническими cells',
     async (target) => {
       const { api, level } = await startLevel1();
 
@@ -304,7 +370,7 @@ describe('P1 mock Level 1 контракт (RED regression, start-level/005/006)
     },
   );
 
-  it('submit-route: exact reverse маршрут цели также распознаётся как found', async () => {
+  it('API-006: exact reverse маршрут цели также распознаётся как found', async () => {
     const { api, level } = await startLevel1();
 
     const response = await api.submitRoute(
@@ -316,7 +382,7 @@ describe('P1 mock Level 1 контракт (RED regression, start-level/005/006)
     expect(response.levelCompleted).toBe(false);
   });
 
-  it('после первой найденной цели ДОХОД остаётся 6 целей и уровень не завершён', async () => {
+  it('после первой найденной цели остаётся 2 цели и уровень не завершён', async () => {
     const { api, level } = await startLevel1();
 
     const response = await api.submitRoute(level.levelId, TARGET_INCOME.route);
@@ -324,12 +390,12 @@ describe('P1 mock Level 1 контракт (RED regression, start-level/005/006)
     expect(response.result).toBe(RouteSubmissionResponseResultEnum3.Found);
     expect(response.isTarget).toBe(true);
     expect(response.word).toBe(TARGET_INCOME.word);
-    expect(response.targetsRemaining).toBe(6);
+    expect(response.targetsRemaining).toBe(2);
     expect(response.levelCompleted).toBe(false);
     expect(response.nextAction).toBe('play');
   });
 
-  it('семь уникальных целей завершают уровень только на седьмой, остаток убывает 6..0 и без дублей', async () => {
+  it('три Registry-цели завершают уровень только на третьей, остаток убывает 2..0 и без дублей', async () => {
     const { api, level } = await startLevel1();
     const seen = new Set<string>();
 
@@ -341,7 +407,7 @@ describe('P1 mock Level 1 контракт (RED regression, start-level/005/006)
       expect(response.result).toBe(RouteSubmissionResponseResultEnum3.Found);
       expect(response.isTarget).toBe(true);
       expect(response.word).toBe(target.word);
-      expect(response.targetsRemaining).toBe(6 - index);
+      expect(response.targetsRemaining).toBe(ALL_TARGETS.length - index - 1);
       expect(response.newFoundTargets).toHaveLength(1);
       const word = response.newFoundTargets[0]?.word;
       expect(word).toBe(target.word);
@@ -362,108 +428,46 @@ describe('P1 mock Level 1 контракт (RED regression, start-level/005/006)
     }
   });
 
-  it('ЛАПА: первый сабмит находит бонус, повторный с новым ключом — repeated, стартовый список бонусов пуст', async () => {
+  it('нецелевой маршрут остаётся invalid, потому что Registry не содержит campaign bonus allowlist', async () => {
     const { api, level } = await startLevel1();
 
     expect(level.bonusWords).toEqual([]);
 
     const first = await api.submitRoute(level.levelId, LAPA_ROUTE);
-
-    expect(first.result).toBe(RouteSubmissionResponseResultEnum3.Found);
-    expect(first.isTarget).toBe(false);
-    expect(first.word).toBe('ЛАПА');
-    expect(first.newBonusWords).toHaveLength(1);
-    expect(first.newBonusWords[0].word).toBe('ЛАПА');
+    expect(first.result).toBe(RouteSubmissionResponseResultEnum3.Invalid);
+    expect(first.newBonusWords).toEqual([]);
     expect(first.levelCompleted).toBe(false);
 
-    // Повторный сабмит того же маршрута с новым идемпотент-ключом (новый вызов)
-    // не начисляет слово повторно.
     const second = await api.submitRoute(level.levelId, LAPA_ROUTE);
-
-    expect(second.result).toBe(RouteSubmissionResponseResultEnum3.Repeated);
-    expect(second.newBonusWords).toHaveLength(0);
+    expect(second.result).toBe(RouteSubmissionResponseResultEnum3.Invalid);
+    expect(second.newBonusWords).toEqual([]);
     expect(second.newFoundTargets).toEqual([]);
-    expect(second.levelCompleted).toBe(false);
   });
 
-  it('сервер ведёт regular reward по порогу 4, открывает указатель и блокирует игровые мутации до claim', async () => {
-    const { api, level } = await startLevel1();
-    const bonusRoutes = [
-      { route: LAPA_ROUTE, word: 'ЛАПА' },
-      { route: TIP_ROUTE, word: 'ТИП' },
-      { route: SON_ROUTE, word: 'СОН' },
-    ];
-
+  it('явный regular reward fixture блокирует gameplay до claim и начинает следующий цикл 0/6', async () => {
+    resetP1FakeDb({ pendingReward: true });
+    const api = createP1Api();
     const initialState = await api.loadState();
-    const initialReward = initialState.clientState.rewards[0];
-    expect(initialReward).toBeDefined();
-    if (!initialReward) throw new Error('Expected collecting regular reward');
-    expectCollectingRegularReward(initialReward, 0);
-
-    for (const [index, bonus] of bonusRoutes.entries()) {
-      const response = await api.submitRoute(level.levelId, bonus.route);
-      expect(response.result).toBe(RouteSubmissionResponseResultEnum3.Found);
-      expect(response.word).toBe(bonus.word);
-      expect(response.newBonusWords.map((item: { word: string }) => item.word)).toEqual([bonus.word]);
-      expect(response.rewardProgress).toBe(index + 1);
-
-      const state = await api.loadState();
-      const reward = state.clientState.rewards[0];
-      expect(reward).toBeDefined();
-      if (!reward) throw new Error('Expected collecting regular reward');
-      expectCollectingRegularReward(reward, index + 1);
-    }
-
-    const stateResponse = await fetch('http://localhost/demo-api/state');
-    const key = 'p3-regular-threshold-concurrent-key';
-    const headers = {
-      'content-type': 'application/json',
-      'idempotency-key': key,
-      'if-match': stateResponse.headers.get('etag') ?? '',
-    };
-    const request = () => fetch(`http://localhost/demo-api/levels/${level.levelId}/routes`, {
-      method: 'POST',
-      headers,
-      body: JSON.stringify({ route: FON_ROUTE }),
-    });
-    const [first, concurrent] = await Promise.all([request(), request()]);
-    expect(first.status).toBe(200);
-    expect(concurrent.status).toBe(200);
-    expect(concurrent.headers.get('idempotency-key-status')).toBe('replayed');
-    const firstBody = await first.json() as RouteSubmissionResponse;
-    const concurrentBody = await concurrent.json() as RouteSubmissionResponse;
-    expect(concurrentBody).toEqual(firstBody);
-    expect(firstBody.result).toBe(RouteSubmissionResponseResultEnum3.Found);
-    expect(firstBody.rewardOpened).toBeDefined();
-    if (!firstBody.rewardOpened) throw new Error('Fourth bonus must open regular reward');
-    expect(firstBody.rewardOpened.rewardType).toBe(RewardSummaryRewardTypeEnum.Regular);
-    expect(firstBody.rewardOpened.status).toBe(RewardSummaryStatusEnum.Available);
-    expect(firstBody.rewardOpened.progress).toEqual({ current: 4, threshold: 4 });
-    expectAvailableRewardOptions(firstBody.rewardOpened);
-
-    const pendingState = await api.loadState();
-    expect(pendingState.clientState.pendingReward).toEqual({
-      rewardId: firstBody.rewardOpened.rewardId,
-    });
-    expect(pendingState.clientState.nextAction).toBe(NextAction.ClaimReward);
-    expect(pendingState.clientState.rewards).toHaveLength(1);
-    expect(pendingState.clientState.rewards[0]).toEqual(firstBody.rewardOpened);
-
-    const pendingEtag = (await fetch('http://localhost/demo-api/state')).headers.get('etag') ?? '';
-    const blockedRoute = await fetch(`http://localhost/demo-api/levels/${level.levelId}/routes`, {
+    const initialReward = initialState.clientState.rewards.find(
+      (reward) => reward.status === RewardSummaryStatusEnum.Available,
+    );
+    expect(initialReward?.progress).toEqual({ current: 4, threshold: 4 });
+    if (!initialReward) throw new Error('Expected explicit available regular reward fixture');
+    const stateResponse = await fetch('http://localhost/api/v1/clients/me/state');
+    const blockedRoute = await fetch('http://localhost/api/v1/levels/4f8fad5b-d9cb-469f-a165-808677289500/routes', {
       method: 'POST',
       headers: {
         'content-type': 'application/json',
-        'idempotency-key': 'p3-route-blocked-by-reward',
-        'if-match': pendingEtag,
+        'idempotency-key': 'regular-fixture-route-blocked',
+        'if-match': stateResponse.headers.get('etag') ?? '',
       },
-      body: JSON.stringify({ route: HOD_ROUTE }),
+      body: JSON.stringify({ route: TARGET_FUND.route }),
     });
-    const blockedHint = await fetch(`http://localhost/demo-api/levels/${level.levelId}/hints`, {
+    const blockedHint = await fetch('http://localhost/api/v1/levels/4f8fad5b-d9cb-469f-a165-808677289500/hints', {
       method: 'POST',
       headers: {
-        'idempotency-key': 'p3-hint-blocked-by-reward',
-        'if-match': pendingEtag,
+        'idempotency-key': 'regular-fixture-hint-blocked',
+        'if-match': stateResponse.headers.get('etag') ?? '',
       },
     });
     expect(blockedRoute.status).toBe(409);
@@ -471,7 +475,7 @@ describe('P1 mock Level 1 контракт (RED regression, start-level/005/006)
     await expect(blockedRoute.json()).resolves.toMatchObject({ type: 'REWARD_PENDING_CLAIM' });
     await expect(blockedHint.json()).resolves.toMatchObject({ type: 'REWARD_PENDING_CLAIM' });
 
-    const claim = await api.claimReward(firstBody.rewardOpened.rewardId, { rewardType: 'hint' });
+    const claim = await api.claimReward(initialReward.rewardId, { rewardType: 'hint' });
     expect(claim.rewardType).toBe(ClaimRewardResponseRewardTypeEnum.Regular);
     expect(claim.nextAction).toBe(NextAction.Play);
     const afterClaim = await api.loadState();
@@ -480,28 +484,22 @@ describe('P1 mock Level 1 контракт (RED regression, start-level/005/006)
     expect(afterClaim.clientState.rewards).toHaveLength(1);
     expectCollectingRegularReward(afterClaim.clientState.rewards[0], 0, 6);
 
-    const nextCycle = await api.submitRoute(level.levelId, HOD_ROUTE);
-    expect(nextCycle.result).toBe(RouteSubmissionResponseResultEnum3.Found);
-    expect(nextCycle.word).toBe('ХОД');
-    expect(nextCycle.rewardProgress).toBe(1);
-    const nextCycleState = await api.loadState();
-    expectCollectingRegularReward(nextCycleState.clientState.rewards[0], 1, 6);
   });
 
-  it('submit-route отклоняет известное ДОХОД по неканоническому маршруту без mutation и с outcomeCode', async () => {
+  it('API-006 отклоняет нецелевой маршрут без mutation', async () => {
     const { api, level } = await startLevel1();
-    const before = await fetch('http://localhost/demo-api/state');
+    const before = await fetch('http://localhost/api/v1/clients/me/state');
     const beforeBody = await before.json() as ClientStateResponse;
     const beforeEtag = before.headers.get('etag');
 
     const response = await api.submitRoute(level.levelId, NONCANONICAL_INCOME_ROUTE);
 
     expect(response.result).toBe(RouteSubmissionResponseResultEnum3.Invalid);
-    expect(response.outcomeCode).toBe(RouteSubmissionResponseOutcomeCodeEnum.TARGET_NONCANONICAL_PATH);
+    expect(response.outcomeCode).toBeUndefined();
     expect(response.newFoundTargets).toEqual([]);
     expect(response.newBonusWords).toEqual([]);
 
-    const after = await fetch('http://localhost/demo-api/state');
+    const after = await fetch('http://localhost/api/v1/clients/me/state');
     const afterBody = await after.json() as ClientStateResponse;
     expect(after.headers.get('etag')).toBe(beforeEtag);
     expect(afterBody.clientState).toEqual(beforeBody.clientState);
@@ -512,12 +510,12 @@ describe('P1 mock Level 1 контракт (RED regression, start-level/005/006)
       'idempotency-key': replayKey,
       'if-match': after.headers.get('etag') ?? '',
     };
-    const firstReplay = await fetch(`http://localhost/demo-api/levels/${level.levelId}/routes`, {
+    const firstReplay = await fetch(`http://localhost/api/v1/levels/${level.levelId}/routes`, {
       method: 'POST',
       headers: replayHeaders,
       body: JSON.stringify({ route: NONCANONICAL_INCOME_ROUTE }),
     });
-    const secondReplay = await fetch(`http://localhost/demo-api/levels/${level.levelId}/routes`, {
+    const secondReplay = await fetch(`http://localhost/api/v1/levels/${level.levelId}/routes`, {
       method: 'POST',
       headers: replayHeaders,
       body: JSON.stringify({ route: NONCANONICAL_INCOME_ROUTE }),
@@ -528,12 +526,12 @@ describe('P1 mock Level 1 контракт (RED regression, start-level/005/006)
     await expect(secondReplay.json()).resolves.toEqual(await firstReplay.clone().json());
   });
 
-  it('submit-route и use-hint возвращают 409 REWARD_PENDING_CLAIM до игрового действия', async () => {
+  it('API-006 и API-007 возвращают 409 REWARD_PENDING_CLAIM до игрового действия', async () => {
     resetP1FakeDb({ pendingReward: true });
-    const stateResponse = await fetch('http://localhost/demo-api/state');
+    const stateResponse = await fetch('http://localhost/api/v1/clients/me/state');
     const etag = stateResponse.headers.get('etag') ?? '';
 
-    const routeResponse = await fetch('http://localhost/demo-api/levels/4f8fad5b-d9cb-469f-a165-808677289500/routes', {
+    const routeResponse = await fetch('http://localhost/api/v1/levels/4f8fad5b-d9cb-469f-a165-808677289500/routes', {
       method: 'POST',
       headers: {
         'content-type': 'application/json',
@@ -542,7 +540,7 @@ describe('P1 mock Level 1 контракт (RED regression, start-level/005/006)
       },
       body: JSON.stringify({ route: HOD_ROUTE }),
     });
-    const hintResponse = await fetch('http://localhost/demo-api/levels/4f8fad5b-d9cb-469f-a165-808677289500/hints', {
+    const hintResponse = await fetch('http://localhost/api/v1/levels/4f8fad5b-d9cb-469f-a165-808677289500/hints', {
       method: 'POST',
       headers: {
         'idempotency-key': 'p3-direct-hint-reward-gate',
@@ -556,7 +554,7 @@ describe('P1 mock Level 1 контракт (RED regression, start-level/005/006)
     await expect(hintResponse.json()).resolves.toMatchObject({ type: 'REWARD_PENDING_CLAIM' });
   });
 
-  it('claim-reward claim regular reward очищает exact pointer и создаёт новый collecting cycle', async () => {
+  it('API-009 claim regular reward очищает exact pointer и создаёт новый collecting cycle', async () => {
     resetP1FakeDb({ pendingReward: true });
     const api = createP1Api();
     const state = await api.loadState();
@@ -598,7 +596,7 @@ describe('P1 mock Level 1 контракт (RED regression, start-level/005/006)
     expect('pendingReward' in refreshed.clientState).toBe(false);
   });
 
-  it('P4: completed level-results Results include courseOffer only for linked АКЦИЯ and keep target order', async () => {
+  it('P4: completed L1 API-008 Results keep Registry target order and do not invent offers', async () => {
     const { api, level } = await startLevel1();
 
     for (const target of ALL_TARGETS) {
@@ -610,19 +608,10 @@ describe('P1 mock Level 1 контракт (RED regression, start-level/005/006)
       ALL_TARGETS.map((target) => target.word),
     );
 
-    const linkedTarget = results.foundTargets.find((target) => target.word === 'АКЦИЯ');
-    const unlinkedTarget = results.foundTargets.find((target) => target.word === 'ФОНД');
-    expect(linkedTarget).toBeDefined();
-    expect(unlinkedTarget).toBeDefined();
-    expect(linkedTarget && 'courseOffer' in linkedTarget).toBe(true);
-    if (!linkedTarget || !('courseOffer' in linkedTarget)) {
-      throw new Error('level-results linked target must contain courseOffer');
-    }
-    expect(linkedTarget.courseOffer).toEqual(COURSE_OFFER);
-    expect(unlinkedTarget && 'courseOffer' in unlinkedTarget).toBe(false);
+    expect(results.foundTargets.every((target) => !('courseOffer' in target))).toBe(true);
   });
 
-  it('P4: acknowledge-results rewardless acknowledgement leaves neither pending pointer in the real handler', async () => {
+  it('P4: API-017 rewardless acknowledgement leaves neither pending pointer in the real handler', async () => {
     const { api, level } = await startLevel1();
 
     for (const target of ALL_TARGETS) {
@@ -630,7 +619,7 @@ describe('P1 mock Level 1 контракт (RED regression, start-level/005/006)
     }
     await api.getLevelResults(level.levelId);
 
-    const stateResponse = await fetch('http://localhost/demo-api/state');
+    const stateResponse = await fetch('http://localhost/api/v1/clients/me/state');
     const acknowledgeResponse = await acknowledgeLevelResults(
       level.levelId,
       stateResponse.headers.get('etag') ?? '',
@@ -667,7 +656,7 @@ describe('P1 mock Level 1 контракт (RED regression, start-level/005/006)
   });
 });
 
-describe('P1 mock Level 1 hint contract (RED regression, use-hint)', () => {
+describe('P1 mock Level 1 hint contract (RED regression, API-007)', () => {
   it('первая подсказка выбирает первую нерешённую цель и сохраняет targetId/hintTarget', async () => {
     const { api, level } = await startLevel1();
 
@@ -750,20 +739,20 @@ describe('P1 mock Level 1 hint contract (RED regression, use-hint)', () => {
     expect(resumed.hintState).toBeUndefined();
   });
 
-  it('use-hint replay не списывает подсказку повторно и не дублирует persisted trail', async () => {
+  it('API-007 replay не списывает подсказку повторно и не дублирует persisted trail', async () => {
     const { api, level } = await startLevel1();
-    const stateResponse = await fetch('http://localhost/demo-api/state');
+    const stateResponse = await fetch('http://localhost/api/v1/clients/me/state');
     const key = 'p3-hint-replay-key';
     const headers = {
       'idempotency-key': key,
       'if-match': stateResponse.headers.get('etag') ?? '',
     };
 
-    const first = await fetch(`http://localhost/demo-api/levels/${level.levelId}/hints`, {
+    const first = await fetch(`http://localhost/api/v1/levels/${level.levelId}/hints`, {
       method: 'POST',
       headers,
     });
-    const replay = await fetch(`http://localhost/demo-api/levels/${level.levelId}/hints`, {
+    const replay = await fetch(`http://localhost/api/v1/levels/${level.levelId}/hints`, {
       method: 'POST',
       headers,
     });
@@ -784,10 +773,7 @@ describe('P4 mock chapter Results/reward contract', () => {
   it('real chapter completion exposes chapter_golden and requires acknowledgement before claim', async () => {
     resetP1FakeDb({ chapterCompletion: true });
     const { api, level } = await startLevel1();
-
-    for (const target of ALL_TARGETS) {
-      await api.submitRoute(level.levelId, target.route);
-    }
+    await completeActiveLevel(api, level);
 
     const state = await api.loadState();
     const reward = state.clientState.rewards.find((candidate) => candidate.status === 'available');
@@ -812,7 +798,7 @@ describe('P4 mock chapter Results/reward contract', () => {
     expect(results.reward?.rewardType).toBe(RewardSummaryRewardTypeEnum.ChapterGolden);
     expect(results.nextAction).toBe(NextAction.ClaimReward);
     expect(results.reward?.options).toEqual(rewardOptions);
-    if (!results.reward) throw new Error('level-results must preserve the available reward');
+    if (!results.reward) throw new Error('API-008 must preserve the available reward');
     expectAvailableRewardOptions(results.reward);
 
     const decorationId = results.reward?.options?.find(
@@ -824,12 +810,8 @@ describe('P4 mock chapter Results/reward contract', () => {
   });
 
   it('сохраняет partial regular progress 3 при Golden priority и после Golden claim', async () => {
-    resetP1FakeDb({ chapterCompletion: true });
+    resetP1FakeDb({ chapterCompletion: true, regularRewardProgress: 3 });
     const { api, level } = await startLevel1();
-
-    for (const bonus of [LAPA_ROUTE, TIP_ROUTE, SON_ROUTE]) {
-      await api.submitRoute(level.levelId, bonus);
-    }
     const beforeGolden = await api.loadState();
     const collectingBeforeGolden = beforeGolden.clientState.rewards.find(
       (reward) => reward.rewardType === RewardSummaryRewardTypeEnum.Regular,
@@ -838,9 +820,7 @@ describe('P4 mock chapter Results/reward contract', () => {
     if (!collectingBeforeGolden) throw new Error('Expected partial collecting regular reward');
     expectCollectingRegularReward(collectingBeforeGolden, 3);
 
-    for (const target of ALL_TARGETS) {
-      await api.submitRoute(level.levelId, target.route);
-    }
+    await completeActiveLevel(api, level);
     const goldenState = await api.loadState();
     const availableRewards = goldenState.clientState.rewards.filter(
       (reward) => reward.status === RewardSummaryStatusEnum.Available,
@@ -892,13 +872,10 @@ describe('P4 mock chapter Results/reward contract', () => {
     expectCollectingRegularReward(resumedRegular, 3);
   });
 
-  it('after acknowledge-results acknowledgement, transfers the golden pointer and keeps reward state unchanged for claim-reward', async () => {
+  it('after API-017 acknowledgement, transfers the golden pointer and keeps reward state unchanged for API-009', async () => {
     resetP1FakeDb({ chapterCompletion: true });
     const { api, level } = await startLevel1();
-
-    for (const target of ALL_TARGETS) {
-      await api.submitRoute(level.levelId, target.route);
-    }
+    await completeActiveLevel(api, level);
     const results = await api.getLevelResults(level.levelId);
     const reward = results.reward!;
     const decorationOption = reward.options?.find(
@@ -912,7 +889,7 @@ describe('P4 mock chapter Results/reward contract', () => {
     const beforeAcknowledge = await api.loadState();
     const rewardsBeforeAcknowledge = beforeAcknowledge.clientState.rewards;
 
-    const stateResponse = await fetch('http://localhost/demo-api/state');
+    const stateResponse = await fetch('http://localhost/api/v1/clients/me/state');
     const acknowledgeResponse = await acknowledgeLevelResults(
       level.levelId,
       stateResponse.headers.get('etag') ?? '',
@@ -937,7 +914,7 @@ describe('P4 mock chapter Results/reward contract', () => {
       (candidate) => candidate.rewardId === reward.rewardId,
     );
     expect(acknowledgedReward).toBeDefined();
-    if (!acknowledgedReward) throw new Error('acknowledge-results must preserve the available reward');
+    if (!acknowledgedReward) throw new Error('API-017 must preserve the available reward');
     expectAvailableRewardOptions(acknowledgedReward);
     expect(afterAcknowledge.clientState.rewards).toEqual(
       expect.arrayContaining([expect.objectContaining({
@@ -953,13 +930,10 @@ describe('P4 mock chapter Results/reward contract', () => {
     expect('pendingReward' in afterClaim.clientState).toBe(false);
   });
 
-  it('recovers a real claim-reward claim after acknowledge-results from a stale ETag using pendingReward', async () => {
+  it('recovers a real API-009 claim after API-017 from a stale ETag using pendingReward', async () => {
     resetP1FakeDb({ chapterCompletion: true });
     const { api, level } = await startLevel1();
-
-    for (const target of ALL_TARGETS) {
-      await api.submitRoute(level.levelId, target.route);
-    }
+    await completeActiveLevel(api, level);
     const results = await api.getLevelResults(level.levelId);
     const reward = results.reward!;
     const decorationId = reward.options?.find(
@@ -993,11 +967,15 @@ describe('P4 handler idempotency and validation protocol', () => {
 
   async function availableRewardContext() {
     resetP1FakeDb({ pendingReward: true });
-    const stateResponse = await fetch('http://localhost/demo-api/state');
+    const stateResponse = await fetch('http://localhost/api/v1/clients/me/state');
     const state = await stateResponse.json() as ClientStateResponse;
+    const reward = state.clientState.rewards[0];
     return {
-      rewardId: state.clientState.rewards[0].rewardId,
+      rewardId: reward.rewardId,
       etag: stateResponse.headers.get('etag') ?? '',
+      decorationOptionId: reward.options?.find(
+        (option) => option.optionType === RewardOptionOptionTypeEnum.Decoration,
+      )?.optionId,
     };
   }
 
@@ -1014,17 +992,20 @@ describe('P4 handler idempotency and validation protocol', () => {
     return problem;
   }
 
-  it('clears corrupted persisted fake DB state when handlers are restored', async () => {
-    window.localStorage.setItem('finwords:p1-mock-backend:v1', 'not-json');
+  it('preserves malformed JSON and stops with a controlled migration error', async () => {
+    const corruptedState = 'not-json';
+    window.localStorage.setItem('finwords:p1-mock-backend:v1', corruptedState);
 
-    vi.resetModules();
-    await import('./p1Handlers');
+    await reloadP1HandlersFromStorage();
 
-    expect(window.localStorage.getItem('finwords:p1-mock-backend:v1')).toBeNull();
+    await expectControlledPersistenceMigrationFailure(
+      'finwords:p1-mock-backend:v1',
+      corruptedState,
+    );
   });
 
   it.each(['found target', 'hint state'])(
-    'clears persisted state with a non-UUID %s targetId',
+    'preserves persisted state and stops with a controlled error for a non-UUID %s targetId',
     async (kind) => {
       const { api, level } = await startLevel1();
       if (kind === 'found target') {
@@ -1052,10 +1033,15 @@ describe('P4 handler idempotency and validation protocol', () => {
         throw new Error('Expected persisted hint state');
       }
       window.localStorage.setItem('finwords:p1-mock-backend:v1', JSON.stringify(persisted));
+      const corruptedState = window.localStorage.getItem('finwords:p1-mock-backend:v1');
+      if (!corruptedState) throw new Error('Expected corrupted persisted fake DB state');
 
       await reloadP1HandlersFromStorage();
 
-      expect(window.localStorage.getItem('finwords:p1-mock-backend:v1')).toBeNull();
+      await expectControlledPersistenceMigrationFailure(
+        'finwords:p1-mock-backend:v1',
+        corruptedState,
+      );
     },
   );
 
@@ -1092,7 +1078,7 @@ describe('P4 handler idempotency and validation protocol', () => {
     expect(resumed.hintState.revealedCells).toEqual(TARGET_FUND.canonicalCells.slice(0, 1));
   });
 
-  it('clears persisted state with an invalid nested courseOffer when handlers are restored', async () => {
+  it('preserves an invalid nested courseOffer and stops with a controlled migration error', async () => {
     const { api, level } = await startLevel1();
     for (const target of ALL_TARGETS) {
       await api.submitRoute(level.levelId, target.route);
@@ -1114,16 +1100,20 @@ describe('P4 handler idempotency and validation protocol', () => {
       title: null,
     };
     window.localStorage.setItem('finwords:p1-mock-backend:v1', JSON.stringify(persisted));
+    const corruptedState = window.localStorage.getItem('finwords:p1-mock-backend:v1');
+    if (!corruptedState) throw new Error('Expected corrupted persisted fake DB state');
 
-    vi.resetModules();
-    await import('./p1Handlers');
+    await reloadP1HandlersFromStorage();
 
-    expect(window.localStorage.getItem('finwords:p1-mock-backend:v1')).toBeNull();
+    await expectControlledPersistenceMigrationFailure(
+      'finwords:p1-mock-backend:v1',
+      corruptedState,
+    );
   });
 
-  it('clears persisted state with an incomplete claim-reward replay response when handlers are restored', async () => {
+  it('preserves an incomplete API-009 replay and stops with a controlled migration error', async () => {
     const { rewardId, etag } = await availableRewardContext();
-    const claimResponse = await fetch(`http://localhost/demo-api/rewards/${rewardId}/claim`, {
+    const claimResponse = await fetch(`http://localhost/api/v1/rewards/${rewardId}/claim`, {
       method: 'POST',
       headers: {
         'content-type': 'application/json',
@@ -1143,18 +1133,22 @@ describe('P4 handler idempotency and validation protocol', () => {
     expect(persisted.rewardReplays).toHaveLength(1);
     persisted.rewardReplays[0].response.claimResult = {};
     window.localStorage.setItem('finwords:p1-mock-backend:v1', JSON.stringify(persisted));
+    const corruptedState = window.localStorage.getItem('finwords:p1-mock-backend:v1');
+    if (!corruptedState) throw new Error('Expected corrupted persisted fake DB state');
 
-    vi.resetModules();
-    await import('./p1Handlers');
+    await reloadP1HandlersFromStorage();
 
-    expect(window.localStorage.getItem('finwords:p1-mock-backend:v1')).toBeNull();
+    await expectControlledPersistenceMigrationFailure(
+      'finwords:p1-mock-backend:v1',
+      corruptedState,
+    );
   });
 
-  it('сохраняет regular claim-reward nextAction=play и replay response после reload handlers', async () => {
+  it('сохраняет regular API-009 nextAction=play и replay response после reload handlers', async () => {
     const { rewardId, etag } = await availableRewardContext();
     const key = 'p3-regular-claim-persisted-replay';
     const body: ClaimRewardRequest = { rewardType: 'hint' };
-    const first = await fetch(`http://localhost/demo-api/rewards/${rewardId}/claim`, {
+    const first = await fetch(`http://localhost/api/v1/rewards/${rewardId}/claim`, {
       method: 'POST',
       headers: {
         'content-type': 'application/json',
@@ -1169,13 +1163,13 @@ describe('P4 handler idempotency and validation protocol', () => {
     expect(firstBody.nextAction).toBe(NextAction.Play);
 
     await reloadP1HandlersFromStorage();
-    const restoredStateResponse = await fetch('http://localhost/demo-api/state');
+    const restoredStateResponse = await fetch('http://localhost/api/v1/clients/me/state');
     const restoredState = await restoredStateResponse.json() as ClientStateResponse;
     expect(restoredState.clientState.pendingReward).toBeUndefined();
     expect(restoredState.clientState.nextAction).toBe(NextAction.Play);
     expectCollectingRegularReward(restoredState.clientState.rewards[0], 0, 6);
 
-    const replay = await fetch(`http://localhost/demo-api/rewards/${rewardId}/claim`, {
+    const replay = await fetch(`http://localhost/api/v1/rewards/${rewardId}/claim`, {
       method: 'POST',
       headers: {
         'content-type': 'application/json',
@@ -1188,19 +1182,19 @@ describe('P4 handler idempotency and validation protocol', () => {
     expect(replay.headers.get('idempotency-key-status')).toBe('replayed');
     await expect(replay.json()).resolves.toEqual(firstBody);
 
-    const stateAfterReplayResponse = await fetch('http://localhost/demo-api/state');
+    const stateAfterReplayResponse = await fetch('http://localhost/api/v1/clients/me/state');
     const stateAfterReplay = await stateAfterReplayResponse.json() as ClientStateResponse;
     expect(stateAfterReplay.clientState).toEqual(restoredState.clientState);
     expect(stateAfterReplayResponse.headers.get('etag')).toBe(restoredStateResponse.headers.get('etag'));
   });
 
-  it('does not bump the existing profile ETag on bootstrap replay', async () => {
+  it('does not bump the existing profile ETag on API-001 replay', async () => {
     const key = crypto.randomUUID();
-    const first = await fetch('http://localhost/demo-api/bootstrap', {
+    const first = await fetch('http://localhost/api/v1/clients/me/bootstrap', {
       method: 'POST',
       headers: { 'idempotency-key': key },
     });
-    const second = await fetch('http://localhost/demo-api/bootstrap', {
+    const second = await fetch('http://localhost/api/v1/clients/me/bootstrap', {
       method: 'POST',
       headers: { 'idempotency-key': key },
     });
@@ -1211,9 +1205,9 @@ describe('P4 handler idempotency and validation protocol', () => {
     expect(second.headers.get('idempotency-key-status')).toBe('replayed');
   });
 
-  it('includes rewardId and body in claim-reward idempotency identity', async () => {
+  it('includes rewardId and body in API-009 idempotency identity', async () => {
     resetP1FakeDb({ pendingReward: true });
-    const stateResponse = await fetch('http://localhost/demo-api/state');
+    const stateResponse = await fetch('http://localhost/api/v1/clients/me/state');
     const state = await stateResponse.json() as ClientStateResponse;
     const rewardId = state.clientState.rewards[0].rewardId;
     const body: ClaimRewardRequest = {
@@ -1225,13 +1219,13 @@ describe('P4 handler idempotency and validation protocol', () => {
       'idempotency-key': key,
       'if-match': stateResponse.headers.get('etag') ?? '',
     };
-    const first = await fetch(`http://localhost/demo-api/rewards/${rewardId}/claim`, {
+    const first = await fetch(`http://localhost/api/v1/rewards/${rewardId}/claim`, {
       method: 'POST',
       headers,
       body: JSON.stringify(body),
     });
     const differentReward = '8f8fad5b-d9cb-469f-a165-808677289599';
-    const reused = await fetch(`http://localhost/demo-api/rewards/${differentReward}/claim`, {
+    const reused = await fetch(`http://localhost/api/v1/rewards/${differentReward}/claim`, {
       method: 'POST',
       headers,
       body: JSON.stringify(body),
@@ -1242,9 +1236,9 @@ describe('P4 handler idempotency and validation protocol', () => {
     await expect(reused.json()).resolves.toMatchObject({ type: 'IDEMPOTENCY_KEY_REUSED' });
   });
 
-  it('returns a contract-valid ValidationProblem for malformed claim-reward JSON', async () => {
+  it('returns a contract-valid ValidationProblem for malformed API-009 JSON', async () => {
     const { rewardId, etag } = await availableRewardContext();
-    await expectValidation(await fetch(`http://localhost/demo-api/rewards/${rewardId}/claim`, {
+    await expectValidation(await fetch(`http://localhost/api/v1/rewards/${rewardId}/claim`, {
       method: 'POST',
       headers: {
         'content-type': 'application/json',
@@ -1256,10 +1250,10 @@ describe('P4 handler idempotency and validation protocol', () => {
   });
 
   it.each(['', '   '])(
-    'returns REQUIRED_FIELD ValidationProblem for an empty claim-reward body (%j) before reward lookup',
+    'returns REQUIRED_FIELD ValidationProblem for an empty API-009 body (%j) before reward lookup',
     async (body) => {
       const { rewardId, etag } = await availableRewardContext();
-      const problem = await expectValidation(await fetch(`http://localhost/demo-api/rewards/${rewardId}/claim`, {
+      const problem = await expectValidation(await fetch(`http://localhost/api/v1/rewards/${rewardId}/claim`, {
         method: 'POST',
         headers: {
           'content-type': 'application/json',
@@ -1278,9 +1272,9 @@ describe('P4 handler idempotency and validation protocol', () => {
     },
   );
 
-  it('returns INVALID_FORMAT ValidationProblem for malformed claim-reward rewardId before state lookup', async () => {
-    const stateResponse = await fetch('http://localhost/demo-api/state');
-    const problem = await expectValidation(await fetch('http://localhost/demo-api/rewards/not-a-uuid/claim', {
+  it('returns INVALID_FORMAT ValidationProblem for malformed API-009 rewardId before state lookup', async () => {
+    const stateResponse = await fetch('http://localhost/api/v1/clients/me/state');
+    const problem = await expectValidation(await fetch('http://localhost/api/v1/rewards/not-a-uuid/claim', {
       method: 'POST',
       headers: {
         'content-type': 'application/json',
@@ -1304,7 +1298,7 @@ describe('P4 handler idempotency and validation protocol', () => {
     ['empty selectedOptionId', { rewardType: 'decoration', selectedOptionId: '' }],
   ])('returns REQUIRED_FIELD ValidationProblem for %s', async (_, body) => {
     const { rewardId, etag } = await availableRewardContext();
-    const problem = await expectValidation(await fetch(`http://localhost/demo-api/rewards/${rewardId}/claim`, {
+    const problem = await expectValidation(await fetch(`http://localhost/api/v1/rewards/${rewardId}/claim`, {
       method: 'POST',
       headers: {
         'content-type': 'application/json',
@@ -1334,7 +1328,7 @@ describe('P4 handler idempotency and validation protocol', () => {
     ['invalid option enum', { option: { selectedOptionType: 'invalid' } }],
   ])('returns a contract-valid ValidationProblem for %s', async (_, body) => {
     const { rewardId, etag } = await availableRewardContext();
-    await expectValidation(await fetch(`http://localhost/demo-api/rewards/${rewardId}/claim`, {
+    await expectValidation(await fetch(`http://localhost/api/v1/rewards/${rewardId}/claim`, {
       method: 'POST',
       headers: {
         'content-type': 'application/json',
@@ -1345,9 +1339,9 @@ describe('P4 handler idempotency and validation protocol', () => {
     }));
   });
 
-  it('rejects a legacy nested claim-reward request body', async () => {
+  it('rejects a legacy nested API-009 request body', async () => {
     const { rewardId, etag } = await availableRewardContext();
-    await expectValidation(await fetch(`http://localhost/demo-api/rewards/${rewardId}/claim`, {
+    await expectValidation(await fetch(`http://localhost/api/v1/rewards/${rewardId}/claim`, {
       method: 'POST',
       headers: {
         'content-type': 'application/json',
@@ -1364,16 +1358,19 @@ describe('P4 handler idempotency and validation protocol', () => {
       rewardType: 'decoration',
       selectedOptionId: '1f8fad5b-d9cb-469f-a165-808677289512',
     }],
-  ])('accepts the current claim-reward %s oneOf request body', async (_, body) => {
-    const { rewardId, etag } = await availableRewardContext();
-    const response = await fetch(`http://localhost/demo-api/rewards/${rewardId}/claim`, {
+  ])('accepts the current API-009 %s oneOf request body', async (kind, body) => {
+    const { rewardId, etag, decorationOptionId } = await availableRewardContext();
+    const currentBody = kind === 'decoration'
+      ? { ...body, selectedOptionId: decorationOptionId }
+      : body;
+    const response = await fetch(`http://localhost/api/v1/rewards/${rewardId}/claim`, {
       method: 'POST',
       headers: {
         'content-type': 'application/json',
         'idempotency-key': crypto.randomUUID(),
         'if-match': etag,
       },
-      body: JSON.stringify(body),
+      body: JSON.stringify(currentBody),
     });
     expect(response.status).toBe(200);
     await expect(response.json()).resolves.toMatchObject({
@@ -1427,8 +1424,8 @@ describe('P5 handler replay, persistence and error hardening', () => {
     route: CellRef[],
     key: string,
   ): Promise<Response> {
-    const stateResponse = await fetch('http://localhost/demo-api/state');
-    return fetch(`http://localhost/demo-api/levels/${levelId}/routes`, {
+    const stateResponse = await fetch('http://localhost/api/v1/clients/me/state');
+    return fetch(`http://localhost/api/v1/levels/${levelId}/routes`, {
       method: 'POST',
       headers: {
         'content-type': 'application/json',
@@ -1440,7 +1437,7 @@ describe('P5 handler replay, persistence and error hardening', () => {
   }
 
   async function postHint(levelId: string, key: string, etag: string): Promise<Response> {
-    return fetch(`http://localhost/demo-api/levels/${levelId}/hints`, {
+    return fetch(`http://localhost/api/v1/levels/${levelId}/hints`, {
       method: 'POST',
       headers: {
         'idempotency-key': key,
@@ -1456,15 +1453,15 @@ describe('P5 handler replay, persistence and error hardening', () => {
     }
   }
 
-  it('submit-route после completion: replay-first возвращает старый ответ, новый key получает LEVEL_NOT_IN_PROGRESS без mutation, а descriptor учитывает levelId', async () => {
+  it('API-006 после completion: replay-first возвращает старый ответ, новый key получает LEVEL_NOT_IN_PROGRESS без mutation, а descriptor учитывает levelId', async () => {
     const { api, level } = await startLevel1();
     for (const target of ALL_TARGETS.slice(0, -1)) {
       await api.submitRoute(level.levelId, target.route);
     }
 
-    const stateBeforeCompletion = await fetch('http://localhost/demo-api/state');
+    const stateBeforeCompletion = await fetch('http://localhost/api/v1/clients/me/state');
     const key = 'p5-api006-completion-replay';
-    const final = await fetch(`http://localhost/demo-api/levels/${level.levelId}/routes`, {
+    const final = await fetch(`http://localhost/api/v1/levels/${level.levelId}/routes`, {
       method: 'POST',
       headers: {
         'content-type': 'application/json',
@@ -1475,12 +1472,12 @@ describe('P5 handler replay, persistence and error hardening', () => {
     });
     expect(final.status).toBe(200);
     const finalBody = await final.clone().json();
-    const completedState = await fetch('http://localhost/demo-api/state');
+    const completedState = await fetch('http://localhost/api/v1/clients/me/state');
     const completedBody = await completedState.json() as ClientStateResponse;
     expect(completedBody.clientState.pendingResults).toEqual({ levelId: level.levelId });
     const completedEtag = completedState.headers.get('etag');
 
-    const replay = await fetch(`http://localhost/demo-api/levels/${level.levelId}/routes`, {
+    const replay = await fetch(`http://localhost/api/v1/levels/${level.levelId}/routes`, {
       method: 'POST',
       headers: {
         'content-type': 'application/json',
@@ -1496,7 +1493,7 @@ describe('P5 handler replay, persistence and error hardening', () => {
 
     const otherLevelId = completedBody.clientState.levels[1]?.levelId;
     expect(otherLevelId).toBeDefined();
-    const reusedForOtherLevel = await fetch(`http://localhost/demo-api/levels/${otherLevelId}/routes`, {
+    const reusedForOtherLevel = await fetch(`http://localhost/api/v1/levels/${otherLevelId}/routes`, {
       method: 'POST',
       headers: {
         'content-type': 'application/json',
@@ -1510,7 +1507,7 @@ describe('P5 handler replay, persistence and error hardening', () => {
       type: 'IDEMPOTENCY_KEY_REUSED',
     });
 
-    const fresh = await fetch(`http://localhost/demo-api/levels/${level.levelId}/routes`, {
+    const fresh = await fetch(`http://localhost/api/v1/levels/${level.levelId}/routes`, {
       method: 'POST',
       headers: {
         'content-type': 'application/json',
@@ -1522,14 +1519,14 @@ describe('P5 handler replay, persistence and error hardening', () => {
     expect(fresh.status).toBe(409);
     await expect(fresh.json()).resolves.toMatchObject({ type: 'LEVEL_NOT_IN_PROGRESS' });
 
-    const after = await fetch('http://localhost/demo-api/state');
+    const after = await fetch('http://localhost/api/v1/clients/me/state');
     await expect(after.json()).resolves.toEqual(completedBody);
     expect(after.headers.get('etag')).toBe(completedEtag);
   });
 
-  it('use-hint после completion/pendingResults: старый key replay-ится, новый key получает LEVEL_NOT_IN_PROGRESS без mutation', async () => {
+  it('API-007 после completion/pendingResults: старый key replay-ится, новый key получает LEVEL_NOT_IN_PROGRESS без mutation', async () => {
     const { api, level } = await startLevel1();
-    const initialState = await fetch('http://localhost/demo-api/state');
+    const initialState = await fetch('http://localhost/api/v1/clients/me/state');
     const key = 'p5-api007-completion-replay';
     const firstHint = await postHint(
       level.levelId,
@@ -1541,7 +1538,7 @@ describe('P5 handler replay, persistence and error hardening', () => {
     const firstHintEtag = firstHint.headers.get('etag');
 
     await completeLevelWithDirectRoutes(level.levelId);
-    const completedState = await fetch('http://localhost/demo-api/state');
+    const completedState = await fetch('http://localhost/api/v1/clients/me/state');
     const completedBody = await completedState.json() as ClientStateResponse;
     expect(completedBody.clientState.pendingResults).toEqual({ levelId: level.levelId });
     const completedEtag = completedState.headers.get('etag');
@@ -1560,14 +1557,14 @@ describe('P5 handler replay, persistence and error hardening', () => {
     expect(fresh.status).toBe(409);
     await expect(fresh.json()).resolves.toMatchObject({ type: 'LEVEL_NOT_IN_PROGRESS' });
 
-    const after = await fetch('http://localhost/demo-api/state');
+    const after = await fetch('http://localhost/api/v1/clients/me/state');
     await expect(after.json()).resolves.toEqual(completedBody);
     expect(after.headers.get('etag')).toBe(completedEtag);
     void api;
   });
 
-  it('submit-feedback Settings feedback: replay сохраняет response и ETag, changed body получает IDEMPOTENCY_KEY_REUSED', async () => {
-    const stateResponse = await fetch('http://localhost/demo-api/state');
+  it('API-013 Settings feedback: replay сохраняет response и ETag, changed body получает IDEMPOTENCY_KEY_REUSED', async () => {
+    const stateResponse = await fetch('http://localhost/api/v1/clients/me/state');
     const etag = stateResponse.headers.get('etag') ?? '';
     const key = 'p5-api013-settings-replay';
     const body = { source: 'settings', rating: 5, comment: 'Отлично' };
@@ -1576,7 +1573,7 @@ describe('P5 handler replay, persistence and error hardening', () => {
       'idempotency-key': key,
       'if-match': etag,
     };
-    const first = await fetch('http://localhost/demo-api/feedback', {
+    const first = await fetch('http://localhost/api/v1/feedbacks', {
       method: 'POST',
       headers,
       body: JSON.stringify(body),
@@ -1584,7 +1581,7 @@ describe('P5 handler replay, persistence and error hardening', () => {
     expect(first.status).toBe(200);
     const firstBody = await first.clone().json();
 
-    const replay = await fetch('http://localhost/demo-api/feedback', {
+    const replay = await fetch('http://localhost/api/v1/feedbacks', {
       method: 'POST',
       headers,
       body: JSON.stringify(body),
@@ -1594,7 +1591,7 @@ describe('P5 handler replay, persistence and error hardening', () => {
     expect(replay.headers.get('etag')).toBe(first.headers.get('etag'));
     await expect(replay.json()).resolves.toEqual(firstBody);
 
-    const changed = await fetch('http://localhost/demo-api/feedback', {
+    const changed = await fetch('http://localhost/api/v1/feedbacks', {
       method: 'POST',
       headers: {
         ...headers,
@@ -1617,9 +1614,9 @@ describe('P5 handler replay, persistence and error hardening', () => {
       JSON.stringify({ source: 'settings', rating: 5, chapterId: '5f8fad5b-d9cb-469f-a165-808677289540' }),
       'FORBIDDEN_FIELD',
     ],
-  ])('submit-feedback возвращает ValidationProblem с errors[] для %s', async (_, body, errorType) => {
-    const stateResponse = await fetch('http://localhost/demo-api/state');
-    const response = await fetch('http://localhost/demo-api/feedback', {
+  ])('API-013 возвращает ValidationProblem с errors[] для %s', async (_, body, errorType) => {
+    const stateResponse = await fetch('http://localhost/api/v1/clients/me/state');
+    const response = await fetch('http://localhost/api/v1/feedbacks', {
       method: 'POST',
       headers: {
         'content-type': 'application/json',
@@ -1636,9 +1633,9 @@ describe('P5 handler replay, persistence and error hardening', () => {
     ]));
   });
 
-  it('submit-feedback возвращает ValidationProblem для malformed JSON', async () => {
-    const stateResponse = await fetch('http://localhost/demo-api/state');
-    const response = await fetch('http://localhost/demo-api/feedback', {
+  it('API-013 возвращает ValidationProblem для malformed JSON', async () => {
+    const stateResponse = await fetch('http://localhost/api/v1/clients/me/state');
+    const response = await fetch('http://localhost/api/v1/feedbacks', {
       method: 'POST',
       headers: {
         'content-type': 'application/json',
@@ -1654,9 +1651,9 @@ describe('P5 handler replay, persistence and error hardening', () => {
     });
   });
 
-  it('claim-reward concurrent same-key claim is processed/replayed once, while a new key after claim is terminal', async () => {
+  it('API-009 concurrent same-key claim is processed/replayed once, while a new key after claim is terminal', async () => {
     resetP1FakeDb({ pendingReward: true });
-    const beforeResponse = await fetch('http://localhost/demo-api/state');
+    const beforeResponse = await fetch('http://localhost/api/v1/clients/me/state');
     const before = await beforeResponse.json() as ClientStateResponse;
     const rewardId = before.clientState.rewards[0].rewardId;
     const key = 'p5-api009-concurrent-claim';
@@ -1665,7 +1662,7 @@ describe('P5 handler replay, persistence and error hardening', () => {
       'idempotency-key': key,
       'if-match': beforeResponse.headers.get('etag') ?? '',
     };
-    const request = () => fetch(`http://localhost/demo-api/rewards/${rewardId}/claim`, {
+    const request = () => fetch(`http://localhost/api/v1/rewards/${rewardId}/claim`, {
       method: 'POST',
       headers,
       body: JSON.stringify({ rewardType: 'hint' }),
@@ -1677,14 +1674,14 @@ describe('P5 handler replay, persistence and error hardening', () => {
       .toEqual(['processed', 'replayed']);
     await expect(concurrent.json()).resolves.toEqual(await first.clone().json());
 
-    const afterResponse = await fetch('http://localhost/demo-api/state');
+    const afterResponse = await fetch('http://localhost/api/v1/clients/me/state');
     const after = await afterResponse.json() as ClientStateResponse;
     expect(after.clientState.clientView.balance.hintBalance)
       .toBe(before.clientState.clientView.balance.hintBalance + 1);
     expect(after.clientState.pendingReward).toBeUndefined();
     expect(afterResponse.headers.get('etag')).toBe(first.headers.get('etag'));
 
-    const newKey = await fetch(`http://localhost/demo-api/rewards/${rewardId}/claim`, {
+    const newKey = await fetch(`http://localhost/api/v1/rewards/${rewardId}/claim`, {
       method: 'POST',
       headers: {
         ...headers,
@@ -1696,7 +1693,7 @@ describe('P5 handler replay, persistence and error hardening', () => {
     expect(newKey.status).toBe(409);
     await expect(newKey.json()).resolves.toMatchObject({ type: 'REWARD_ALREADY_CLAIMED' });
 
-    const finalResponse = await fetch('http://localhost/demo-api/state');
+    const finalResponse = await fetch('http://localhost/api/v1/clients/me/state');
     await expect(finalResponse.json()).resolves.toEqual(after);
     expect(finalResponse.headers.get('etag')).toBe(afterResponse.headers.get('etag'));
   });
@@ -1715,28 +1712,33 @@ describe('P5 handler replay, persistence and error hardening', () => {
       void _levelId;
       _fixture.state.clientState.pendingReward = { rewardId: 'not-a-uuid' };
     }],
-  ] as Array<[string, PendingPointerCorruptor]>)('сбрасывает persisted state с невалидным UUID в %s', async (name, corrupt) => {
+  ] as Array<[string, PendingPointerCorruptor]>)(
+    'сохраняет persisted state и возвращает controlled error при невалидном UUID в %s',
+    async (name, corrupt) => {
     const { api, level } = await startLevel1();
     await api.submitRoute(level.levelId, ALL_TARGETS[0].route);
     const fixture = readPersistedFixture();
     corrupt(fixture, level.levelId);
     writePersistedFixture(fixture);
+    const corruptedState = window.localStorage.getItem(PERSISTED_STATE_KEY);
+    if (!corruptedState) throw new Error(`Expected corrupted persisted state for ${name}`);
     await reloadHandlersFromStorage();
-    expect(window.localStorage.getItem(PERSISTED_STATE_KEY), name).toBeNull();
-  });
+    await expectControlledPersistenceMigrationFailure(PERSISTED_STATE_KEY, corruptedState);
+    },
+  );
 
   async function createReplayFor(
-    apiId: 'submit-route' | 'use-hint' | 'submit-feedback' | 'acknowledge-results',
+    apiId: 'API-006' | 'API-007' | 'API-013' | 'API-017',
   ): Promise<string> {
-    if (apiId === 'submit-route') {
+    if (apiId === 'API-006') {
       const { level } = await startLevel1();
       const response = await postRouteWithCurrentEtag(level.levelId, TARGET_FUND.route, crypto.randomUUID());
       expect(response.status).toBe(200);
       return 'route:';
     }
-    if (apiId === 'use-hint') {
+    if (apiId === 'API-007') {
       const { level } = await startLevel1();
-      const stateResponse = await fetch('http://localhost/demo-api/state');
+      const stateResponse = await fetch('http://localhost/api/v1/clients/me/state');
       const response = await postHint(
         level.levelId,
         crypto.randomUUID(),
@@ -1745,7 +1747,7 @@ describe('P5 handler replay, persistence and error hardening', () => {
       expect(response.status).toBe(200);
       return 'hint:';
     }
-    if (apiId === 'submit-feedback') {
+    if (apiId === 'API-013') {
       const api = createP1Api();
       await api.loadState();
       await api.submitFeedback({ source: 'settings', rating: 5, comment: 'Persisted feedback' });
@@ -1754,9 +1756,9 @@ describe('P5 handler replay, persistence and error hardening', () => {
 
     resetP1FakeDb({ chapterCompletion: true });
     const { api, level } = await startLevel1();
-    for (const target of ALL_TARGETS) await api.submitRoute(level.levelId, target.route);
+    await completeActiveLevel(api, level);
     await api.getLevelResults(level.levelId);
-    const stateResponse = await fetch('http://localhost/demo-api/state');
+    const stateResponse = await fetch('http://localhost/api/v1/clients/me/state');
     const response = await acknowledgeLevelResults(
       level.levelId,
       stateResponse.headers.get('etag') ?? '',
@@ -1766,7 +1768,7 @@ describe('P5 handler replay, persistence and error hardening', () => {
     return 'acknowledge:';
   }
 
-  it.each(['submit-route', 'use-hint', 'submit-feedback', 'acknowledge-results'] as const)(
+  it.each(['API-006', 'API-007', 'API-013', 'API-017'] as const)(
     'сохраняет валидную %s replay-запись после reload handlers',
     async (apiId) => {
       const descriptorPrefix = await createReplayFor(apiId);
@@ -1778,12 +1780,12 @@ describe('P5 handler replay, persistence and error hardening', () => {
   );
 
   it.each([
-    ['submit-route', 'route:'],
-    ['use-hint', 'hint:'],
-    ['submit-feedback', 'feedback:'],
-    ['acknowledge-results', 'acknowledge:'],
-  ] as const)('сбрасывает state при невалидном body replay-записи %s', async (apiId, descriptorPrefix) => {
-    if (apiId === 'submit-feedback') {
+    ['API-006', 'route:'],
+    ['API-007', 'hint:'],
+    ['API-013', 'feedback:'],
+    ['API-017', 'acknowledge:'],
+  ] as const)('сохраняет state и возвращает controlled error при невалидном body replay-записи %s', async (apiId, descriptorPrefix) => {
+    if (apiId === 'API-013') {
       await createP1Api().loadState();
       const fixture = readPersistedFixture();
       fixture.p2Replays.push({
@@ -1803,17 +1805,19 @@ describe('P5 handler replay, persistence and error hardening', () => {
       writePersistedFixture(fixture);
     }
 
+    const corruptedState = window.localStorage.getItem(PERSISTED_STATE_KEY);
+    if (!corruptedState) throw new Error(`Expected corrupted persisted state for ${apiId}`);
     await reloadHandlersFromStorage();
-    expect(window.localStorage.getItem(PERSISTED_STATE_KEY)).toBeNull();
+    await expectControlledPersistenceMigrationFailure(PERSISTED_STATE_KEY, corruptedState);
   });
 
   it.each([
-    ['submit-route', 'route:'],
-    ['use-hint', 'hint:'],
-    ['submit-feedback', 'feedback:'],
-    ['acknowledge-results', 'acknowledge:'],
-  ] as const)('сбрасывает state при невалидном descriptor replay-записи %s', async (apiId, descriptorPrefix) => {
-    if (apiId === 'submit-feedback') {
+    ['API-006', 'route:'],
+    ['API-007', 'hint:'],
+    ['API-013', 'feedback:'],
+    ['API-017', 'acknowledge:'],
+  ] as const)('сохраняет state и возвращает controlled error при невалидном descriptor replay-записи %s', async (apiId, descriptorPrefix) => {
+    if (apiId === 'API-013') {
       await createP1Api().loadState();
       const fixture = readPersistedFixture();
       fixture.p2Replays.push({
@@ -1833,8 +1837,10 @@ describe('P5 handler replay, persistence and error hardening', () => {
       writePersistedFixture(fixture);
     }
 
+    const corruptedState = window.localStorage.getItem(PERSISTED_STATE_KEY);
+    if (!corruptedState) throw new Error(`Expected corrupted persisted state for ${apiId}`);
     await reloadHandlersFromStorage();
-    expect(window.localStorage.getItem(PERSISTED_STATE_KEY)).toBeNull();
+    await expectControlledPersistenceMigrationFailure(PERSISTED_STATE_KEY, corruptedState);
   });
 
   it('реальный handler возвращает HINTS_EXHAUSTED без изменения state/ETag', async () => {
@@ -1842,9 +1848,9 @@ describe('P5 handler replay, persistence and error hardening', () => {
     for (let index = 0; index < 5; index += 1) {
       await api.useHint(level.levelId);
     }
-    const before = await fetch('http://localhost/demo-api/state');
+    const before = await fetch('http://localhost/api/v1/clients/me/state');
     const beforeBody = await before.json() as ClientStateResponse;
-    const response = await fetch(`http://localhost/demo-api/levels/${level.levelId}/hints`, {
+    const response = await fetch(`http://localhost/api/v1/levels/${level.levelId}/hints`, {
       method: 'POST',
       headers: {
         'idempotency-key': 'p5-hints-exhausted',
@@ -1853,33 +1859,33 @@ describe('P5 handler replay, persistence and error hardening', () => {
     });
     expect(response.status).toBe(409);
     await expect(response.json()).resolves.toMatchObject({ type: 'HINTS_EXHAUSTED' });
-    const after = await fetch('http://localhost/demo-api/state');
+    const after = await fetch('http://localhost/api/v1/clients/me/state');
     await expect(after.json()).resolves.toEqual(beforeBody);
     expect(after.headers.get('etag')).toBe(before.headers.get('etag'));
   });
 
   it('RED: bounded reset option GAME_UNAVAILABLE is required for a real handler-backed 403', async () => {
     resetP1FakeDb({ gameUnavailable: true });
-    const response = await fetch('http://localhost/demo-api/state');
+    const response = await fetch('http://localhost/api/v1/clients/me/state');
     expect(response.status).toBe(403);
     await expect(response.json()).resolves.toMatchObject({ type: 'GAME_UNAVAILABLE' });
   });
 
   it('RED: bounded reset option CLIENT_NOT_FOUND is required for a real handler-backed 404', async () => {
     resetP1FakeDb({ clientNotFound: true });
-    const response = await fetch('http://localhost/demo-api/state');
+    const response = await fetch('http://localhost/api/v1/clients/me/state');
     expect(response.status).toBe(404);
     await expect(response.json()).resolves.toMatchObject({ type: 'CLIENT_NOT_FOUND' });
   });
 });
 
 describe('P5 server-owned initial balance and regular reward thresholds', () => {
-  it('bootstrap и state возвращают initial knowledge balance ровно 0', async () => {
-    const bootstrap = await fetch('http://localhost/demo-api/bootstrap', {
+  it('API-001 и API-002 возвращают initial knowledge balance ровно 0', async () => {
+    const bootstrap = await fetch('http://localhost/api/v1/clients/me/bootstrap', {
       method: 'POST',
       headers: { 'idempotency-key': 'p5-initial-balance-bootstrap' },
     });
-    const state = await fetch('http://localhost/demo-api/state');
+    const state = await fetch('http://localhost/api/v1/clients/me/state');
 
     expect(bootstrap.status).toBe(200);
     expect(state.status).toBe(200);
@@ -1889,35 +1895,21 @@ describe('P5 server-owned initial balance and regular reward thresholds', () => 
     expect(stateBody.clientState.clientView.balance.knowledgePoints).toBe(0);
   });
 
-  it('regular threshold cycle 0 открывает reward на 4-м bonus, после claim цикл 1 начинается с 0/6 и 5-й bonus даёт 1/6', async () => {
-    const { api, level } = await startLevel1();
-    const initial = await api.loadState();
-    expect(initial.clientState.rewards[0]?.progress).toEqual({ current: 0, threshold: 4 });
+  it('regular threshold cycle 0 переходит из 4/4 в cycle 1 с 0/6; fixture progress 1 остаётся 1/6', async () => {
+    resetP1FakeDb({ pendingReward: true });
+    const api = createP1Api();
+    const available = await api.loadState();
+    const reward = available.clientState.rewards[0];
+    expect(reward.progress).toEqual({ current: 4, threshold: 4 });
 
-    for (const bonus of [
-      { route: LAPA_ROUTE, word: 'ЛАПА' },
-      { route: TIP_ROUTE, word: 'ТИП' },
-      { route: SON_ROUTE, word: 'СОН' },
-    ]) {
-      const response = await api.submitRoute(level.levelId, bonus.route);
-      expect(response.word).toBe(bonus.word);
-    }
-
-    const fourth = await api.submitRoute(level.levelId, FON_ROUTE);
-    expect(fourth.word).toBe('ФОН');
-    expect(fourth.rewardOpened?.progress).toEqual({ current: 4, threshold: 4 });
-    if (!fourth.rewardOpened) throw new Error('Fourth bonus must open regular reward');
-
-    await expect(api.claimReward(fourth.rewardOpened.rewardId, { rewardType: 'hint' }))
-      .resolves.toMatchObject({ rewardId: fourth.rewardOpened.rewardId });
+    await expect(api.claimReward(reward.rewardId, { rewardType: 'hint' }))
+      .resolves.toMatchObject({ rewardId: reward.rewardId });
     const afterClaim = await api.loadState();
     expect(afterClaim.clientState.rewards[0]?.progress).toEqual({ current: 0, threshold: 6 });
 
-    const fifth = await api.submitRoute(level.levelId, HOD_ROUTE);
-    expect(fifth.word).toBe('ХОД');
-    expect(fifth.rewardProgress).toBe(1);
-    const afterFifth = await api.loadState();
-    expect(afterFifth.clientState.rewards[0]?.progress).toEqual({ current: 1, threshold: 6 });
+    resetP1FakeDb({ regularRewardCycle: 1, regularRewardProgress: 1 });
+    const fixtureProgress = await createP1Api().loadState();
+    expect(fixtureProgress.clientState.rewards[0]?.progress).toEqual({ current: 1, threshold: 6 });
   });
 
   it.each([
@@ -1930,7 +1922,7 @@ describe('P5 server-owned initial balance and regular reward thresholds', () => 
     expect(state.clientState.rewards[0]?.progress).toEqual({ current: 0, threshold });
   });
 
-  it('normal Level1 completion from initial balance 0 returns Results earnedKnowledgePoints=7 and total=7', async () => {
+  it('normal Level1 completion from initial balance 0 returns Results for the three governed targets', async () => {
     const { api, level } = await startLevel1();
 
     for (const target of ALL_TARGETS) {
@@ -1938,8 +1930,188 @@ describe('P5 server-owned initial balance and regular reward thresholds', () => 
     }
 
     const results = await api.getLevelResults(level.levelId);
-    expect(results.summary.earnedKnowledgePoints).toBe(7);
-    expect(results.summary.knowledgePointsTotal).toBe(7);
-    expect(results.summary.targets).toEqual({ foundCount: 7, totalCount: 7 });
+    expect(results.summary.earnedKnowledgePoints).toBe(3);
+    expect(results.summary.knowledgePointsTotal).toBe(3);
+    expect(results.summary.targets).toEqual({ foundCount: 3, totalCount: 3 });
+  });
+});
+
+describe('Stage 4 Chapter 1 reward and feedback lifecycle', () => {
+  async function reachAcknowledgedGoldenReward(api: P1Api) {
+    const state = await api.loadState();
+    const level = await api.enterLevel(state);
+    expect(level.levelNumber).toBe(9);
+    await completeActiveLevel(api, level);
+    const results = await api.getLevelResults(level.levelId);
+    expect(results.completionKind).toBe(LevelResultsResponseCompletionKindEnum.Chapter);
+    const acknowledged = await api.acknowledgeLevelResults(level.levelId);
+    expect(acknowledged.nextAction).toBe(NextAction.ClaimReward);
+    const pending = await api.loadState();
+    const reward = availablePendingRewardForTest(pending);
+    expect(reward?.rewardType).toBe(RewardSummaryRewardTypeEnum.ChapterGolden);
+    if (!reward) throw new Error('Expected acknowledged Golden reward');
+    return { level, results, reward };
+  }
+
+  function availablePendingRewardForTest(state: ClientStateResponse): RewardSummary | undefined {
+    const rewardId = state.clientState.pendingReward?.rewardId;
+    return state.clientState.rewards.find(
+      (reward) => reward.rewardId === rewardId && reward.status === RewardSummaryStatusEnum.Available,
+    );
+  }
+
+  it.each(['hint', 'decoration'] as const)(
+    'Level 9 → API-017 → Golden API-009 %s opens eligible chapter feedback',
+    async (option) => {
+      resetP1FakeDb({ chapterCompletion: true });
+      const api = createP1Api();
+      const { reward } = await reachAcknowledgedGoldenReward(api);
+      const before = await api.loadState();
+      const ownedBefore = (await api.getAppearances()).items.filter((item) => item.isOwned).length;
+      const decorationId = reward.options?.find(
+        (candidate) => candidate.optionType === RewardOptionOptionTypeEnum.Decoration,
+      )?.optionId;
+      if (option === 'decoration' && !decorationId) throw new Error('Expected special decoration option');
+
+      const claim = await api.claimReward(
+        reward.rewardId,
+        option === 'hint'
+          ? { rewardType: 'hint' }
+          : { rewardType: 'decoration', selectedOptionId: decorationId! },
+      );
+
+      expect(claim.nextAction).toBe(NextAction.OpenFeedback);
+      expect(claim.claimResult.balance.hintBalance).toBe(
+        before.clientState.clientView.balance.hintBalance + (option === 'hint' ? 3 : 0),
+      );
+      const ownedAfter = (await api.getAppearances()).items.filter((item) => item.isOwned).length;
+      expect(ownedAfter).toBe(ownedBefore + (option === 'decoration' ? 1 : 0));
+      const eligible = await api.loadState();
+      expect(eligible.clientState.nextAction).toBe(NextAction.OpenFeedback);
+    },
+  );
+
+  it('submits chapter feedback with the wire chapter UUID and routes to unavailable next chapter', async () => {
+    resetP1FakeDb({ chapterCompletion: true });
+    const api = createP1Api();
+    const { reward } = await reachAcknowledgedGoldenReward(api);
+    await api.claimReward(reward.rewardId, { rewardType: 'hint' });
+    const eligible = await api.loadState();
+    const chapterId = eligible.clientState.chapters[0].chapterId;
+
+    await expect(api.submitFeedback({
+      source: 'chapter_completion',
+      chapterId,
+      rating: 5,
+      comment: 'Понятно',
+    })).resolves.toMatchObject({ nextAction: NextAction.NextChapter, status: 'submitted' });
+    const after = await api.loadState();
+    expect(after.clientState.nextAction).toBe(NextAction.NextChapter);
+  });
+
+  it('API-014 dismisses without suppressing a later eligible fixture', async () => {
+    resetP1FakeDb({ chapterCompletion: true });
+    const api = createP1Api();
+    const { reward } = await reachAcknowledgedGoldenReward(api);
+    await api.claimReward(reward.rewardId, { rewardType: 'hint' });
+    const eligible = await api.loadState();
+    const chapterId = eligible.clientState.chapters[0].chapterId;
+
+    await expect(api.dismissFeedback(chapterId)).resolves.toMatchObject({
+      chapterId,
+      nextAction: NextAction.NextChapter,
+    });
+    expect((await api.loadState()).clientState.nextAction).toBe(NextAction.NextChapter);
+
+    resetP1FakeDb({ chapterCompletion: true, feedbackPreviouslyDismissed: true });
+    const laterApi = createP1Api();
+    const later = await reachAcknowledgedGoldenReward(laterApi);
+    await expect(laterApi.claimReward(later.reward.rewardId, { rewardType: 'hint' }))
+      .resolves.toMatchObject({ nextAction: NextAction.OpenFeedback });
+  });
+
+  it('API-014 uses canonical validation taxonomy and write-once replay/no-op semantics', async () => {
+    const initialResponse = await fetch('http://localhost/api/v1/clients/me/state');
+    const initial = await initialResponse.json() as ClientStateResponse;
+    const chapterId = initial.clientState.chapters[0].chapterId;
+    const initialEtag = initialResponse.headers.get('etag') ?? '';
+
+    const invalid = await fetch('http://localhost/api/v1/chapters/not-a-uuid/feedback-prompt/dismiss', {
+      method: 'POST',
+      headers: {
+        'idempotency-key': crypto.randomUUID(),
+        'if-match': initialEtag,
+      },
+    });
+    expect(invalid.status).toBe(400);
+    await expect(invalid.json()).resolves.toMatchObject({
+      type: 'VALIDATION_ERROR',
+      errors: [expect.objectContaining({ type: 'INVALID_FORMAT', field: 'path.chapterId' })],
+    });
+
+    const key = crypto.randomUUID();
+    const request = (idempotencyKey: string, ifMatch: string) => fetch(
+      `http://localhost/api/v1/chapters/${chapterId}/feedback-prompt/dismiss`,
+      {
+        method: 'POST',
+        headers: {
+          'idempotency-key': idempotencyKey,
+          'if-match': ifMatch,
+        },
+      },
+    );
+    const first = await request(key, initialEtag);
+    expect(first.status).toBe(200);
+    expect(first.headers.get('idempotency-key-status')).toBe('processed');
+    const firstEtag = first.headers.get('etag') ?? '';
+    const firstBody = await first.json();
+    expect(firstBody).toEqual({
+      chapterId,
+      feedbackPromptShownAt: '2026-09-03T12:00:00.000Z',
+      nextAction: NextAction.NextChapter,
+    });
+
+    const replay = await request(key, initialEtag);
+    expect(replay.status).toBe(200);
+    expect(replay.headers.get('idempotency-key-status')).toBe('replayed');
+    expect(replay.headers.get('etag')).toBe(firstEtag);
+    await expect(replay.json()).resolves.toEqual(firstBody);
+
+    const noOp = await request(crypto.randomUUID(), firstEtag);
+    expect(noOp.status).toBe(200);
+    expect(noOp.headers.get('idempotency-key-status')).toBe('processed');
+    expect(noOp.headers.get('etag')).toBe(firstEtag);
+    await expect(noOp.json()).resolves.toEqual(firstBody);
+  });
+
+  it('allows repeatable Settings feedback after the first successful submit', async () => {
+    const api = createP1Api();
+    await api.loadState();
+
+    await expect(api.submitFeedback({ source: 'settings', rating: 4 }))
+      .resolves.toMatchObject({ status: 'submitted' });
+    await expect(api.submitFeedback({ source: 'settings', rating: 5, comment: 'Повторная оценка' }))
+      .resolves.toMatchObject({ status: 'submitted' });
+  });
+
+  it('a successful Settings feedback suppresses a later automatic chapter prompt', async () => {
+    resetP1FakeDb({ chapterCompletion: true });
+    const api = createP1Api();
+    await api.loadState();
+    await api.submitFeedback({ source: 'settings', rating: 4 });
+    const { reward } = await reachAcknowledgedGoldenReward(api);
+    await expect(api.claimReward(reward.rewardId, { rewardType: 'hint' }))
+      .resolves.toMatchObject({ nextAction: NextAction.NextChapter });
+    expect((await api.loadState()).clientState.nextAction).toBe(NextAction.NextChapter);
+  });
+
+  it('rejects chapter_completion feedback before Golden eligibility by ProblemDetails.type', async () => {
+    const api = createP1Api();
+    const initial = await api.loadState();
+    await expect(api.submitFeedback({
+      source: 'chapter_completion',
+      chapterId: initial.clientState.chapters[0].chapterId,
+      rating: 5,
+    })).rejects.toMatchObject({ type: 'FEEDBACK_NOT_ELIGIBLE' });
   });
 });

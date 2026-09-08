@@ -1,0 +1,295 @@
+{
+  "schemaVersion": "1",
+  "id": "level-32",
+  "number": 32,
+  "chapterId": "chapter-05",
+  "chapterTitle": "Мир бизнеса",
+  "microtheme": "Запуск бизнеса",
+  "rows": 6,
+  "cols": 6,
+  "desiredTurns": {
+    "min": 1,
+    "max": 3
+  },
+  "difficulty": "Средняя",
+  "sourceWords": [
+    "ФИРМА",
+    "БИЗНЕС",
+    "КОМАНДА",
+    "ПРОЕКТ",
+    "БЮДЖЕТ",
+    "ЗАПУСК"
+  ],
+  "gridStatus": "TBD_AFTER_DATA_MODEL",
+  "contentStatus": "Draft",
+  "validation": "VALID",
+  "grid": [
+    [
+      "Ю",
+      "Б",
+      "Т",
+      "К",
+      "Е",
+      "О"
+    ],
+    [
+      "Д",
+      "Ж",
+      "Д",
+      "А",
+      "П",
+      "Р"
+    ],
+    [
+      "К",
+      "Е",
+      "Н",
+      "А",
+      "М",
+      "Ф"
+    ],
+    [
+      "С",
+      "Т",
+      "А",
+      "Б",
+      "Р",
+      "И"
+    ],
+    [
+      "У",
+      "З",
+      "М",
+      "И",
+      "З",
+      "Н"
+    ],
+    [
+      "П",
+      "А",
+      "О",
+      "К",
+      "С",
+      "Е"
+    ]
+  ],
+  "targets": [
+    {
+      "targetId": "target-32-01",
+      "order": 1,
+      "word": "ФИРМА",
+      "normalized": "ФИРМА",
+      "definition": "Коммерческая организация, которая производит товары или оказывает услуги.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 2,
+          "col": 5
+        },
+        {
+          "row": 3,
+          "col": 5
+        },
+        {
+          "row": 3,
+          "col": 4
+        },
+        {
+          "row": 2,
+          "col": 4
+        },
+        {
+          "row": 2,
+          "col": 3
+        }
+      ]
+    },
+    {
+      "targetId": "target-32-02",
+      "order": 2,
+      "word": "БИЗНЕС",
+      "normalized": "БИЗНЕС",
+      "definition": "Деятельность по созданию и продаже ценности с расчётом на устойчивый результат.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "offerId": "offer-32",
+      "canonicalPath": [
+        {
+          "row": 3,
+          "col": 3
+        },
+        {
+          "row": 4,
+          "col": 3
+        },
+        {
+          "row": 4,
+          "col": 4
+        },
+        {
+          "row": 4,
+          "col": 5
+        },
+        {
+          "row": 5,
+          "col": 5
+        },
+        {
+          "row": 5,
+          "col": 4
+        }
+      ]
+    },
+    {
+      "targetId": "target-32-03",
+      "order": 3,
+      "word": "КОМАНДА",
+      "normalized": "КОМАНДА",
+      "definition": "Группа людей, совместно работающих над общей целью.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 5,
+          "col": 3
+        },
+        {
+          "row": 5,
+          "col": 2
+        },
+        {
+          "row": 4,
+          "col": 2
+        },
+        {
+          "row": 3,
+          "col": 2
+        },
+        {
+          "row": 2,
+          "col": 2
+        },
+        {
+          "row": 1,
+          "col": 2
+        },
+        {
+          "row": 1,
+          "col": 3
+        }
+      ]
+    },
+    {
+      "targetId": "target-32-04",
+      "order": 4,
+      "word": "ПРОЕКТ",
+      "normalized": "ПРОЕКТ",
+      "definition": "Ограниченная по времени работа для создания определённого результата.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 1,
+          "col": 4
+        },
+        {
+          "row": 1,
+          "col": 5
+        },
+        {
+          "row": 0,
+          "col": 5
+        },
+        {
+          "row": 0,
+          "col": 4
+        },
+        {
+          "row": 0,
+          "col": 3
+        },
+        {
+          "row": 0,
+          "col": 2
+        }
+      ]
+    },
+    {
+      "targetId": "target-32-05",
+      "order": 5,
+      "word": "БЮДЖЕТ",
+      "normalized": "БЮДЖЕТ",
+      "definition": "План доходов и расходов на установленный период.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 0,
+          "col": 1
+        },
+        {
+          "row": 0,
+          "col": 0
+        },
+        {
+          "row": 1,
+          "col": 0
+        },
+        {
+          "row": 1,
+          "col": 1
+        },
+        {
+          "row": 2,
+          "col": 1
+        },
+        {
+          "row": 3,
+          "col": 1
+        }
+      ]
+    },
+    {
+      "targetId": "target-32-06",
+      "order": 6,
+      "word": "ЗАПУСК",
+      "normalized": "ЗАПУСК",
+      "definition": "Начало работы продукта, проекта или нового процесса.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 4,
+          "col": 1
+        },
+        {
+          "row": 5,
+          "col": 1
+        },
+        {
+          "row": 5,
+          "col": 0
+        },
+        {
+          "row": 4,
+          "col": 0
+        },
+        {
+          "row": 3,
+          "col": 0
+        },
+        {
+          "row": 2,
+          "col": 0
+        }
+      ]
+    }
+  ]
+}

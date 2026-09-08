@@ -1,0 +1,294 @@
+{
+  "schemaVersion": "1",
+  "id": "level-33",
+  "number": 33,
+  "chapterId": "chapter-05",
+  "chapterTitle": "Мир бизнеса",
+  "microtheme": "Команда и роли",
+  "rows": 6,
+  "cols": 6,
+  "desiredTurns": {
+    "min": 1,
+    "max": 3
+  },
+  "difficulty": "Средняя",
+  "sourceWords": [
+    "ЛИДЕР",
+    "МЕНЕДЖЕР",
+    "ЮРИСТ",
+    "БУХГАЛТЕР",
+    "ОТДЕЛ",
+    "ШТАТ"
+  ],
+  "gridStatus": "TBD_AFTER_DATA_MODEL",
+  "contentStatus": "Draft",
+  "validation": "VALID",
+  "grid": [
+    [
+      "А",
+      "Т",
+      "Ш",
+      "Р",
+      "Ю",
+      "Р"
+    ],
+    [
+      "Т",
+      "Е",
+      "Р",
+      "И",
+      "С",
+      "Е"
+    ],
+    [
+      "О",
+      "Д",
+      "И",
+      "Л",
+      "Т",
+      "Т"
+    ],
+    [
+      "Т",
+      "Ж",
+      "Е",
+      "Р",
+      "М",
+      "Л"
+    ],
+    [
+      "Д",
+      "Д",
+      "Е",
+      "Н",
+      "Е",
+      "А"
+    ],
+    [
+      "Е",
+      "Л",
+      "Б",
+      "У",
+      "Х",
+      "Г"
+    ]
+  ],
+  "targets": [
+    {
+      "targetId": "target-33-01",
+      "order": 1,
+      "word": "ЛИДЕР",
+      "normalized": "ЛИДЕР",
+      "definition": "Человек, который задаёт направление и помогает группе достигать общей цели.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 2,
+          "col": 3
+        },
+        {
+          "row": 2,
+          "col": 2
+        },
+        {
+          "row": 2,
+          "col": 1
+        },
+        {
+          "row": 1,
+          "col": 1
+        },
+        {
+          "row": 1,
+          "col": 2
+        }
+      ]
+    },
+    {
+      "targetId": "target-33-02",
+      "order": 2,
+      "word": "МЕНЕДЖЕР",
+      "normalized": "МЕНЕДЖЕР",
+      "definition": "Специалист, который планирует, организует и контролирует работу.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 3,
+          "col": 4
+        },
+        {
+          "row": 4,
+          "col": 4
+        },
+        {
+          "row": 4,
+          "col": 3
+        },
+        {
+          "row": 4,
+          "col": 2
+        },
+        {
+          "row": 4,
+          "col": 1
+        },
+        {
+          "row": 3,
+          "col": 1
+        },
+        {
+          "row": 3,
+          "col": 2
+        },
+        {
+          "row": 3,
+          "col": 3
+        }
+      ]
+    },
+    {
+      "targetId": "target-33-03",
+      "order": 3,
+      "word": "ЮРИСТ",
+      "normalized": "ЮРИСТ",
+      "definition": "Специалист по праву, договорам и защите законных интересов.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 0,
+          "col": 4
+        },
+        {
+          "row": 0,
+          "col": 3
+        },
+        {
+          "row": 1,
+          "col": 3
+        },
+        {
+          "row": 1,
+          "col": 4
+        },
+        {
+          "row": 2,
+          "col": 4
+        }
+      ]
+    },
+    {
+      "targetId": "target-33-04",
+      "order": 4,
+      "word": "БУХГАЛТЕР",
+      "normalized": "БУХГАЛТЕР",
+      "definition": "Специалист, который ведёт учёт операций и готовит финансовую отчётность.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 5,
+          "col": 2
+        },
+        {
+          "row": 5,
+          "col": 3
+        },
+        {
+          "row": 5,
+          "col": 4
+        },
+        {
+          "row": 5,
+          "col": 5
+        },
+        {
+          "row": 4,
+          "col": 5
+        },
+        {
+          "row": 3,
+          "col": 5
+        },
+        {
+          "row": 2,
+          "col": 5
+        },
+        {
+          "row": 1,
+          "col": 5
+        },
+        {
+          "row": 0,
+          "col": 5
+        }
+      ]
+    },
+    {
+      "targetId": "target-33-05",
+      "order": 5,
+      "word": "ОТДЕЛ",
+      "normalized": "ОТДЕЛ",
+      "definition": "Часть организации, выполняющая определённую группу функций.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 2,
+          "col": 0
+        },
+        {
+          "row": 3,
+          "col": 0
+        },
+        {
+          "row": 4,
+          "col": 0
+        },
+        {
+          "row": 5,
+          "col": 0
+        },
+        {
+          "row": 5,
+          "col": 1
+        }
+      ]
+    },
+    {
+      "targetId": "target-33-06",
+      "order": 6,
+      "word": "ШТАТ",
+      "normalized": "ШТАТ",
+      "definition": "Совокупность должностей и сотрудников организации.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 0,
+          "col": 2
+        },
+        {
+          "row": 0,
+          "col": 1
+        },
+        {
+          "row": 0,
+          "col": 0
+        },
+        {
+          "row": 1,
+          "col": 0
+        }
+      ]
+    }
+  ]
+}

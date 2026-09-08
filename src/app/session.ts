@@ -1,4 +1,4 @@
-import { getTarget, LEVELS } from '../content/levels';
+import { getTarget, LEVELS } from '../content/campaign';
 import type {
   LevelId,
   LevelProgress,
@@ -87,9 +87,13 @@ export function createInitialSession(search = ''): SessionState {
 
   let selectedWordId: string | undefined;
   if (overlay === 'course') {
-    selectedWordId = 'stock';
+    selectedWordId = LEVELS[currentLevelId].targets.find(
+      (target) => target.offer?.type === 'course',
+    )?.id;
   } else if (overlay === 'product') {
-    selectedWordId = 'iis';
+    selectedWordId = LEVELS[currentLevelId].targets.find(
+      (target) => target.offer?.type === 'product',
+    )?.id;
   } else if (overlay === 'word-definition') {
     selectedWordId = LEVELS[currentLevelId].targets[0]?.id;
   }

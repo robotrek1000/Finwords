@@ -1,0 +1,295 @@
+{
+  "schemaVersion": "1",
+  "id": "level-48",
+  "number": 48,
+  "chapterId": "chapter-07",
+  "chapterTitle": "Финансовая свобода",
+  "microtheme": "Пассивный доход",
+  "rows": 6,
+  "cols": 6,
+  "desiredTurns": {
+    "min": 2,
+    "max": 4
+  },
+  "difficulty": "Продвинутая",
+  "sourceWords": [
+    "ПРОЦЕНТ",
+    "ПРИТОК",
+    "ПЛАТЁЖ",
+    "РОЯЛТИ",
+    "РАНТЬЕ",
+    "БОНУС"
+  ],
+  "gridStatus": "TBD_AFTER_DATA_MODEL",
+  "contentStatus": "Draft",
+  "validation": "VALID",
+  "grid": [
+    [
+      "Е",
+      "Ц",
+      "О",
+      "Р",
+      "П",
+      "С"
+    ],
+    [
+      "Н",
+      "Т",
+      "П",
+      "Р",
+      "Н",
+      "У"
+    ],
+    [
+      "К",
+      "О",
+      "Т",
+      "И",
+      "О",
+      "Б"
+    ],
+    [
+      "П",
+      "Л",
+      "А",
+      "Т",
+      "Ь",
+      "Е"
+    ],
+    [
+      "О",
+      "Р",
+      "Ж",
+      "Е",
+      "Т",
+      "Р"
+    ],
+    [
+      "Я",
+      "Л",
+      "Т",
+      "И",
+      "Н",
+      "А"
+    ]
+  ],
+  "targets": [
+    {
+      "targetId": "target-48-01",
+      "order": 1,
+      "word": "ПРОЦЕНТ",
+      "normalized": "ПРОЦЕНТ",
+      "definition": "Одна сотая доля величины или ставка, применяемая к денежной сумме.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "offerId": "offer-48",
+      "canonicalPath": [
+        {
+          "row": 0,
+          "col": 4
+        },
+        {
+          "row": 0,
+          "col": 3
+        },
+        {
+          "row": 0,
+          "col": 2
+        },
+        {
+          "row": 0,
+          "col": 1
+        },
+        {
+          "row": 0,
+          "col": 0
+        },
+        {
+          "row": 1,
+          "col": 0
+        },
+        {
+          "row": 1,
+          "col": 1
+        }
+      ]
+    },
+    {
+      "targetId": "target-48-02",
+      "order": 2,
+      "word": "ПРИТОК",
+      "normalized": "ПРИТОК",
+      "definition": "Поступление денег, ресурсов или участников за определённый период.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 1,
+          "col": 2
+        },
+        {
+          "row": 1,
+          "col": 3
+        },
+        {
+          "row": 2,
+          "col": 3
+        },
+        {
+          "row": 2,
+          "col": 2
+        },
+        {
+          "row": 2,
+          "col": 1
+        },
+        {
+          "row": 2,
+          "col": 0
+        }
+      ]
+    },
+    {
+      "targetId": "target-48-03",
+      "order": 3,
+      "word": "ПЛАТЁЖ",
+      "normalized": "ПЛАТЕЖ",
+      "definition": "Передача денег для исполнения обязательства.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 3,
+          "col": 0
+        },
+        {
+          "row": 3,
+          "col": 1
+        },
+        {
+          "row": 3,
+          "col": 2
+        },
+        {
+          "row": 3,
+          "col": 3
+        },
+        {
+          "row": 4,
+          "col": 3
+        },
+        {
+          "row": 4,
+          "col": 2
+        }
+      ]
+    },
+    {
+      "targetId": "target-48-04",
+      "order": 4,
+      "word": "РОЯЛТИ",
+      "normalized": "РОЯЛТИ",
+      "definition": "Регулярная плата владельцу права за использование его интеллектуальной собственности.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 4,
+          "col": 1
+        },
+        {
+          "row": 4,
+          "col": 0
+        },
+        {
+          "row": 5,
+          "col": 0
+        },
+        {
+          "row": 5,
+          "col": 1
+        },
+        {
+          "row": 5,
+          "col": 2
+        },
+        {
+          "row": 5,
+          "col": 3
+        }
+      ]
+    },
+    {
+      "targetId": "target-48-05",
+      "order": 5,
+      "word": "РАНТЬЕ",
+      "normalized": "РАНТЬЕ",
+      "definition": "Человек, живущий преимущественно на регулярный доход от капитала или имущества.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 4,
+          "col": 5
+        },
+        {
+          "row": 5,
+          "col": 5
+        },
+        {
+          "row": 5,
+          "col": 4
+        },
+        {
+          "row": 4,
+          "col": 4
+        },
+        {
+          "row": 3,
+          "col": 4
+        },
+        {
+          "row": 3,
+          "col": 5
+        }
+      ]
+    },
+    {
+      "targetId": "target-48-06",
+      "order": 6,
+      "word": "БОНУС",
+      "normalized": "БОНУС",
+      "definition": "Дополнительная выгода или вознаграждение сверх основного результата.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 2,
+          "col": 5
+        },
+        {
+          "row": 2,
+          "col": 4
+        },
+        {
+          "row": 1,
+          "col": 4
+        },
+        {
+          "row": 1,
+          "col": 5
+        },
+        {
+          "row": 0,
+          "col": 5
+        }
+      ]
+    }
+  ]
+}

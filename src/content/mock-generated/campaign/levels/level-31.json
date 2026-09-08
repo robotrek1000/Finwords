@@ -1,0 +1,294 @@
+{
+  "schemaVersion": "1",
+  "id": "level-31",
+  "number": 31,
+  "chapterId": "chapter-04",
+  "chapterTitle": "История капитала",
+  "microtheme": "Правила рынка",
+  "rows": 6,
+  "cols": 6,
+  "desiredTurns": {
+    "min": 1,
+    "max": 3
+  },
+  "difficulty": "Средняя",
+  "sourceWords": [
+    "КОНТРОЛЬ",
+    "НАДЗОР",
+    "КОДЕКС",
+    "АУДИТ",
+    "РЕЕСТР",
+    "НОРМА"
+  ],
+  "gridStatus": "TBD_AFTER_DATA_MODEL",
+  "contentStatus": "Draft",
+  "validation": "VALID",
+  "grid": [
+    [
+      "Т",
+      "Р",
+      "Р",
+      "К",
+      "О",
+      "Д"
+    ],
+    [
+      "Н",
+      "О",
+      "О",
+      "Т",
+      "С",
+      "Е"
+    ],
+    [
+      "О",
+      "Л",
+      "З",
+      "Р",
+      "Е",
+      "К"
+    ],
+    [
+      "К",
+      "Ь",
+      "Д",
+      "Р",
+      "Е",
+      "С"
+    ],
+    [
+      "А",
+      "Н",
+      "А",
+      "Т",
+      "И",
+      "А"
+    ],
+    [
+      "М",
+      "Р",
+      "О",
+      "Н",
+      "Д",
+      "У"
+    ]
+  ],
+  "targets": [
+    {
+      "targetId": "target-31-01",
+      "order": 1,
+      "word": "КОНТРОЛЬ",
+      "normalized": "КОНТРОЛЬ",
+      "definition": "Проверка соответствия действий установленным требованиям и целям.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 3,
+          "col": 0
+        },
+        {
+          "row": 2,
+          "col": 0
+        },
+        {
+          "row": 1,
+          "col": 0
+        },
+        {
+          "row": 0,
+          "col": 0
+        },
+        {
+          "row": 0,
+          "col": 1
+        },
+        {
+          "row": 1,
+          "col": 1
+        },
+        {
+          "row": 2,
+          "col": 1
+        },
+        {
+          "row": 3,
+          "col": 1
+        }
+      ]
+    },
+    {
+      "targetId": "target-31-02",
+      "order": 2,
+      "word": "НАДЗОР",
+      "normalized": "НАДЗОР",
+      "definition": "Наблюдение уполномоченного органа за соблюдением правил и закона.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 4,
+          "col": 1
+        },
+        {
+          "row": 4,
+          "col": 2
+        },
+        {
+          "row": 3,
+          "col": 2
+        },
+        {
+          "row": 2,
+          "col": 2
+        },
+        {
+          "row": 1,
+          "col": 2
+        },
+        {
+          "row": 0,
+          "col": 2
+        }
+      ]
+    },
+    {
+      "targetId": "target-31-03",
+      "order": 3,
+      "word": "КОДЕКС",
+      "normalized": "КОДЕКС",
+      "definition": "Свод правил и норм, регулирующих определённую сферу.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 0,
+          "col": 3
+        },
+        {
+          "row": 0,
+          "col": 4
+        },
+        {
+          "row": 0,
+          "col": 5
+        },
+        {
+          "row": 1,
+          "col": 5
+        },
+        {
+          "row": 2,
+          "col": 5
+        },
+        {
+          "row": 3,
+          "col": 5
+        }
+      ]
+    },
+    {
+      "targetId": "target-31-04",
+      "order": 4,
+      "word": "АУДИТ",
+      "normalized": "АУДИТ",
+      "definition": "Независимая проверка отчётности, процессов или соблюдения требований.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 4,
+          "col": 5
+        },
+        {
+          "row": 5,
+          "col": 5
+        },
+        {
+          "row": 5,
+          "col": 4
+        },
+        {
+          "row": 4,
+          "col": 4
+        },
+        {
+          "row": 4,
+          "col": 3
+        }
+      ]
+    },
+    {
+      "targetId": "target-31-05",
+      "order": 5,
+      "word": "РЕЕСТР",
+      "normalized": "РЕЕСТР",
+      "definition": "Упорядоченный официальный список объектов, прав или участников.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 3,
+          "col": 3
+        },
+        {
+          "row": 3,
+          "col": 4
+        },
+        {
+          "row": 2,
+          "col": 4
+        },
+        {
+          "row": 1,
+          "col": 4
+        },
+        {
+          "row": 1,
+          "col": 3
+        },
+        {
+          "row": 2,
+          "col": 3
+        }
+      ]
+    },
+    {
+      "targetId": "target-31-06",
+      "order": 6,
+      "word": "НОРМА",
+      "normalized": "НОРМА",
+      "definition": "Установленное правило или допустимое значение показателя.",
+      "definitionStatus": "Draft",
+      "completeness": "OK",
+      "duplicateCount": 1,
+      "canonicalPath": [
+        {
+          "row": 5,
+          "col": 3
+        },
+        {
+          "row": 5,
+          "col": 2
+        },
+        {
+          "row": 5,
+          "col": 1
+        },
+        {
+          "row": 5,
+          "col": 0
+        },
+        {
+          "row": 4,
+          "col": 0
+        }
+      ]
+    }
+  ]
+}
