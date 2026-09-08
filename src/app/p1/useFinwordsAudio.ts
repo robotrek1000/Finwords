@@ -18,7 +18,12 @@ export function useFinwordsAudio(
       document,
       createAudio: (src) => {
         const supportsOgg = document.createElement('audio').canPlayType('audio/ogg; codecs=vorbis');
-        return new Audio(supportsOgg ? src : src.replace(/\.ogg$/, '.mp3'));
+        const audio = new Audio();
+        // Preserve media Range headers when MSW forwards the request through fetch.
+        // Browsers strip those headers from rewritten no-cors requests.
+        audio.crossOrigin = 'anonymous';
+        audio.src = supportsOgg ? src : src.replace(/\.ogg$/, '.mp3');
+        return audio;
       },
       random: Math.random,
     });

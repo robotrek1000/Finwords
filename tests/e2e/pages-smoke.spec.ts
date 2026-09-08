@@ -71,6 +71,12 @@ test('production campaign starts, plays real audio and resets on reload', async 
 
   await page.getByRole('button', { name: 'Настройки', exact: true }).click();
   await expect.poll(() => page.evaluate(() => window.__PAGES_AUDIO__.some(a => a.loop && !a.paused && a.currentTime > 0))).toBe(true);
+  const rangeResponse = await page.evaluate(async () => {
+    const track = window.__PAGES_AUDIO__.find(a => a.loop)!;
+    const response = await fetch(track.src, { mode: 'cors', headers: { Range: 'bytes=1-16' } });
+    return { status: response.status, range: response.headers.get('content-range'), size: (await response.arrayBuffer()).byteLength };
+  });
+  expect(rangeResponse).toEqual({ status: 206, range: expect.stringMatching(/^bytes 1-16\/\d+$/), size: 16 });
   await expect.poll(() => page.evaluate(() => window.__PAGES_AUDIO__.some(a => !a.loop && a.currentTime > 0))).toBe(true);
   const music = page.getByRole('switch', { name: 'Музыка', exact: true });
   const sound = page.getByRole('switch', { name: 'Звук', exact: true });
