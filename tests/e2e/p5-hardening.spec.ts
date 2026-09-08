@@ -1,7 +1,7 @@
 import { expect, test, type Page } from '@playwright/test';
 import type { CellId } from '../../src/app/types';
 
-declare global { interface Window { __RELEASE_ROUTE__?: () => void } }
+declare global { interface Window { __RELEASE_ROUTE__?: () => void; __RELEASE_BOOTSTRAP__?: () => void; __RELEASE_RESULTS__?: () => void } }
 
 // Keep the notice visible while geometry is measured; expiration has separate unit coverage.
 test.beforeEach(async ({ page }, testInfo) => {
@@ -487,12 +487,11 @@ test('P5: reduced motion отключает loading/results spinner и switch tr
       configurable: true,
       value: function (this: XMLHttpRequest, body: Document | XMLHttpRequestBodyInit | null) {
         const url = urls.get(this) ?? '';
-        const delay = url.includes('/bootstrap') ? 500 : url.includes('/results') ? 700 : 0;
-        if (delay === 0) {
-          Reflect.apply(send, this, [body]);
-          return;
-        }
-        window.setTimeout(() => Reflect.apply(send, this, [body]), delay);
+        // Keep each loading state mounted until its styles have been inspected.
+        const release = () => Reflect.apply(send, this, [body]);
+        if (url.includes('/bootstrap')) window.__RELEASE_BOOTSTRAP__ = release;
+        else if (url.includes('/results')) window.__RELEASE_RESULTS__ = release;
+        else release();
       },
     });
   });
@@ -511,6 +510,8 @@ test('P5: reduced motion отключает loading/results spinner и switch tr
     ),
   ).toBe(0);
 
+  await expect.poll(() => page.evaluate(() => typeof window.__RELEASE_BOOTSTRAP__)).toBe('function');
+  await page.evaluate(() => window.__RELEASE_BOOTSTRAP__?.());
   await expect(page.getByLabel('Главный экран')).toBeVisible();
   await page.getByRole('button', { name: 'Настройки', exact: true }).click();
   const settings = page.getByRole('dialog', { name: 'Настройки' });
@@ -538,6 +539,9 @@ test('P5: reduced motion отключает loading/results spinner и switch tr
   expect(
     await resultsLoader.locator('span').evaluate((element) => getComputedStyle(element).animationName),
   ).toBe('none');
+  await expect.poll(() => page.evaluate(() => typeof window.__RELEASE_RESULTS__)).toBe('function');
+  await page.evaluate(() => window.__RELEASE_RESULTS__?.());
+  await expect(page.getByLabel('Результаты уровня 1', { exact: true })).toBeVisible();
 });
 
 test('P5: Home, Game и Results не переполняют 320px/430px и показывают нижние действия', async ({
