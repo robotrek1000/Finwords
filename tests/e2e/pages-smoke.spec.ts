@@ -4,6 +4,24 @@ import { completeMandatoryTutorial, selectPath } from './campaign-helpers';
 
 declare global { interface Window { __PAGES_AUDIO__: HTMLAudioElement[] } }
 
+test.afterEach(async ({ page }, testInfo) => {
+  if (testInfo.status === testInfo.expectedStatus) return;
+  const audio = await page.evaluate(() => ({
+    visibility: document.visibilityState,
+    ogg: document.createElement('audio').canPlayType('audio/ogg; codecs=vorbis'),
+    mp3: document.createElement('audio').canPlayType('audio/mpeg'),
+    elements: (window.__PAGES_AUDIO__ ?? []).map(a => ({
+      src: a.currentSrc || a.src, paused: a.paused, time: a.currentTime,
+      readyState: a.readyState, networkState: a.networkState,
+      error: a.error ? { code: a.error.code, message: a.error.message } : null,
+    })),
+  }));
+  console.log('Native audio diagnostics:', JSON.stringify(audio));
+  await testInfo.attach('audio-diagnostics', {
+    body: JSON.stringify(audio, null, 2), contentType: 'application/json',
+  });
+});
+
 async function expectCleanDocument(page: Page) {
   await expect.poll(() => page.evaluate(() => [...document.images]
     .filter(image => !image.complete || image.naturalWidth === 0)

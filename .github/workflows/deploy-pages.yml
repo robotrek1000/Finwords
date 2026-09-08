@@ -48,11 +48,27 @@ jobs:
       - name: Install Playwright browsers
         run: npx playwright install --with-deps chromium webkit
 
-      - name: Mobile end-to-end tests
-        run: npm run test:e2e
+      - name: Start audio output for WebKit
+        run: |
+          sudo apt-get install -y pulseaudio
+          pulseaudio --start --exit-idle-time=-1
+          pactl load-module module-null-sink sink_name=finwords
+          pactl set-default-sink finwords
+          pactl info
 
       - name: Production Pages smoke test
         run: npm run test:e2e:pages
+
+      - name: Mobile end-to-end tests
+        run: npm run test:e2e
+
+      - name: Upload failed browser checks
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-failure
+          path: test-results/
+          retention-days: 7
 
       - name: Disable Jekyll
         run: touch dist/.nojekyll
